@@ -1,0 +1,19 @@
+{
+  "username": "__username__",
+  "tag": "__bnet_numbers__",
+  "email": "__email__",
+  "avatar": "__avatar_png__",
+  "last_update": "__unix_timstamp__",
+  "times_switched": "__number__",
+  "times_launched": "__number__",
+  "rank_histories": {
+    "tank": {},
+    "damage": {},
+    "support": {},
+    "highest": {
+      "tank": {"rating": "__sr__", "date": "__unix_timestamp__"},
+      "damage": {"rating": "__sr__", "date": "__unix_timestamp__"},
+      "support": {"rating": "__sr__", "date": "__unix_timestamp__"}
+    }
+  }
+}

@@ -23,5 +23,8 @@
   "homepage": "https://github.com/imshyft/OverwatchAccountLauncher#readme",
   "devDependencies": {
     "electron": "^35.0.1"
+  },
+  "dependencies": {
+    "xmlhttprequest": "^1.8.0"
   }
 }
