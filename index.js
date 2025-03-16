@@ -35,7 +35,7 @@ async function player_file(username, tag, json) {
         let obj = {};
         if (err) {
             console.log(err);
-            if (err.errno == -4058) {
+            if (err.errno === -4058) {
                 obj = {
                     "username": username,
                     "tag": tag,
