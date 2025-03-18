@@ -64,7 +64,7 @@ public partial class App : Application
         // Services
         services.AddSingleton<INavigationService, NavigationService>();
 
-        services.AddSingleton<ISampleDataService, SampleDataService>();
+        services.AddSingleton<IProfileDataService, ProfileDataService>();
 
         // Views
         services.AddTransient<IShellWindow, ShellWindow>();

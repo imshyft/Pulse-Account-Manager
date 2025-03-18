@@ -5,9 +5,9 @@ using Studio.Core.Models;
 
 namespace Studio.Core.Contracts.Services
 {
-    public interface ISampleDataService
+    public interface IProfileDataService
     {
-        IEnumerable<ProfileData> GetFavouriteProfiles();
-        IEnumerable<ProfileData> GetUserProfiles();
+        IEnumerable<UserData> GetFavouriteProfiles();
+        IEnumerable<UserData> GetUserProfiles();
     }
 }

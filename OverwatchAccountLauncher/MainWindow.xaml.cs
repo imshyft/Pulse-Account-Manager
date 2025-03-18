@@ -25,7 +25,7 @@ namespace OverwatchAccountLauncher
                 // do something with them
             }
 
-            if (AccountSwitcher.UserAccounts.First() != null)
+            if (AccountSwitcher.UserAccounts.Count > 0)
             {
                 ButtonOne.Content = "Load " + AccountSwitcher.UserAccounts[0].CustomID;
             }
@@ -37,10 +37,10 @@ namespace OverwatchAccountLauncher
         {
             // AccountHandler.CreateAccount("PlateOfSuki", 3588, "");
             // AccountHandler.CreateAccount("ReinDownMid", 1175, "");
-            AccountHandler.CreateAccount("FstAsFoxGirl", 1143, ""); // Friend account
-            AccountHandler.CreateAccount("FstAsFrogBoi", 1143, ""); // Friend account
+            AccountHandler.CreateAccount("FstAsFoxGirl", 1143, "pitchshyft@gmail.com"); // Friend account
+            AccountHandler.CreateAccount("FstAsFrogBoi", 1110, "thelivingspeqtor@gmail.com"); // Friend account
 
-            if (AccountSwitcher.UserAccounts.First() != null)
+            if (AccountSwitcher.UserAccounts.Count > 0)
             {
                 ButtonOne.Content = "Load " + AccountSwitcher.UserAccounts[0].CustomID;
             }
@@ -56,7 +56,7 @@ namespace OverwatchAccountLauncher
         private void Button_Click_4(object sender, RoutedEventArgs e)
         {
             AccountSwitcher.LoadAccounts();
-            UserAccount.Text = AccountSwitcher.CurrentAccount.CustomID;
+            UserAccount.Text = AccountSwitcher.CurrentAccount?.CustomID;
         }
     }
 }

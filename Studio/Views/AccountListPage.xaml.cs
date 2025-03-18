@@ -27,16 +27,16 @@ namespace Studio.Views
     /// </summary>
     public partial class AccountListPage : Page
     {
-        public ObservableCollection<ProfileData> ProfileData { get; set; } = new ObservableCollection<ProfileData>();
+        public ObservableCollection<UserData> ProfileData { get; set; } = new ObservableCollection<UserData>();
         private bool _mouseOverButton = false;
-        public AccountListPage(ISampleDataService sampleDataService)
+        public AccountListPage(IProfileDataService profileDataService)
         {
             InitializeComponent();
             
             DataContext = this;
 
 
-            foreach (var profile in sampleDataService.GetFavouriteProfiles())
+            foreach (var profile in profileDataService.GetFavouriteProfiles())
             {
                 ProfileData.Add(profile);
             }
@@ -49,7 +49,7 @@ namespace Studio.Views
         {
             if (e.AddedItems.Count > 0 && !_mouseOverButton)
             {
-                NavigationService?.Navigate(new AccountDetailsPage((e.AddedItems[0] as ProfileData)));
+                NavigationService?.Navigate(new AccountDetailsPage((e.AddedItems[0] as UserData)));
             }
 
             AccountDataGrid.SelectedItem = null;
@@ -62,7 +62,7 @@ namespace Studio.Views
                 var row = VisualTreeHelper.GetParent(source) as DataGridRow;
                 if (row != null)
                 {
-                    NavigationService?.Navigate(new AccountDetailsPage((row.DataContext as ProfileData)));
+                    NavigationService?.Navigate(new AccountDetailsPage((row.DataContext as UserData)));
                 }
             }
         }
@@ -70,8 +70,8 @@ namespace Studio.Views
 
         private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
         {
-            ProfileData profile = ((FrameworkElement)sender).DataContext as ProfileData;
-            Debug.WriteLine($"Launching Profile {profile.Account.Name}");
+            UserData profile = ((FrameworkElement)sender).DataContext as UserData;
+            Debug.WriteLine($"Launching Profile {profile.Username}");
             e.Handled = true;
         }
 

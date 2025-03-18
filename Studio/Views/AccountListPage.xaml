@@ -47,15 +47,15 @@
                     <Image Grid.Row="0" Grid.Column="2" Source="{StaticResource SupportDrawingImage}"/>
 
                     <TextBlock Grid.Column="0" Grid.Row="1" 
-                               Text="{Binding TankRankActive}" 
+                               Text="{Binding RankedCareer.Tank.CurrentRank.SkillRating}" 
                                Style="{StaticResource SubtitleTextStyle}"
                                TextAlignment="Center"/>
                     <TextBlock Grid.Column="1" Grid.Row="1" 
-                               Text="{Binding DamageRankActive}" 
+                               Text="{Binding RankedCareer.Damage.CurrentRank.SkillRating}" 
                                Style="{StaticResource SubtitleTextStyle}"
                                TextAlignment="Center"/>
                     <TextBlock Grid.Column="2" Grid.Row="1" 
-                               Text="{Binding SupportRankActive}" 
+                               Text="{Binding RankedCareer.Support.CurrentRank.SkillRating}" 
                                Style="{StaticResource SubtitleTextStyle}"
                                TextAlignment="Center"/>
                 </Grid>
@@ -84,7 +84,7 @@
                     CanUserResize="False">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Image Source="{Binding AvatarUrl}"/>
+                            <Image Source="{Binding Avatar}"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
@@ -101,10 +101,10 @@
                             <StackPanel
                                 Margin="{StaticResource SmallLeftMargin}">
                                 <TextBlock
-                                    Text="{Binding Account.Name}"
+                                    Text="{Binding Username}"
                                     Style="{StaticResource ListTitleStyle}"/>
                                 <TextBlock
-                                    Text="{Binding Account.Id}"
+                                    Text="{Binding Battletag}"
                                     Style="{StaticResource ListSubTitleStyle}"/>
                             </StackPanel>
                         </DataTemplate>
@@ -128,7 +128,7 @@
                                 <Image Source="{StaticResource TankDrawingImage}"/>
 
                                 <TextBlock Grid.Row="1"
-                                           Text="{Binding TankRankActive}" 
+                                           Text="{Binding RankedCareer.Tank.CurrentRank.SkillRating}" 
                                            Margin="{StaticResource SmallTopBottomMargin}"
                                            Style="{StaticResource SubtitleTextStyle}" 
                                            HorizontalAlignment="Center"/>
@@ -154,7 +154,7 @@
                                 <Image Source="{StaticResource DamageDrawingImage}"/>
 
                                 <TextBlock Grid.Row="1"
-                                           Text="{Binding DamageRankActive}" 
+                                           Text="{Binding RankedCareer.Damage.CurrentRank.SkillRating}" 
                                            Margin="{StaticResource SmallTopBottomMargin}"
                                            Style="{StaticResource SubtitleTextStyle}" 
                                            HorizontalAlignment="Center"/>
@@ -180,7 +180,7 @@
                                 <Image Source="{StaticResource SupportDrawingImage}"/>
 
                                 <TextBlock Grid.Row="1"
-                                           Text="{Binding SupportRankActive}" 
+                                           Text="{Binding RankedCareer.Support.CurrentRank.SkillRating}" 
                                            Margin="{StaticResource SmallTopBottomMargin}"
                                            Style="{StaticResource SubtitleTextStyle}" 
                                            HorizontalAlignment="Center"/>

@@ -29,9 +29,9 @@ namespace Studio.Views
     /// </summary>
     public partial class AccountDetailsPage : Page
     {
-        public ProfileData Profile { get; set; }
+        public UserData Profile { get; set; }
         public ISeries[] Series { get; set; }
-        public AccountDetailsPage(ProfileData profile)
+        public AccountDetailsPage(UserData profile)
         {
             InitializeComponent();
             DataContext = this;
@@ -42,9 +42,9 @@ namespace Studio.Views
             ISeries[] series =
             {
                 
-                new StackedAreaSeries<int>(Profile.TankRankHistory) {Name = "Tank", Fill = new SolidColorPaint(SKColors.LightSkyBlue)},
-                new StackedAreaSeries<int>(Profile.DamageRankHistory) {Name = "Damage", Fill = new SolidColorPaint(SKColors.IndianRed)},
-                new StackedAreaSeries<int>(Profile.SupportRankHistory) {Name = "Support", Fill = new SolidColorPaint(SKColors.MediumSeaGreen)}
+                //new StackedAreaSeries<int>(Profile.TankRankHistory) {Name = "Tank", Fill = new SolidColorPaint(SKColors.LightSkyBlue)},
+                //new StackedAreaSeries<int>(Profile.DamageRankHistory) {Name = "Damage", Fill = new SolidColorPaint(SKColors.IndianRed)},
+                //new StackedAreaSeries<int>(Profile.SupportRankHistory) {Name = "Support", Fill = new SolidColorPaint(SKColors.MediumSeaGreen)}
             };
             Series = series;
 

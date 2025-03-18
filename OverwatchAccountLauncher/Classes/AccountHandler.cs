@@ -40,7 +40,7 @@ namespace OverwatchAccountLauncher.Classes
             {
                 LoadAccount(account);
             }
-            Debug.WriteLine(UserAccounts.First());
+            Debug.WriteLine(UserAccounts.Count);
             Debug.WriteLine(FriendAccounts.Count);
         }
 

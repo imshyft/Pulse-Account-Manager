@@ -19,10 +19,10 @@
                 <Grid.ToolTip>
                     <StackPanel>
                         <TextBlock
-                            Text="{Binding Account.Name}"
+                            Text="{Binding Username}"
                             Style="{StaticResource ListTitleStyle}"/>
                         <TextBlock
-                            Text="{Binding Account.Id}"
+                            Text="{Binding Battletag}"
                             Style="{StaticResource ListSubTitleStyle}"/>
                     </StackPanel>
                 </Grid.ToolTip>
@@ -33,16 +33,16 @@
                 </Grid.ColumnDefinitions>
 
                 <Image
-                    Source="{Binding AvatarUrl}"
+                    Source="{Binding Avatar}"
                     Margin="{StaticResource XSmallLeftMargin}"/>
 
                 <StackPanel Grid.Column="1"
                             Margin="{StaticResource MediumLeftMargin}">
                     <TextBlock
-                        Text="{Binding Account.Name}"
+                        Text="{Binding Username}"
                         Style="{StaticResource ListTitleStyle}"/>
                     <TextBlock
-                        Text="{Binding Account.Id}"
+                        Text="{Binding Battletag}"
                         Style="{StaticResource ListSubTitleStyle}"/>
                 </StackPanel>
 
@@ -63,9 +63,18 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Grid.Resources>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="40"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
 
-        </Grid.Resources>
+            <ui:Button 
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch">
+                <ui:SymbolIcon Symbol="Add48"/>
+            </ui:Button>
+        </Grid>
 
         <Button 
             Width="40" 

@@ -26,7 +26,7 @@
                     <ColumnDefinition Width="*" MinWidth="200"/>
                     <ColumnDefinition Width="5*"/>
                 </Grid.ColumnDefinitions>
-                <Image Source="{Binding Profile.AvatarUrl}"></Image>
+                <Image Source="{Binding Profile.Avatar}"></Image>
                 <Grid
                     Grid.Column="1"
                     MinWidth="100">
@@ -35,12 +35,12 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
                     <TextBlock
-                        Text="{Binding Profile.Account.Name}"
+                        Text="{Binding Profile.Username}"
                         Style="{StaticResource PageTitleStyle}"
                         FontSize="70"></TextBlock>
                     <TextBlock
                         Grid.Row="1"
-                        Text="{Binding Profile.Account.Id}"
+                        Text="{Binding Profile.Battletag}"
                         Style="{StaticResource SubtitleTextStyle}"
                         FontSize="30"></TextBlock>
                 </Grid>
@@ -67,15 +67,15 @@
                 <Image Grid.Row="0" Grid.Column="2" Source="{StaticResource SupportDrawingImage}"/>
 
                 <TextBlock Grid.Column="0" Grid.Row="1" 
-                           Text="{Binding Profile.TankRankActive}" 
+                           Text="{Binding Profile.RankedCareer.Tank.CurrentRank.SkillRating}" 
                            Style="{StaticResource SubtitleTextStyle}"
                            TextAlignment="Center"/>
                 <TextBlock Grid.Column="1" Grid.Row="1" 
-                           Text="{Binding Profile.DamageRankActive}" 
+                           Text="{Binding Profile.RankedCareer.Damage.CurrentRank.SkillRating}" 
                            Style="{StaticResource SubtitleTextStyle}"
                            TextAlignment="Center"/>
                 <TextBlock Grid.Column="2" Grid.Row="1" 
-                           Text="{Binding Profile.SupportRankActive}" 
+                           Text="{Binding Profile.RankedCareer.Tank.CurrentRank.SkillRating}" 
                            Style="{StaticResource SubtitleTextStyle}"
                            TextAlignment="Center"/>
             </Grid>

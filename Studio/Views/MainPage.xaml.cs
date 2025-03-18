@@ -18,24 +18,24 @@ namespace Studio.Views;
 public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
 {
 
-    public ObservableCollection<ProfileData> Profiles { get; set; } = new ObservableCollection<ProfileData>();
-    public ObservableCollection<ProfileData> FilteredProfiles { get; set; } = new();
-    public string[] s { get; set; } = { "User1", "User2", "User3" };
+    public ObservableCollection<UserData> Profiles { get; set; } = new ObservableCollection<UserData>();
+    public ObservableCollection<UserData> FilteredProfiles { get; set; } = new();
 
-    private ISampleDataService _sampleDataService;
+
+    private IProfileDataService _profileDataService;
     private bool isFavouritesPanelCollapsed { get; set; } = false;
 
     public MainPage()
     {
         InitializeComponent();
         DataContext = this;
-        _sampleDataService = ((App)Application.Current).GetService<ISampleDataService>(); ;
+        _profileDataService = ((App)Application.Current).GetService<IProfileDataService>(); ;
         OpenAccountList();
 
         PreviewMouseDown += OnPreviewMouseDown;
 
         Profiles.Clear();
-        foreach (var profile in _sampleDataService.GetFavouriteProfiles())
+        foreach (var profile in _profileDataService.GetFavouriteProfiles())
         {
             Profiles.Add(profile);
             FilteredProfiles.Add(profile);
@@ -72,7 +72,7 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
     }
 
 
-    public void OpenDetailsPage(ProfileData profile)
+    public void OpenDetailsPage(UserData profile)
     {
         mainContentFrame.NavigationService.Navigate(new AccountDetailsPage(profile));
 
@@ -80,7 +80,7 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
     private void OpenAccountList()
     {
         FavouritesList.SelectedItem = null;
-        mainContentFrame.NavigationService.Navigate(new AccountListPage(_sampleDataService));
+        mainContentFrame.NavigationService.Navigate(new AccountListPage(_profileDataService));
     }
 
     protected void OnPreviewMouseDown(object sender, MouseButtonEventArgs e)
@@ -103,7 +103,7 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
     {
         if (e.AddedItems.Count > 0)
         {
-            OpenDetailsPage(e.AddedItems[0] as ProfileData);
+            OpenDetailsPage(e.AddedItems[0] as UserData);
         }
 
     }
@@ -118,7 +118,7 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
     {
         //https://learn.microsoft.com/en-us/windows/apps/design/controls/listview-filtering
         string text = (sender as TextBox).Text;
-        var filtered = Profiles.Where(p => p.Account.Name.Contains(text, StringComparison.CurrentCultureIgnoreCase));
+        var filtered = Profiles.Where(p => p.Username.Contains(text, StringComparison.CurrentCultureIgnoreCase));
 
         for (int i = FilteredProfiles.Count - 1; i >= 0; i--)
         {
