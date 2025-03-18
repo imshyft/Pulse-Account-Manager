@@ -14,6 +14,8 @@ namespace Studio.Views;
 
 public partial class ShellWindow : FluentWindow, IShellWindow, INotifyPropertyChanged
 {
+    public static ShellWindow Instance { get; private set; }
+    public ContentPresenter DialogPresenter => RootContentDialogPresenter;
     public ObservableCollection<object> MenuItems { get; private set; } = new()
     {
         new NavigationViewItem()
@@ -54,7 +56,7 @@ public partial class ShellWindow : FluentWindow, IShellWindow, INotifyPropertyCh
         _navigationService = navigationService;
         InitializeComponent();
         DataContext = this;
-        
+        Instance = this;
     }
 
     public Frame GetNavigationFrame()

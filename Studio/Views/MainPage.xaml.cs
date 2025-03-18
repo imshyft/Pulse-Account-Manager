@@ -8,9 +8,11 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using Studio.Contracts.Views;
+using Studio.Controls;
 using Studio.Core.Contracts.Services;
 using Studio.Core.Models;
 using Studio.Services;
+using Wpf.Ui.Controls;
 using TextBox = Wpf.Ui.Controls.TextBox;
 
 namespace Studio.Views;
@@ -31,7 +33,7 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
         DataContext = this;
         _profileDataService = ((App)Application.Current).GetService<IProfileDataService>(); ;
         OpenAccountList();
-
+        
         PreviewMouseDown += OnPreviewMouseDown;
 
         Profiles.Clear();
@@ -163,5 +165,31 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
 
         isFavouritesPanelCollapsed = !isFavouritesPanelCollapsed;
         
+    }
+
+    private async void OnAddUserProfileButtonClick(object sender, RoutedEventArgs e)
+    {
+        if (ShellWindow.Instance == null)
+            return;
+
+        ContentPresenter dialogPresenter = ShellWindow.Instance.DialogPresenter;
+        if (dialogPresenter == null)
+            return;
+
+        var content = (StackPanel)FindResource("DialogContent");
+        var textBox = content.Children.OfType<TextBox>().FirstOrDefault();
+
+        
+
+
+        var dialog = new AddAccountPrompt(dialogPresenter);
+        
+
+        // Show the dialog and wait for user input
+        var result = await dialog.ShowAsync();
+        if (result == ContentDialogResult.Primary)
+        {
+
+        }
     }
 }

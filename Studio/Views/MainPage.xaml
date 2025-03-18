@@ -49,11 +49,19 @@
 
             </Grid>
         </DataTemplate>
+        <StackPanel x:Key="DialogContent">
+            <ui:TextBlock
+                Text="This will sign you out of Battle.net, where you can log in with a new account. Once you have logged in, press Continue"/>
+            <ui:TextBox
+                PlaceholderText="Enter Battletag..."/>
+        </StackPanel>
+
     </Page.Resources>
 
     <Grid
         Grid.Row="1"
         Margin="{StaticResource XSmallLeftRightMargin}">
+
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition x:Name="FavouritesColumn" Width="250"/>
@@ -63,6 +71,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
+
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="40"/>
@@ -71,7 +80,8 @@
 
             <ui:Button 
                 HorizontalAlignment="Stretch"
-                VerticalAlignment="Stretch">
+                VerticalAlignment="Stretch"
+                Click="OnAddUserProfileButtonClick">
                 <ui:SymbolIcon Symbol="Add48"/>
             </ui:Button>
         </Grid>

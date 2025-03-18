@@ -7,7 +7,7 @@ using Studio.Core.Models;
 
 namespace Studio.Core.Services
 {
-    public class ProfileDataService : IProfileDataService
+    public class SampleProfileDataService : IProfileDataService
     {
         private readonly Random _rnd = new(1);
 

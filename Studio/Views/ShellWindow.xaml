@@ -23,6 +23,9 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
+
+
+
         <ui:TitleBar
             x:Name="TitleBar"
             Title="TITLE"
@@ -47,6 +50,9 @@
                     Focusable="False" />
             </ui:NavigationView.ContentOverlay>
         </ui:NavigationView>
-
+        <ContentPresenter 
+            Grid.Row="0"
+            x:Name="RootContentDialogPresenter"
+            Grid.RowSpan="2"/>
     </Grid>
 </ui:FluentWindow>
