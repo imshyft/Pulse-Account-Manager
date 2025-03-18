@@ -41,21 +41,13 @@ namespace OverwatchAccountLauncher.Classes
         {
 
             ApiResponse response = Api.ApiRequest($"{username}-{tag}").Result;
-            if (response == null)
-            {
-                return null;
-            }
-
             UserData userData = new UserData();
 
             userData.CustomID = $"{username}#{tag}";
             userData.Username = username;
-            Debug.WriteLine(userData.Username);
             userData.Tag = tag;
             userData.Email = email;
 
-            userData.Last_update = response.last_updated_at;
-            userData.Avatar = response.avatar;
             userData.Times_launched = 0;
             userData.Times_switched = 0;
 
@@ -75,6 +67,14 @@ namespace OverwatchAccountLauncher.Classes
             userData.Rank_history.Highest.Damage.Date = 0;
             userData.Rank_history.Highest.Support.Rating = 0;
             userData.Rank_history.Highest.Support.Date = 0;
+
+            if (response == null)
+            {
+                return userData;
+            }
+
+            userData.Last_update = response.last_updated_at;
+            userData.Avatar = response.avatar;
 
             if (response.competitive.pc.tank != null)
             {

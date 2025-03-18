@@ -24,42 +24,33 @@ namespace OverwatchAccountLauncher
             {
                 // do something with them
             }
-            UserAccount.Text = AccountSwitcher.CurrentAccount.CustomID;
-            ButtonOne.Content = "Load " + AccountSwitcher.UserAccounts[0].CustomID;
-            ButtonTwo.Content = "Load " + AccountSwitcher.UserAccounts[1].CustomID;
+
+            if (AccountSwitcher.UserAccounts.First() != null)
+            {
+                ButtonOne.Content = "Load " + AccountSwitcher.UserAccounts[0].CustomID;
+            }
         }
 
 
         // Create New User And Save Data To File
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            // AccountHandler.CreateAccount("PlateOfSuki", 3588, "reinlover2382@gmail.com");
-            // AccountHandler.CreateAccount("ReinDownMid", 1175, "bowlofloki@gmail.com");
+            // AccountHandler.CreateAccount("PlateOfSuki", 3588, "");
+            // AccountHandler.CreateAccount("ReinDownMid", 1175, "");
             AccountHandler.CreateAccount("FstAsFoxGirl", 1143, ""); // Friend account
+            AccountHandler.CreateAccount("FstAsFrogBoi", 1143, ""); // Friend account
 
-            AccountSwitcher.LoadAccount("ReinDownMid", 1175);
-            UserAccount.Text = AccountSwitcher.CurrentAccount.CustomID;
+            if (AccountSwitcher.UserAccounts.First() != null)
+            {
+                ButtonOne.Content = "Load " + AccountSwitcher.UserAccounts[0].CustomID;
+            }
         }
 
 
-        // Load ReinDownMid Data From File
+        // Switch First Account
         private void Button_Click_2(object sender, RoutedEventArgs e)
         {
-            AccountSwitcher.LoadAccount("ReinDownMid", 1175);
-            UserAccount.Text = AccountSwitcher.CurrentAccount.CustomID;
-        }
-
-        // Load PlateOfSuki Data From File
-        private void Button_Click_3(object sender, RoutedEventArgs e)
-        {
-            AccountSwitcher.LoadAccount("PlateOfSuki", 3588);
-            UserAccount.Text = AccountSwitcher.CurrentAccount.CustomID;
-        }
-
-        // Swap To Account
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            Boolean swap = AccountSwitcher.SwapToBattlenetAccount();
+            AccountSwitcher.SwapToBattlenetAccount(AccountSwitcher.UserAccounts.First());
         }
 
         private void Button_Click_4(object sender, RoutedEventArgs e)

@@ -8,9 +8,7 @@
         Title="MainWindow" Height="450" Width="800">
     <Grid>
         <Button Content="Create User Files" HorizontalAlignment="Left" Height="97" Margin="48,88,0,0" VerticalAlignment="Top" Width="194" Click="Button_Click_1"/>
-        <Button x:Name="ButtonOne" Content="Load ReinDownMid" HorizontalAlignment="Left" Height="97" Margin="490,93,0,0" VerticalAlignment="Top" Width="207" Click="Button_Click_2"/>
-        <Button Content="Swap Account" HorizontalAlignment="Left" Height="97" Margin="271,313,0,0" VerticalAlignment="Top" Width="247" Click="Button_Click"/>
-        <Button x:Name="ButtonTwo" Content="Load PlateOfSuki" HorizontalAlignment="Left" Height="97" Margin="490,203,0,0" VerticalAlignment="Top" Width="207" Click="Button_Click_3"/>
+        <Button x:Name="ButtonOne" Content="No Account" HorizontalAlignment="Left" Height="97" Margin="501,150,0,0" VerticalAlignment="Top" Width="207" Click="Button_Click_2"/>
         <TextBlock x:Name="UserAccount" HorizontalAlignment="Left" Height="21" Margin="225,47,0,0" TextWrapping="Wrap" Text="No User" VerticalAlignment="Top" Width="58"/>
         <Button Content="Load User Profiles" HorizontalAlignment="Left" Height="97" Margin="48,203,0,0" VerticalAlignment="Top" Width="194" Click="Button_Click_4"/>
     </Grid>

@@ -20,6 +20,18 @@ namespace OverwatchAccountLauncher.Classes
         public List<UserData> FriendAccounts = new List<UserData>();
         public UserData? CurrentAccount;
 
+        public AccountHandler()
+        {
+            if (!Directory.Exists(_filepath))
+            {
+                System.IO.Directory.CreateDirectory(_filepath);
+                System.IO.Directory.CreateDirectory($"{_filepath}\\accounts");
+            }
+            if (!Directory.Exists($"{_filepath}\\accounts"))
+            {
+                System.IO.Directory.CreateDirectory($"{_filepath}\\accounts");
+            }
+        }
 
         public void LoadAccounts()
         {
@@ -60,8 +72,12 @@ namespace OverwatchAccountLauncher.Classes
 
         public Boolean SwapToBattlenetAccount(UserData account)
         {
-            CurrentAccount = account;
-            return SwapToBattlenetAccount();
+            if (account != null)
+            {
+                CurrentAccount = account;
+                return SwapToBattlenetAccount();
+            }
+            return false;
         }
 
         public Boolean SwapToBattlenetAccount()
