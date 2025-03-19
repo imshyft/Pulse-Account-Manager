@@ -1,25 +1,37 @@
 ﻿using Microsoft.Extensions.Hosting;
-
 using Studio.Contracts.Activation;
 using Studio.Contracts.Services;
 using Studio.Contracts.Views;
+using Studio.Services.Storage;
 using Studio.Views;
 
-namespace Studio.Services;
+namespace Studio.Services.ApplicationServices;
 
 public class ApplicationHostService : IHostedService
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly INavigationService _navigationService;
+    private readonly UserProfileDataService _userProfileDataService;
+    private readonly FavouriteProfileDataService _favouriteProfileDataService;
+    private readonly ConfigStorageService _persistAndRestoreService;
     private readonly IEnumerable<IActivationHandler> _activationHandlers;
     private IShellWindow _shellWindow;
     private bool _isInitialized;
 
-    public ApplicationHostService(IServiceProvider serviceProvider, IEnumerable<IActivationHandler> activationHandlers, INavigationService navigationService)
+    public ApplicationHostService(IServiceProvider serviceProvider, 
+        IEnumerable<IActivationHandler> activationHandlers, 
+        INavigationService navigationService, 
+        ConfigStorageService persistAndRestoreService,
+        UserProfileDataService userProfileDataService,
+        FavouriteProfileDataService favouriteProfileDataService)
     {
         _serviceProvider = serviceProvider;
         _activationHandlers = activationHandlers;
         _navigationService = navigationService;
+        _persistAndRestoreService = persistAndRestoreService;
+
+        _userProfileDataService = userProfileDataService;
+        _favouriteProfileDataService = favouriteProfileDataService;
     }
 
     public async Task StartAsync(CancellationToken cancellationToken)
@@ -36,6 +48,7 @@ public class ApplicationHostService : IHostedService
 
     public async Task StopAsync(CancellationToken cancellationToken)
     {
+        _persistAndRestoreService.PersistData();
         await Task.CompletedTask;
     }
 
@@ -43,6 +56,9 @@ public class ApplicationHostService : IHostedService
     {
         if (!_isInitialized)
         {
+            _persistAndRestoreService.RestoreData();
+            _userProfileDataService.LoadProfilesFromDisk();
+            _favouriteProfileDataService.LoadProfilesFromDisk();
             await Task.CompletedTask;
         }
     }
@@ -66,7 +82,7 @@ public class ApplicationHostService : IHostedService
 
         await Task.CompletedTask;
 
-        if (App.Current.Windows.OfType<IShellWindow>().Count() == 0)
+        if (System.Windows.Application.Current.Windows.OfType<IShellWindow>().Count() == 0)
         {
             // Default activation that navigates to the apps default page
             _shellWindow = _serviceProvider.GetService(typeof(IShellWindow)) as IShellWindow;

@@ -20,6 +20,7 @@ namespace Studio.Views
     /// </summary>
     public partial class SettingsPage : Page
     {
+        // TODO : Add Settings Config
         public SettingsPage()
         {
             InitializeComponent();

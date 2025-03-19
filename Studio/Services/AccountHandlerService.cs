@@ -1,16 +1,17 @@
-﻿using System;using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Windows.Documents;
 using Windows.System;
-using OverwatchAccountLauncher.Classes;
-using Studio.Core.Contracts.Services;
-using Studio.Core.Models;
 using System.Diagnostics;
 using System.Xml.Linq;
+using Studio.Helpers;
+using Studio.Models;
 
-namespace Studio.Core.Services
+namespace Studio.Services
 {
+    // TODO : migrate to a fileservice
     public class AccountHandlerService
     {
         public string FilePath { get; set; }

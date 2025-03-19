@@ -14,9 +14,10 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Studio.Contracts.Services;
 using Studio.Contracts.Views;
-using Studio.Core.Contracts.Services;
-using Studio.Core.Models;
+using Studio.Models;
+using Studio.Services.Storage;
 using Wpf.Ui.Controls;
 using Button = System.Windows.Controls.Button;
 
@@ -27,19 +28,18 @@ namespace Studio.Views
     /// </summary>
     public partial class AccountListPage : Page
     {
-        public ObservableCollection<UserData> ProfileData { get; set; } = new ObservableCollection<UserData>();
+
+        public UserProfileDataService UserProfiles {get; set; }
+
         private bool _mouseOverButton = false;
-        public AccountListPage(IProfileDataService profileDataService)
+
+        public AccountListPage()
         {
             InitializeComponent();
             
             DataContext = this;
 
-
-            foreach (var profile in profileDataService.GetFavouriteProfiles())
-            {
-                ProfileData.Add(profile);
-            }
+            UserProfiles = ((App)Application.Current).GetService<UserProfileDataService>();
 
             AccountDataGrid.SelectedItem = null;
         }
@@ -71,7 +71,7 @@ namespace Studio.Views
         private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
         {
             UserData profile = ((FrameworkElement)sender).DataContext as UserData;
-            Debug.WriteLine($"Launching Profile {profile.Username}");
+            Debug.WriteLine($"Launching Profile {profile.Battletag}");
             e.Handled = true;
         }
 

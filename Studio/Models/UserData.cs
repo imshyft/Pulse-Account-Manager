@@ -1,57 +1,80 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Studio.Core.Models
+﻿namespace Studio.Models
 {
+
+    #region Profile
+
     public class UserData
     {
-        public string CustomID { get; set; }
+        public Battletag Battletag { get; set; }
+        public string BattletagString => Battletag?.ToString();
+        public string CustomId { get; set; }
         public string Username { get; set; }
         public string Tag { get; set; }
-        public string Battletag => $"{Username}#{Tag}";
         public string Email { get; set; }
         public string Avatar { get; set; }
-        public int Last_update { get; set; }
-        public int Times_switched { get; set; }
-        public int Times_launched { get; set; }
-        public RankHistory Rank_history { get; set; }
+        public int LastUpdate { get; set; }
+        public int TimesSwitched { get; set; }
+        public int TimesLaunched { get; set; }
 
         public RankedCareer RankedCareer { get; set; }
 
-
     }
 
-    public class RankHistory
+    public class Battletag
     {
-        public Dictionary<int, int> Tank { get; set; }
-        public Dictionary<int, int> Damage { get; set; }
-        public Dictionary<int, int> Support { get; set; }
-        public _HighestRoles Highest { get; set; }
-        public _CurrentRoles Current { get; set; }
+        public string Username { get; set; }
+        public string Tag { get; set; }
 
+        public Battletag(string username, string tag)
+        {
+            Username = username;
+            Tag = tag;
+        }
+        public Battletag(string battletag)
+        {
+            string[] parts = battletag.Split('#');
+            Username = parts[0];
+            Tag = parts[1];
+        }
+
+
+        public override string ToString()
+        {
+            return $"{Username}#{Tag}";
+        }
     }
 
-    public class _CurrentRoles
+    #endregion
+
+    #region Statistics
+
+    public class Statistic
     {
-        public int Tank { get; set; }
-        public int Damage { get; set; }
-        public int Support { get; set; }
-    }
+        public StatisticType Name { get; set; }
+        public double Value { get; set; }
+        public double ValuePer10 { get; set; }
+        public double ScaledValuePer10 { get; set; }
 
-    public class _HighestRoles
+        public void ScaleToRole(Role role) =>
+            ScaledValuePer10 = role.Scalars[StatisticType.Assists] * ValuePer10;
+
+    }
+    public class StatCollection
     {
-        public _Role Tank { get; set; }
-        public _Role Damage { get; set; }
-        public _Role Support { get; set; }
-    }
 
-    public class _Role
-    {
-        public int Rating { get; set; }
-        public int Date { get; set; }
-    }
+        public Dictionary<StatisticType, Statistic> Stats;
+        public void ScaleToRole(Role role)
+        {
+            foreach (var stat in Stats)
+            {
+                stat.Value.ScaleToRole(role);
+            }
+        }
 
+    }
+    #endregion
+
+    #region Roles
     public class RankedCareer
     {
         public Tank Tank { get; set; }
@@ -65,6 +88,46 @@ namespace Studio.Core.Models
         public abstract List<RankMoment> RankMoments { get; set; }
         public abstract RankMoment PeakRank { get; set; }
         public abstract Rank CurrentRank { get; set; }
+
+        public abstract StatCollection StatCollection { get; set; }
+        public static Dictionary<StatisticType, float> StatScalars { get; set; }
+
+        public Dictionary<StatisticType, float> Scalars => ScalarCollection[Type];
+
+        public static Dictionary<Roles, Dictionary<StatisticType, float>> ScalarCollection = new()
+        {
+            { Roles.Tank, new Dictionary<StatisticType, float>
+                {
+                    { StatisticType.Damage, 0.002f },
+                    { StatisticType.Assists, 0.004f },
+                    { StatisticType.FinalBlows, 1.0f },
+                    { StatisticType.TimePlayed, 1.0f },
+                    { StatisticType.Healing, 1.0f },
+                    { StatisticType.Deaths, 1.0f }
+                }
+            },
+            { Roles.Damage, new Dictionary<StatisticType, float>
+                {
+                    { StatisticType.Damage, 0.004f },
+                    { StatisticType.Assists, 0.004f },
+                    { StatisticType.FinalBlows, 1.0f },
+                    { StatisticType.TimePlayed, 1.0f },
+                    { StatisticType.Healing, 0.00167f },
+                    { StatisticType.Deaths, 1.0f }
+                }
+            },
+            { Roles.Support, new Dictionary<StatisticType, float>
+                {
+                    { StatisticType.Damage, 0.002f },
+                    { StatisticType.Assists, 0.004f },
+                    { StatisticType.FinalBlows, 1.0f },
+                    { StatisticType.TimePlayed, 1.0f },
+                    { StatisticType.Healing, 0.00333f },
+                    { StatisticType.Deaths, 1.0f }
+                }
+            },
+        };
+
     }
 
     public class Tank : Role
@@ -73,6 +136,9 @@ namespace Studio.Core.Models
         public override List<RankMoment> RankMoments { get; set; }
         public override RankMoment PeakRank { get; set; }
         public override Rank CurrentRank { get; set; }
+        public override StatCollection StatCollection { get; set; }
+
+
     }
 
     public class Support : Role
@@ -81,6 +147,7 @@ namespace Studio.Core.Models
         public override List<RankMoment> RankMoments { get; set; }
         public override RankMoment PeakRank { get; set; }
         public override Rank CurrentRank { get; set; }
+        public override StatCollection StatCollection { get; set; }
     }
 
     public class Damage : Role
@@ -89,10 +156,12 @@ namespace Studio.Core.Models
         public override List<RankMoment> RankMoments { get; set; }
         public override RankMoment PeakRank { get; set; }
         public override Rank CurrentRank { get; set; }
+        public override StatCollection StatCollection { get; set; }
     }
 
+    #endregion
 
-
+    #region Ranks
     public class RankMoment
     {
         public Rank Rank { get; set; }
@@ -150,7 +219,7 @@ namespace Studio.Core.Models
 
         public static Rank RankFromDivision(string divisionString, int tier)
         {
-            if (!Enum.TryParse(divisionString, out Division division))
+            if (!Enum.TryParse(divisionString, true, out Division division))
                 throw new ArgumentException("Division was not an accepted string");
 
             if (tier < 1 || tier > 5)
@@ -169,6 +238,7 @@ namespace Studio.Core.Models
             };
         }
     }
+    #endregion
 
     public enum Roles
     {
@@ -187,5 +257,15 @@ namespace Studio.Core.Models
         Master = 3500,
         Grandmaster = 4000,
         Champion = 4500
+    }
+
+    public enum StatisticType
+    {
+        Damage,
+        Assists,
+        Deaths,
+        TimePlayed,
+        FinalBlows,
+        Healing
     }
 }

@@ -29,11 +29,7 @@
                 <ui:ThemesDictionary Theme="Dark" />
                 <!--<ResourceDictionary Source="pack://application:,,,/Wpf.Ui;component/Resources/Theme/Dark.xaml" />-->
                 <ui:ControlsDictionary />
-
-                <ResourceDictionary Source="/Styles/UiTheme.xaml"/>
-                <ResourceDictionary>
-
-                </ResourceDictionary>
+                <!--<ResourceDictionary Source="/Styles/UiTheme.xaml"/>-->
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

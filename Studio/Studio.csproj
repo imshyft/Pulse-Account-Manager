@@ -10,9 +10,80 @@
   </PropertyGroup>
   
   <ItemGroup>
+    <None Remove="Resources\PatchNotesWebView\index.html" />
+    <None Remove="Resources\PatchNotesWebView\script.js" />
+    <None Remove="Resources\PatchNotesWebView\styles.css" />
+    <None Remove="Resources\PlaceholderPlayerIcon.png" />
+    <None Remove="Resources\RankIcons\Divisions\Bronze.png" />
+    <None Remove="Resources\RankIcons\Divisions\Diamond.png" />
+    <None Remove="Resources\RankIcons\Divisions\Gold.png" />
+    <None Remove="Resources\RankIcons\Divisions\Grandmaster.png" />
+    <None Remove="Resources\RankIcons\Divisions\Master.png" />
+    <None Remove="Resources\RankIcons\Divisions\Platinum.png" />
+    <None Remove="Resources\RankIcons\Divisions\Silver.png" />
+    <None Remove="Resources\RankIcons\Tiers\1.png" />
+    <None Remove="Resources\RankIcons\Tiers\2.png" />
+    <None Remove="Resources\RankIcons\Tiers\3.png" />
+    <None Remove="Resources\RankIcons\Tiers\4.png" />
+    <None Remove="Resources\RankIcons\Tiers\5.png" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Content Include="Resources\PatchNotesWebView\index.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\PatchNotesWebView\script.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\PatchNotesWebView\styles.css">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Resource Include="Resources\PlaceholderPlayerIcon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\RankIcons\Divisions\Bronze.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\RankIcons\Divisions\Diamond.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\RankIcons\Divisions\Gold.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\RankIcons\Divisions\Grandmaster.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\RankIcons\Divisions\Master.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\RankIcons\Divisions\Platinum.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\RankIcons\Divisions\Silver.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\RankIcons\Tiers\1.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\RankIcons\Tiers\2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\RankIcons\Tiers\3.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\RankIcons\Tiers\4.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\RankIcons\Tiers\5.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+  
+  <ItemGroup>
     <PackageReference Include="LiveChartsCore.SkiaSharpView.WPF" Version="2.0.0-rc5.4" />
     <PackageReference Include="MahApps.Metro" Version="2.4.9" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3171-prerelease" />
     <PackageReference Include="WPF-UI" Version="4.0.2" />
   </ItemGroup>
   

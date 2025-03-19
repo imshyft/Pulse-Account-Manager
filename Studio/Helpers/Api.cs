@@ -9,8 +9,11 @@ using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Studio.Helpers;
+using Studio.Models;
 
-namespace OverwatchAccountLauncher.Classes
+namespace Studio.Helpers
 {
     class Api
     {
@@ -29,13 +32,46 @@ namespace OverwatchAccountLauncher.Classes
                 }
                 return null;
             }
-        } 
+        }
+
+        public async static Task<dynamic> GetAccountStats(string accountid)
+        {
+            using (var client = new HttpClient(new HttpClientHandler { AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate }))
+            {
+                Debug.WriteLine($"https://overfast-api.tekrop.fr/players/%7Baccountid%7D/stats/summary?gamemode=competitive");
+                client.BaseAddress = new Uri($"https://overfast-api.tekrop.fr/players/%7Baccountid%7D/stats/summary?gamemode=competitive");
+                HttpResponseMessage response = client.GetAsync("").Result;
+                if (response.IsSuccessStatusCode)
+                {
+                    string result = response.Content.ReadAsStringAsync().Result;
+                    dynamic json_response = JsonConvert.DeserializeObject<dynamic>(result);
+                    return json_response.roles;
+                }
+                return null;
+            }
+        }
+
     }
 
     // Overfast Api Response
 
+
+    public class ProfileFetchResult
+    {
+        public UserData Profile { get; set; }
+        public string Error { get; set; }
+    }
+
+    public enum ProfileFetchOutcome
+    {
+        Success,
+        NotFound,
+        Failure
+    }
+
     public class ApiResponse
     {
+        public string Error { get; set; } = "";
         public string username { get; set; }
         public string avatar { get; set; }
         public string namecard { get; set; }

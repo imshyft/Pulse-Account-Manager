@@ -8,10 +8,12 @@ using MahApps.Metro.Controls;
 
 using Studio.Contracts.Services;
 using Studio.Contracts.Views;
+using Studio.Services.Storage;
 using Wpf.Ui.Controls;
 
 namespace Studio.Views;
 
+// TODO : Add the Template Studio Theming package, and try to make it change wpf-ui theme
 public partial class ShellWindow : FluentWindow, IShellWindow, INotifyPropertyChanged
 {
     public static ShellWindow Instance { get; private set; }
@@ -26,9 +28,9 @@ public partial class ShellWindow : FluentWindow, IShellWindow, INotifyPropertyCh
         },
         new NavigationViewItem()
         {
-            Content = "Data",
+            Content = "Patch",
             Icon = new SymbolIcon { Symbol = SymbolRegular.DataHistogram24 },
-            TargetPageType = typeof(SettingsPage)
+            TargetPageType = typeof(PatchNotesPage)
         }
     };
 
@@ -51,7 +53,7 @@ public partial class ShellWindow : FluentWindow, IShellWindow, INotifyPropertyCh
         set { Set(ref _canGoBack, value); }
     }
 
-    public ShellWindow(INavigationService navigationService)
+    public ShellWindow(INavigationService navigationService, UserProfileDataService profileDataService)
     {
         _navigationService = navigationService;
         InitializeComponent();

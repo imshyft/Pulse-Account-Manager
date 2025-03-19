@@ -4,6 +4,7 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:Studio.Views"
+      xmlns:controls="clr-namespace:Studio.Controls"
       xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
@@ -17,8 +18,8 @@
             <RowDefinition Height="6*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="3*" MinWidth="400"/>
-            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="2*" MinWidth="400"/>
+            <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <Viewbox HorizontalAlignment="Left">
             <Grid>
@@ -26,7 +27,15 @@
                     <ColumnDefinition Width="*" MinWidth="200"/>
                     <ColumnDefinition Width="5*"/>
                 </Grid.ColumnDefinitions>
-                <Image Source="{Binding Profile.Avatar}"></Image>
+                <Image>
+                    <Image.Source>
+                        <Binding Path="Profile.Avatar" >
+                            <Binding.TargetNullValue>
+                                <ImageSource>/Resources/PlaceholderPlayerIcon.png</ImageSource>
+                            </Binding.TargetNullValue>
+                        </Binding>
+                    </Image.Source>
+                </Image>
                 <Grid
                     Grid.Column="1"
                     MinWidth="100">
@@ -35,19 +44,24 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
                     <TextBlock
-                        Text="{Binding Profile.Username}"
+                        Text="{Binding Profile.CustomId}"
                         Style="{StaticResource PageTitleStyle}"
                         FontSize="70"></TextBlock>
                     <TextBlock
                         Grid.Row="1"
-                        Text="{Binding Profile.Battletag}"
+                        Text="{Binding Profile.BattletagString}"
                         Style="{StaticResource SubtitleTextStyle}"
                         FontSize="30"></TextBlock>
                 </Grid>
             </Grid>
         </Viewbox>
 
-        <Viewbox            
+        <controls:MultiRankDisplay
+            Grid.Row="1"
+            Grid.Column="0"
+            x:Name="RankDisplay"/>
+        <Viewbox    
+            Visibility="Collapsed"
             Grid.Row="1"
             Grid.Column="0">
             <Grid
@@ -82,11 +96,14 @@
         </Viewbox>
 
 
+        
         <lvc:CartesianChart
             x:Name="Chart"
             Grid.Row="2"
             Grid.Column="0"
-            Series="{Binding Series}"/>
+            Series="{Binding Series}"
+            XAxes="{Binding XAxes}"
+            FindingStrategy="Automatic"/>
 
     </Grid>
 </Page>

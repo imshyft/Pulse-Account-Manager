@@ -13,27 +13,41 @@
     <Grid MaxWidth="300">
         <StackPanel>
             <ui:TextBlock
+                x:Name="InformationText"
                 TextWrapping="Wrap"
                 HorizontalAlignment="Center"
                 TextAlignment="Center"
                 Style="{StaticResource BodyTextStyle}"
                 Margin="{StaticResource SmallLeftTopRightBottomMargin}"
-                Text="This will sign you out of Battle.net, where you can log in with a new account. Once you have logged in, press Continue"/>
+                Text="Enter the Battle tag of the account you will log into. This will log you out of Battle.net, where you can log in with a new account."/>
             <ui:TextBox
                 x:Name="BattletagInputBox"
                 PlaceholderText="Enter Battletag..."
                 TextChanged="OnBattleTagInputTextChanged"/>
+            <ui:InfoBar
+                x:Name="InformationBar"
+                Margin="{StaticResource SmallTopMargin}"
+                Severity="Error"
+                Title="Invalid Battletag"
+                Message="Battletag must be written as ExampleName#1234"
+                IsOpen="False"/>
 
-            <TextBlock
-                x:Name="ErrorText"
-                HorizontalAlignment="Center"
-                VerticalAlignment="Center"
-                FontSize="16"
-                Foreground="Red"
-                TextAlignment="Center"
-                TextWrapping="Wrap"
-                Text="Battletag must be written as ExampleName#1234"
+            <ui:Button
+                x:Name="LaunchBnetButton"
+                HorizontalAlignment="Stretch"
+                Margin="{StaticResource SmallTopBottomMargin}"
+                Height="35"
+                Content="Launch Battle.net"
+                IsEnabled="{Binding IsBattleTagValid}"
+                Click="OnLaunchBattlenetButtonClick"/>
+
+            <ProgressBar
+                x:Name="LaunchingBnetProgressBar"
+                IsIndeterminate="True"
+                Margin="{StaticResource SmallLeftRightMargin}"
                 Visibility="Collapsed"/>
+
+
 
         </StackPanel>
 

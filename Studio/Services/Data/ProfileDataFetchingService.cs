@@ -1,57 +1,65 @@
-﻿using System;
+﻿using Studio.Helpers;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
+using System.Net.Http;
+using System.Net;
 using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
+using Windows.System;
+using HarfBuzzSharp;
 using Studio.Models;
+using LiveChartsCore.Kernel;
 
-namespace Studio.Helpers
+namespace Studio.Services.Data
 {
-    class JsonHandler
+    public class ProfileDataFetchingService
     {
-        private static readonly string[] _divs = { "bronze", "silver", "gold", "platinum", "diamond", "master", "grandmaster", "champion" };
-        private static readonly Dictionary<string, int> _divisions = new Dictionary<string, int> { { "bronze", 1000 }, { "silver", 1500 }, { "gold", 2000 }, { "platinum", 2500 }, { "diamond", 3000 }, { "master", 3500 }, { "grandmaster", 4000 }, { "champion", 4500 } };
-        public static ApiResponse DeserializeApiResponseJson(string json)
+        public ProfileDataFetchingService()
         {
-            return JsonSerializer.Deserialize<ApiResponse>(json)!;
+
         }
 
-        public static UserData DeserializeUserDataJson(string json)
-        {
-            return JsonSerializer.Deserialize<UserData>(json)!;
-        }
+        public static string BattletagToWebFormat(Battletag battletag) =>
+            $"{battletag.Username}-{battletag.Tag}";
 
-        public static string LoadJsonFromFile(string filepath)
+        private async Task<ApiResponse> FetchProfileFromApi(Battletag battletag)
         {
-            using (StreamReader reader = new StreamReader(filepath))
+            string accountId = BattletagToWebFormat(battletag);
+            using (var client = new HttpClient(new HttpClientHandler { AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate }))
             {
-                string json = reader.ReadToEnd();
-                return json;
+                Debug.WriteLine($"https://overfast-api.tekrop.fr/players/{accountId}/summary");
+
+                client.BaseAddress = new Uri($"https://overfast-api.tekrop.fr/players/{accountId}/summary");
+
+                HttpResponseMessage response = await client.GetAsync("");
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    return new ApiResponse()
+                    {
+                        Error = response.ReasonPhrase
+                    };
+
+                }
+
+
+                string result = response.Content.ReadAsStringAsync().Result;
+                ApiResponse jsonResponse = JsonHandler.DeserializeApiResponseJson(result);
+
+                return jsonResponse;
             }
         }
 
-        public static void WriteUserDataToFile(UserData data, string filepath)
+        public async Task<ProfileFetchResult> GetUserProfile(Battletag battletag)
         {
-            File.WriteAllText(filepath, JsonSerializer.Serialize(data));
-        }
-
-
-
-
-        //obsolete
-        public static UserData CreateUserData(string username, string tag, string? email)
-        {
-
-            ApiResponse response = Api.ApiRequest($"{username}-{tag}").Result;
-            Battletag battletag = new Battletag(username, tag);
+            ApiResponse response = await FetchProfileFromApi(battletag);
 
             UserData userData = new UserData
             {
                 Battletag = battletag,
-                CustomId = battletag?.ToString(),
+                CustomId = battletag?.Username,
                 //Username = username,
                 //Tag = tag,
 
@@ -62,13 +70,13 @@ namespace Studio.Helpers
 
             };
 
-            if (email != null)
-                userData.Email = email;
-
-
-            if (response == null)
+            if (!string.IsNullOrEmpty(response.Error))
             {
-                return userData;
+                return new ProfileFetchResult()
+                {
+                    Error = response.Error,
+                    Profile = userData
+                };
             }
 
             userData.LastUpdate = response.last_updated_at;
@@ -130,11 +138,11 @@ namespace Studio.Helpers
                     RankMoments = new List<RankMoment> { peakRankMoment }
                 };
             }
-            return userData;
+            return new ProfileFetchResult()
+            {
+                Error = "",
+                Profile = userData
+            };
         }
-
     }
-
-
-
 }

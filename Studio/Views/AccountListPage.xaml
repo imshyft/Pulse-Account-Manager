@@ -6,66 +6,14 @@
       xmlns:local="clr-namespace:Studio.Views"
       mc:Ignorable="d" 
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:properties="clr-namespace:Studio.Properties"
       d:DesignHeight="450" d:DesignWidth="800"
       Title="AccountListPage"
       KeepAlive="True">
-    <Page.Resources>
-        <DataTemplate x:Key="ProfileListItemTemplate">
-            <Grid Height="140">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="50"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="2*"/>
-                </Grid.ColumnDefinitions>
-                <Image
-                    Source="{Binding AvatarUrl}"/>
-                <StackPanel Grid.Column="1"
-                            Margin="{StaticResource SmallLeftMargin}">
-                    <TextBlock
-                        Text="{Binding Account.Name}"
-                        Style="{StaticResource ListTitleStyle}"/>
-                    <TextBlock
-                        Text="{Binding Account.Id}"
-                        Style="{StaticResource ListSubTitleStyle}"/>
-                </StackPanel>
-
-                <Grid
-                    Grid.Column="2"
-                    MinWidth="300"
-                    Margin="{StaticResource SmallLeftTopRightBottomMargin}">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="2*"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-                    <Image Source="{StaticResource TankDrawingImage}"/>
-                    <Image Grid.Row="0" Grid.Column="1" Source="{StaticResource DamageDrawingImage}"/>
-                    <Image Grid.Row="0" Grid.Column="2" Source="{StaticResource SupportDrawingImage}"/>
-
-                    <TextBlock Grid.Column="0" Grid.Row="1" 
-                               Text="{Binding RankedCareer.Tank.CurrentRank.SkillRating}" 
-                               Style="{StaticResource SubtitleTextStyle}"
-                               TextAlignment="Center"/>
-                    <TextBlock Grid.Column="1" Grid.Row="1" 
-                               Text="{Binding RankedCareer.Damage.CurrentRank.SkillRating}" 
-                               Style="{StaticResource SubtitleTextStyle}"
-                               TextAlignment="Center"/>
-                    <TextBlock Grid.Column="2" Grid.Row="1" 
-                               Text="{Binding RankedCareer.Support.CurrentRank.SkillRating}" 
-                               Style="{StaticResource SubtitleTextStyle}"
-                               TextAlignment="Center"/>
-                </Grid>
-            </Grid>
-        </DataTemplate>
-    </Page.Resources>
     <Grid>
         <ui:DataGrid
             x:Name="AccountDataGrid"
-            ItemsSource="{Binding ProfileData, Mode=OneWay}"
+            ItemsSource="{Binding UserProfiles.Profiles, Mode=OneWay}"
             AutoGenerateColumns="False"
             RowHeight="100"
             CanUserAddRows="False"
@@ -84,7 +32,16 @@
                     CanUserResize="False">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Image Source="{Binding Avatar}"/>
+                            <Image>
+                                <Image.Source>
+                                    <Binding Path="Avatar" >
+                                        <Binding.TargetNullValue>
+                                            <ImageSource>/Resources/PlaceholderPlayerIcon.png</ImageSource>
+                                        </Binding.TargetNullValue>
+                                    </Binding>
+                                </Image.Source>
+                            </Image>
+
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
@@ -95,16 +52,16 @@
                     CanUserSort="True"
                     CanUserResize="False"
                     SortDirection="Descending"
-                    SortMemberPath="Account.Name">
+                    SortMemberPath="Username">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <StackPanel
                                 Margin="{StaticResource SmallLeftMargin}">
                                 <TextBlock
-                                    Text="{Binding Username}"
+                                    Text="{Binding CustomId}"
                                     Style="{StaticResource ListTitleStyle}"/>
                                 <TextBlock
-                                    Text="{Binding Battletag}"
+                                    Text="{Binding BattletagString}"
                                     Style="{StaticResource ListSubTitleStyle}"/>
                             </StackPanel>
                         </DataTemplate>
@@ -116,7 +73,7 @@
                     MinWidth="75"
                     CanUserResize="False"
                     CanUserSort="True"
-                    SortMemberPath="TankRankActive">
+                    SortMemberPath="RankedCareer.Tank.CurrentRank.SkillRating">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Grid>
@@ -128,7 +85,7 @@
                                 <Image Source="{StaticResource TankDrawingImage}"/>
 
                                 <TextBlock Grid.Row="1"
-                                           Text="{Binding RankedCareer.Tank.CurrentRank.SkillRating}" 
+                                           Text="{Binding RankedCareer.Tank.CurrentRank.SkillRating, FallbackValue=----}" 
                                            Margin="{StaticResource SmallTopBottomMargin}"
                                            Style="{StaticResource SubtitleTextStyle}" 
                                            HorizontalAlignment="Center"/>
@@ -142,7 +99,7 @@
                     MinWidth="75"
                     CanUserResize="False"
                     CanUserSort="True"
-                    SortMemberPath="DamageRankActive">
+                    SortMemberPath="RankedCareer.Damage.CurrentRank.SkillRating">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Grid>
@@ -154,7 +111,7 @@
                                 <Image Source="{StaticResource DamageDrawingImage}"/>
 
                                 <TextBlock Grid.Row="1"
-                                           Text="{Binding RankedCareer.Damage.CurrentRank.SkillRating}" 
+                                           Text="{Binding RankedCareer.Damage.CurrentRank.SkillRating, FallbackValue=----}" 
                                            Margin="{StaticResource SmallTopBottomMargin}"
                                            Style="{StaticResource SubtitleTextStyle}" 
                                            HorizontalAlignment="Center"/>
@@ -168,7 +125,7 @@
                     MinWidth="75"
                     CanUserResize="False"
                     CanUserSort="True"
-                    SortMemberPath="SupportRankActive">
+                    SortMemberPath="RankedCareer.Support.CurrentRank.SkillRating">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Grid>
@@ -180,7 +137,7 @@
                                 <Image Source="{StaticResource SupportDrawingImage}"/>
 
                                 <TextBlock Grid.Row="1"
-                                           Text="{Binding RankedCareer.Support.CurrentRank.SkillRating}" 
+                                           Text="{Binding RankedCareer.Support.CurrentRank.SkillRating, FallbackValue=----}" 
                                            Margin="{StaticResource SmallTopBottomMargin}"
                                            Style="{StaticResource SubtitleTextStyle}" 
                                            HorizontalAlignment="Center"/>

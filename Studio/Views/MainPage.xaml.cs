@@ -7,46 +7,81 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using Studio.Contracts.Services;
 using Studio.Contracts.Views;
 using Studio.Controls;
-using Studio.Core.Contracts.Services;
-using Studio.Core.Models;
-using Studio.Services;
+using Studio.Dialogs;
+using Studio.Models;
+using Studio.Services.Data;
+using Studio.Services.Files;
+using Studio.Services.Storage;
 using Wpf.Ui.Controls;
+
 using TextBox = Wpf.Ui.Controls.TextBox;
 
 namespace Studio.Views;
 
+
 public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
 {
-
-    public ObservableCollection<UserData> Profiles { get; set; } = new ObservableCollection<UserData>();
+    // TODO : Find somewhere for button to add favourite (maybe move expand/collapse btn?)
+    // TODO : Add Escape for back navigation
+    // TODO : Add flyouts to introduce main actions (adding profiles, favourites) on first time launch
     public ObservableCollection<UserData> FilteredProfiles { get; set; } = new();
 
 
-    private IProfileDataService _profileDataService;
-    private bool isFavouritesPanelCollapsed { get; set; } = false;
+    private readonly FavouriteProfileDataService _favouriteProfiles;
+    private readonly UserProfileDataService _userProfiles;
+
+    private readonly ConfigStorageService _persistAndRestoreService;
+    private readonly PathResolverService _pathResolverService;
+    private bool IsFavouritesPanelCollapsed { get; set; } = false;
 
     public MainPage()
     {
         InitializeComponent();
         DataContext = this;
-        _profileDataService = ((App)Application.Current).GetService<IProfileDataService>(); ;
+
+        _favouriteProfiles = ((App)Application.Current).GetService<FavouriteProfileDataService>();
+        _userProfiles = ((App)Application.Current).GetService<UserProfileDataService>();
+
+        FilteredProfiles = _favouriteProfiles.Profiles;
+
+        _persistAndRestoreService = ((App)Application.Current).GetService<ConfigStorageService>();
+
         OpenAccountList();
         
         PreviewMouseDown += OnPreviewMouseDown;
 
-        Profiles.Clear();
-        foreach (var profile in _profileDataService.GetFavouriteProfiles())
-        {
-            Profiles.Add(profile);
-            FilteredProfiles.Add(profile);
-        }
 
-
+        CheckIfFirstLaunch();
     }
 
+    private async void CheckIfFirstLaunch()
+    {
+        bool isFirstLaunch = _persistAndRestoreService.GetValue("IsFirstLaunch", true);
+        if (isFirstLaunch)
+        {
+            if (ShellWindow.Instance == null)
+                return;
 
+            ContentPresenter dialogPresenter = ShellWindow.Instance.DialogPresenter;
+            if (dialogPresenter == null)
+                return;
+
+            var dialog = new FirstTimePopup(dialogPresenter);
+
+            var result = await dialog.ShowAsync();
+
+            _persistAndRestoreService.SetValue("IsFirstLaunch", false);
+            _persistAndRestoreService.PersistData();
+        }
+
+    }
+    
+
+
+    #region Property Handling
 
     public event PropertyChangedEventHandler PropertyChanged;
     private void Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
@@ -60,8 +95,9 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
         OnPropertyChanged(propertyName);
     }
     private void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    #endregion
 
-
+    #region Navigation
     public void OnNavigatedTo(object parameter)
     {
 
@@ -82,8 +118,10 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
     private void OpenAccountList()
     {
         FavouritesList.SelectedItem = null;
-        mainContentFrame.NavigationService.Navigate(new AccountListPage(_profileDataService));
+        mainContentFrame.NavigationService.Navigate(new AccountListPage());
     }
+#endregion
+
 
     protected void OnPreviewMouseDown(object sender, MouseButtonEventArgs e)
     {
@@ -115,12 +153,11 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
         OpenAccountList();
     }
 
-
     private void OnFavouritesSearchTextChanged(object sender, TextChangedEventArgs e)
     {
         //https://learn.microsoft.com/en-us/windows/apps/design/controls/listview-filtering
         string text = (sender as TextBox).Text;
-        var filtered = Profiles.Where(p => p.Username.Contains(text, StringComparison.CurrentCultureIgnoreCase));
+        var filtered = _favouriteProfiles.Profiles.Where(p => p.Battletag.Username.Contains(text, StringComparison.CurrentCultureIgnoreCase));
 
         for (int i = FilteredProfiles.Count - 1; i >= 0; i--)
         {
@@ -139,7 +176,7 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
                 FilteredProfiles.Add(item);
             }
         }
-
+        
     }
 
     private void OnFavouritesPanelButtonClick(object sender, RoutedEventArgs e)
@@ -156,14 +193,14 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
         animation.EasingFunction = ease;
         animation.Duration = duration;
         storyboard.Children.Add(animation);
-        animation.From = isFavouritesPanelCollapsed ? collapsedWidth : expandedWidth;
-        animation.To = isFavouritesPanelCollapsed ? expandedWidth : collapsedWidth;
+        animation.From = IsFavouritesPanelCollapsed ? collapsedWidth : expandedWidth;
+        animation.To = IsFavouritesPanelCollapsed ? expandedWidth : collapsedWidth;
         Storyboard.SetTarget(animation, FavouritesColumn);
         Storyboard.SetTargetProperty(animation, new PropertyPath("(ColumnDefinition.MaxWidth)"));
 
         storyboard.Begin();
 
-        isFavouritesPanelCollapsed = !isFavouritesPanelCollapsed;
+        IsFavouritesPanelCollapsed = !IsFavouritesPanelCollapsed;
         
     }
 
@@ -176,11 +213,6 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
         if (dialogPresenter == null)
             return;
 
-        var content = (StackPanel)FindResource("DialogContent");
-        var textBox = content.Children.OfType<TextBox>().FirstOrDefault();
-
-        
-
 
         var dialog = new AddAccountPrompt(dialogPresenter);
         
@@ -189,7 +221,8 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
         var result = await dialog.ShowAsync();
         if (result == ContentDialogResult.Primary)
         {
-
+            UserData profile = dialog.Profile;
+            _userProfiles.SaveProfile(profile);
         }
     }
 }

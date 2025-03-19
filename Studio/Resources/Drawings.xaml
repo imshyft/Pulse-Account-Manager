@@ -1,5 +1,6 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:clr="clr-namespace:System;assembly=mscorlib">
     <DrawingImage x:Key="TankDrawingImage">
         <DrawingImage.Drawing>
             <DrawingGroup ClipGeometry="M0,0 V40 H40 V0 H0 Z">
@@ -7,6 +8,7 @@
             </DrawingGroup>
         </DrawingImage.Drawing>
     </DrawingImage>
+
     <DrawingImage x:Key="SupportDrawingImage">
         <DrawingImage.Drawing>
             <DrawingGroup ClipGeometry="M0,0 V40 H40 V0 H0 Z">

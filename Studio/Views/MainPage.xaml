@@ -19,10 +19,10 @@
                 <Grid.ToolTip>
                     <StackPanel>
                         <TextBlock
-                            Text="{Binding Username}"
+                            Text="{Binding CustomId}"
                             Style="{StaticResource ListTitleStyle}"/>
                         <TextBlock
-                            Text="{Binding Battletag}"
+                            Text="{Binding BattletagString}"
                             Style="{StaticResource ListSubTitleStyle}"/>
                     </StackPanel>
                 </Grid.ToolTip>
@@ -39,10 +39,10 @@
                 <StackPanel Grid.Column="1"
                             Margin="{StaticResource MediumLeftMargin}">
                     <TextBlock
-                        Text="{Binding Username}"
+                        Text="{Binding CustomId}"
                         Style="{StaticResource ListTitleStyle}"/>
                     <TextBlock
-                        Text="{Binding Battletag}"
+                        Text="{Binding BattletagString}"
                         Style="{StaticResource ListSubTitleStyle}"/>
                 </StackPanel>
 

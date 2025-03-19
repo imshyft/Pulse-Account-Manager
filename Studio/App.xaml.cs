@@ -9,10 +9,12 @@ using Microsoft.Extensions.Hosting;
 
 using Studio.Contracts.Services;
 using Studio.Contracts.Views;
-using Studio.Core.Contracts.Services;
-using Studio.Core.Services;
 using Studio.Models;
 using Studio.Services;
+using Studio.Services.ApplicationServices;
+using Studio.Services.Data;
+using Studio.Services.Files;
+using Studio.Services.Storage;
 using Studio.Views;
 
 namespace Studio;
@@ -26,12 +28,14 @@ public partial class App : Application
 {
     private IHost _host;
 
+
     public T GetService<T>()
         where T : class
         => _host.Services.GetService(typeof(T)) as T;
 
     public App()
     {
+
     }
 
     private async void OnStartup(object sender, StartupEventArgs e)
@@ -52,7 +56,6 @@ public partial class App : Application
 
     private void ConfigureServices(HostBuilderContext context, IServiceCollection services)
     {
-        // TODO: Register your services, viewmodels and pages here
 
         // App Host
         services.AddHostedService<ApplicationHostService>();
@@ -60,16 +63,27 @@ public partial class App : Application
         // Activation Handlers
 
         // Core Services
+        services.AddSingleton<FileService>();
 
         // Services
+        services.AddSingleton<ConfigStorageService>();
         services.AddSingleton<INavigationService, NavigationService>();
 
-        services.AddSingleton<IProfileDataService, SampleProfileDataService>();
+
+        services.AddSingleton<UserProfileDataService, SampleUserProfileDataService>();
+        services.AddSingleton<FavouriteProfileDataService, SampleFavouriteProfileDataService>();
+
+
+        services.AddSingleton<PathResolverService>();
+        services.AddSingleton<ProfileDataFetchingService>();
+        services.AddSingleton<BattleNetService>();
+
 
         // Views
         services.AddTransient<IShellWindow, ShellWindow>();
 
         services.AddTransient<MainPage>();
+        services.AddTransient<PatchNotesPage>();
 
         services.AddTransient<SettingsPage>();
 
@@ -89,7 +103,5 @@ public partial class App : Application
 
     private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
     {
-        // TODO: Please log and handle the exception as appropriate to your scenario
-        // For more info see https://docs.microsoft.com/dotnet/api/system.windows.application.dispatcherunhandledexception?view=netcore-3.0
     }
 }

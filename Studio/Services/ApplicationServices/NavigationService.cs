@@ -1,10 +1,9 @@
 ﻿using System.Windows.Controls;
 using System.Windows.Navigation;
-
 using Studio.Contracts.Services;
 using Studio.Contracts.Views;
 
-namespace Studio.Services;
+namespace Studio.Services.ApplicationServices;
 
 public class NavigationService : INavigationService
 {
@@ -51,7 +50,7 @@ public class NavigationService : INavigationService
 
     public bool NavigateTo(Type pageType, object parameter = null, bool clearNavigation = false)
     {
-        if (_frame.Content?.GetType() != pageType || (parameter != null && !parameter.Equals(_lastParameterUsed)))
+        if (_frame.Content?.GetType() != pageType || parameter != null && !parameter.Equals(_lastParameterUsed))
         {
             _frame.Tag = clearNavigation;
             var page = _serviceProvider.GetService(pageType) as Page;
