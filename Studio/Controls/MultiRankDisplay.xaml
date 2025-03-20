@@ -9,9 +9,10 @@
     <Viewbox>
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="45*"/>
+                <ColumnDefinition Width="44*"/>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="45*"/>
             </Grid.ColumnDefinitions>
             <Grid
                 Grid.Column="0">
@@ -26,7 +27,7 @@
                     x:Name="TankDisplay"/>
             </Grid>
             <Grid
-                Grid.Column="1">
+                Grid.Column="1" Grid.ColumnSpan="2">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="30"/>
                     <ColumnDefinition Width="60"/>
@@ -38,7 +39,7 @@
                     x:Name="DamageDisplay"/>
             </Grid>
             <Grid
-                Grid.Column="2">
+                Grid.Column="3">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="30"/>
                     <ColumnDefinition Width="60"/>

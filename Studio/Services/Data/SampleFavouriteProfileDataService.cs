@@ -19,7 +19,7 @@ namespace Studio.Services.Data
                     new RankMoment()
                     {
                         Date = 1726641630 + j * _rnd.Next(80000, 89000),
-                        Rank = Rank.RankFromSR(_rnd.Next(500, 5000))
+                        Rank = Rank.RankFromSr(_rnd.Next(500, 5000))
                     })
                 .ToList();
         }
@@ -34,28 +34,28 @@ namespace Studio.Services.Data
                     Battletag = new Battletag("Username", _rnd.Next(1000, 9999).ToString()),
 
                     Avatar = $"https://d15f34w2p8l1cc.cloudfront.net/overwatch/daeddd96e58a2150afa6ffc3c5503ae7f96afc2e22899210d444f45dee508c6c.png",
-                    CustomId = "Name",
-                    Email = "email@123.com",
+                    CustomId = $"Name{_rnd.Next(1000)}",
+                    Email = null,
                     LastUpdate = _rnd.Next(1, 1000000),
                     RankedCareer = new RankedCareer()
                     {
                         Damage = new Damage()
                         {
-                            CurrentRank = Rank.RankFromSR(_rnd.Next(500, 5000)),
+                            CurrentRank = Rank.RankFromSr(_rnd.Next(500, 5000)),
                             PeakRank = RandomRankMoments(1)[0],
                             RankMoments = RandomRankMoments(10)
                         },
 
                         Support = new Support()
                         {
-                            CurrentRank = Rank.RankFromSR(_rnd.Next(500, 5000)),
+                            CurrentRank = Rank.RankFromSr(_rnd.Next(500, 5000)),
                             PeakRank = RandomRankMoments(1)[0],
                             RankMoments = RandomRankMoments(10)
                         },
 
                         Tank = new Tank()
                         {
-                            CurrentRank = Rank.RankFromSR(_rnd.Next(500, 5000)),
+                            CurrentRank = Rank.RankFromSr(_rnd.Next(500, 5000)),
                             PeakRank = RandomRankMoments(1)[0],
                             RankMoments = RandomRankMoments(10)
                         },

@@ -28,7 +28,7 @@ namespace Studio.Controls
         }
 
         public static readonly DependencyProperty RankValueProperty =
-            DependencyProperty.Register("Rank", typeof(Rank), typeof(RankDisplay),
+            DependencyProperty.Register(nameof(RankValue), typeof(Rank), typeof(RankDisplay),
                 new PropertyMetadata(new Rank(), OnRankPropertyChanged));
 
         public Rank RankValue
@@ -44,7 +44,12 @@ namespace Studio.Controls
                 Rank rank = control.RankValue;
 
                 if (rank == null)
+                {
+                    control.DivisionImage.Source = null;
+                    control.TierImage.Source = null;
                     return;
+                }
+
 
                 string rankDivision = Enum.GetName(rank.Division);
                 string divisionImagePath = $"/Resources/RankIcons/Divisions/{rankDivision}.png";

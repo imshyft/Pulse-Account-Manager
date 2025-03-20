@@ -6,10 +6,10 @@ namespace Studio.Services.Files
 {
     public class PathResolverService
     {
-        private readonly ConfigStorageService _persistAndRestoreService;
+        private readonly PersistAndRestoreService _persistAndRestoreService;
 
 
-        public PathResolverService(ConfigStorageService persistAndRestoreService)
+        public PathResolverService(PersistAndRestoreService persistAndRestoreService)
         {
             _persistAndRestoreService = persistAndRestoreService;
         }

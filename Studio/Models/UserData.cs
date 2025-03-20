@@ -1,4 +1,8 @@
-﻿namespace Studio.Models
+﻿
+
+using Newtonsoft.Json;
+
+namespace Studio.Models
 {
 
     #region Profile
@@ -25,6 +29,7 @@
         public string Username { get; set; }
         public string Tag { get; set; }
 
+        [JsonConstructor]
         public Battletag(string username, string tag)
         {
             Username = username;
@@ -174,22 +179,8 @@
         public int Tier { get; set; }
         public Division Division { get; set; }
 
-        public static Rank ___RankFromSR(int sr)
-        {
-            double flr = ((double)sr - 1000) / 500;
-            int x = (int)(flr - flr % 1);
-            //return $"{_divs[x]} {5 - (sr % 500) / 100}";
-            Rank rank = new Rank()
-            {
-                SkillRating = sr,
-                Division = (Division)x,
-                Tier = 5 - (sr % 500) / 100,
-            };
 
-            return rank;
-        }
-
-        public static Rank RankFromSR(int sr)
+        public static Rank RankFromSr(int sr)
         {
             if (sr < 0) sr = 0;
             if (sr >= 5000) sr = 4999;
@@ -207,7 +198,7 @@
             int baseDivRank = (int)division;
             remainder = sr - baseDivRank;
 
-            int tier = 5 - remainder / 100;
+            int tier = Math.Min(5,  5 - remainder / 100 );
 
             return new Rank()
             {

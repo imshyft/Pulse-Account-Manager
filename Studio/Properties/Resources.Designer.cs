@@ -61,7 +61,7 @@ namespace Studio.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Studio.
+        ///   Looks up a localized string similar to Overwatch Account Launcher.
         /// </summary>
         public static string AppDisplayName {
             get {

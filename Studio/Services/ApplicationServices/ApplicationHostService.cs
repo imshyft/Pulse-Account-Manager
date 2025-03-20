@@ -13,17 +13,19 @@ public class ApplicationHostService : IHostedService
     private readonly INavigationService _navigationService;
     private readonly UserProfileDataService _userProfileDataService;
     private readonly FavouriteProfileDataService _favouriteProfileDataService;
-    private readonly ConfigStorageService _persistAndRestoreService;
+    private readonly PersistAndRestoreService _persistAndRestoreService;
     private readonly IEnumerable<IActivationHandler> _activationHandlers;
+    private readonly IThemeSelectorService _themeSelectorService;
     private IShellWindow _shellWindow;
     private bool _isInitialized;
 
     public ApplicationHostService(IServiceProvider serviceProvider, 
         IEnumerable<IActivationHandler> activationHandlers, 
         INavigationService navigationService, 
-        ConfigStorageService persistAndRestoreService,
+        PersistAndRestoreService persistAndRestoreService,
         UserProfileDataService userProfileDataService,
-        FavouriteProfileDataService favouriteProfileDataService)
+        FavouriteProfileDataService favouriteProfileDataService,
+        IThemeSelectorService themeSelectorService)
     {
         _serviceProvider = serviceProvider;
         _activationHandlers = activationHandlers;
@@ -32,6 +34,8 @@ public class ApplicationHostService : IHostedService
 
         _userProfileDataService = userProfileDataService;
         _favouriteProfileDataService = favouriteProfileDataService;
+
+        _themeSelectorService = themeSelectorService;
     }
 
     public async Task StartAsync(CancellationToken cancellationToken)
@@ -59,6 +63,7 @@ public class ApplicationHostService : IHostedService
             _persistAndRestoreService.RestoreData();
             _userProfileDataService.LoadProfilesFromDisk();
             _favouriteProfileDataService.LoadProfilesFromDisk();
+            _themeSelectorService.InitializeTheme();
             await Task.CompletedTask;
         }
     }

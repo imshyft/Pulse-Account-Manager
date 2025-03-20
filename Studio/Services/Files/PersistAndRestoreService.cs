@@ -11,13 +11,13 @@ using Studio.Services.Files;
 namespace Studio.Services.Storage;
 
 // TODO : split this into multiple services (one for userprofiles, favourites, general settings etc)
-public class ConfigStorageService
+public class PersistAndRestoreService
 {
     private readonly FileService _fileService;
     private readonly AppConfig _appConfig;
     private readonly string _localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
 
-    public ConfigStorageService(FileService fileService, IOptions<AppConfig> appConfig)
+    public PersistAndRestoreService(FileService fileService, IOptions<AppConfig> appConfig)
     {
         _fileService = fileService;
         _appConfig = appConfig.Value;

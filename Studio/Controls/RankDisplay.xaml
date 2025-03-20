@@ -24,14 +24,12 @@
 
             <ui:Image
                 Grid.Column="1"
-                x:Name="DivisionImage"
-                Source="/Resources/RankIcons/Divisions/Diamond.png"/>
+                x:Name="DivisionImage"/>
             <ui:Image
                 Grid.Column="1"
                 Grid.Row="1"
                 x:Name="TierImage"
-                Margin="0,-3,0,0"
-                Source="/Resources/RankIcons/Tiers/5.png"/>
+                Margin="0,-3,0,0"/>
         </Grid>
     </Viewbox>
 

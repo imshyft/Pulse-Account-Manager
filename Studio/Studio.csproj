@@ -15,6 +15,7 @@
     <None Remove="Resources\PatchNotesWebView\styles.css" />
     <None Remove="Resources\PlaceholderPlayerIcon.png" />
     <None Remove="Resources\RankIcons\Divisions\Bronze.png" />
+    <None Remove="Resources\RankIcons\Divisions\Champion.png" />
     <None Remove="Resources\RankIcons\Divisions\Diamond.png" />
     <None Remove="Resources\RankIcons\Divisions\Gold.png" />
     <None Remove="Resources\RankIcons\Divisions\Grandmaster.png" />
@@ -43,6 +44,9 @@
     </Resource>
     <Resource Include="Resources\RankIcons\Divisions\Bronze.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\RankIcons\Divisions\Champion.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resources\RankIcons\Divisions\Diamond.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

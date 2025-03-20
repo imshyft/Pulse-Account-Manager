@@ -1,4 +1,6 @@
-﻿using Studio.Services;
+﻿using Studio.Models;
+using Studio.Services;
+using Studio.Services.Data;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -14,18 +16,14 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using System.Windows.Shell;
-using Studio.Helpers;
-using Studio.Models;
 using Wpf.Ui.Controls;
-using Studio.Services.Data;
 
-namespace Studio.Controls
+namespace Studio.Dialogs
 {
     /// <summary>
-    /// Interaction logic for AddAccountPrompt.xaml
+    /// Interaction logic for AddFavouriteProfilePrompt.xaml
     /// </summary>
-    public partial class AddAccountPrompt : ContentDialog
+    public partial class AddFavouriteProfilePrompt : ContentDialog
     {
         public bool IsBattleTagValid { get; set; }
 
@@ -34,13 +32,13 @@ namespace Studio.Controls
 
 
         public UserData Profile { get; set; }
-        public AddAccountPrompt(ContentPresenter contentPresenter)
+        public AddFavouriteProfilePrompt(ContentPresenter contentPresenter)
         {
             InitializeComponent();
             DialogHost = contentPresenter;
 
             IsPrimaryButtonEnabled = false;
-            PrimaryButtonText = "Add Account";
+            PrimaryButtonText = "Add Favourite";
 
             CloseButtonText = "Cancel";
 
@@ -76,8 +74,6 @@ namespace Studio.Controls
             LaunchBnetButton.IsEnabled = false;
         }
 
-
-
         private async void OnLaunchBattlenetButtonClick(object sender, RoutedEventArgs e)
         {
 
@@ -91,11 +87,9 @@ namespace Studio.Controls
 
 
             InformationText.Text =
-                "Great! Now wait for Battle.net to open and log in while we fetch your account details, then once you're logged in, press Add Account";
+                "Great! Now wait for us to find the account, and confirm";
 
             Battletag battletag = new Battletag(BattletagInputBox.Text);
-
-            _battleNetService.OpenBattleNetWithEmptyAccount();
 
 
             var result = await _profileFetchingService.GetUserProfile(battletag);
@@ -109,18 +103,19 @@ namespace Studio.Controls
                     InformationBar.Title = "Profile Could not be found";
                     InformationBar.Severity = InfoBarSeverity.Warning;
                     InformationBar.Message =
-                        "We couldn't retrieve the details of the account, but you can still switch to it. Could it be a Private Profile?";
+                        "We couldn't retrieve the details of the account. Could it be a Private Profile?";
                     break;
                 case "":
                     InformationBar.Title = "Profile found";
                     InformationBar.Severity = InfoBarSeverity.Success;
                     InformationBar.Message = $"Successfully found the profile at {result.Profile.Battletag}!";
+                    IsPrimaryButtonEnabled = true;
                     break;
                 default:
                     InformationBar.Title = "Couldn't contact the API";
                     InformationBar.Severity = InfoBarSeverity.Error;
                     InformationBar.Message =
-                        $"We couldn't retrieve the details of the account at the moment, but you can still switch to it. Try syncing again later. \nError Message: [{result.Error}]";
+                        $"We couldn't contact the servers at the moment. Try connecting again later. \nError Message: [{result.Error}]";
                     break;
             }
 
@@ -128,34 +123,8 @@ namespace Studio.Controls
 
             Profile = result.Profile;
 
-            IsPrimaryButtonEnabled = true;
         }
 
-        protected override void OnButtonClick(ContentDialogButton button)
-        {
-            if (button != ContentDialogButton.Primary)
-            {
-                base.OnButtonClick(button);
-                return;
-            }
-
-            string email = _battleNetService.GetBattleNetAccount();
-            if (string.IsNullOrEmpty(email))
-            {
-                InformationBar.Title = "Email not found";
-                InformationBar.Severity = InfoBarSeverity.Error;
-                InformationBar.Message =
-                    "Couldn't find the email in the config! Try waiting a bit or closing Battle.net and try again";
-                InformationBar.IsOpen = true;
-                return;
-            }
-
-            InformationBar.IsOpen = false;
-
-            Profile.Email = email;
-
-            base.OnButtonClick(button);
-        }
 
     }
 }

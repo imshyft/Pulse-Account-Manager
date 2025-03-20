@@ -7,9 +7,13 @@
       mc:Ignorable="d" 
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
       xmlns:properties="clr-namespace:Studio.Properties"
+      xmlns:controls="clr-namespace:Studio.Controls"
       d:DesignHeight="450" d:DesignWidth="800"
+      xmlns:data="clr-namespace:Studio.Services.Data"
+      d:DataContext="{d:DesignInstance Type=data:DesignTimeSampleData, IsDesignTimeCreatable=True}"
       Title="AccountListPage"
-      KeepAlive="True">
+      KeepAlive="True"
+      SizeChanged="OnPageSizeChanged">
     <Grid>
         <ui:DataGrid
             x:Name="AccountDataGrid"
@@ -22,32 +26,39 @@
             SelectionUnit="FullRow"
             SelectionChanged="OnProfileListSelectionChanged"
             MouseLeftButtonDown="UIElement_OnPreviewMouseLeftButtonDown"
+            HorizontalAlignment="Stretch"
             IsReadOnly="True">
 
             <ui:DataGrid.Columns>
 
+                <!--Avatar-->
                 <DataGridTemplateColumn
                     Header=""
+                    MinWidth="60"
                     CanUserSort="False"
                     CanUserResize="False">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Image>
-                                <Image.Source>
+                            <ui:Image
+                                CornerRadius="4">
+                                <ui:Image.Source>
                                     <Binding Path="Avatar" >
                                         <Binding.TargetNullValue>
-                                            <ImageSource>/Resources/PlaceholderPlayerIcon.png</ImageSource>
+                                            <StaticResource ResourceKey="PlaceholderAvatar"/>
                                         </Binding.TargetNullValue>
                                     </Binding>
-                                </Image.Source>
-                            </Image>
+                                </ui:Image.Source>
+                            </ui:Image>
+
 
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
+                <!--Name-->
                 <DataGridTemplateColumn
-                    MinWidth="250"
+                    MinWidth="150"
+                    Width="*"
                     Header="Name"
                     CanUserSort="True"
                     CanUserResize="False"
@@ -55,93 +66,104 @@
                     SortMemberPath="Username">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <StackPanel
-                                Margin="{StaticResource SmallLeftMargin}">
-                                <TextBlock
-                                    Text="{Binding CustomId}"
-                                    Style="{StaticResource ListTitleStyle}"/>
-                                <TextBlock
-                                    Text="{Binding BattletagString}"
-                                    Style="{StaticResource ListSubTitleStyle}"/>
-                            </StackPanel>
+                            <Viewbox
+                                HorizontalAlignment="Left"
+                                Margin="{StaticResource MediumLeftRightMargin}">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="25"/>
+                                        <RowDefinition Height="20"/>
+                                    </Grid.RowDefinitions>
+                                    <ui:TextBlock
+                                        Text="{Binding CustomId}"
+                                        FontTypography="Title"
+                                        FontSize="17"
+                                        VerticalAlignment="Top"/>
+                                    <TextBlock
+                                        Grid.Row="1"
+                                        FontSize="8"
+                                        Text="{Binding BattletagString}"
+                                        Style="{StaticResource ListSubTitleStyle}"/>
+                                </Grid>
+                            </Viewbox>
+
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
+                <!--Skill Ranks-->
+
                 <DataGridTemplateColumn
+                    x:Name="DataGridTankColumn"
                     Header="Sort"
-                    MinWidth="75"
+                    Width="75"
+                    MinWidth="68"
                     CanUserResize="False"
                     CanUserSort="True"
                     SortMemberPath="RankedCareer.Tank.CurrentRank.SkillRating">
+                    <DataGridTemplateColumn.HeaderTemplate>
+                        <DataTemplate>
+                            <ui:Image 
+                                Source="{StaticResource TankDrawingImage}" 
+                                Width="18"
+                                Margin="7,0,0,0"
+                                />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.HeaderTemplate>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="*"/>
-                                    <RowDefinition Height="2*"/>
-                                </Grid.RowDefinitions>
-
-                                <Image Source="{StaticResource TankDrawingImage}"/>
-
-                                <TextBlock Grid.Row="1"
-                                           Text="{Binding RankedCareer.Tank.CurrentRank.SkillRating, FallbackValue=----}" 
-                                           Margin="{StaticResource SmallTopBottomMargin}"
-                                           Style="{StaticResource SubtitleTextStyle}" 
-                                           HorizontalAlignment="Center"/>
-                            </Grid>
+                            <controls:RankDisplay
+                                RankValue="{Binding RankedCareer.Tank.CurrentRank, Mode=OneWay}"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
                 <DataGridTemplateColumn
+                    x:Name="DataGridDamageColumn"
                     Header="Sort"
-                    MinWidth="75"
+                    Width="75"
+                    MinWidth="68"
                     CanUserResize="False"
                     CanUserSort="True"
                     SortMemberPath="RankedCareer.Damage.CurrentRank.SkillRating">
+                    <DataGridTemplateColumn.HeaderTemplate>
+                        <DataTemplate>
+                            <ui:Image 
+                                Source="{StaticResource DamageDrawingImage}" 
+                                Width="18"
+                                Margin="7,0,0,0"
+                            />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.HeaderTemplate>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="*"/>
-                                    <RowDefinition Height="2*"/>
-                                </Grid.RowDefinitions>
-
-                                <Image Source="{StaticResource DamageDrawingImage}"/>
-
-                                <TextBlock Grid.Row="1"
-                                           Text="{Binding RankedCareer.Damage.CurrentRank.SkillRating, FallbackValue=----}" 
-                                           Margin="{StaticResource SmallTopBottomMargin}"
-                                           Style="{StaticResource SubtitleTextStyle}" 
-                                           HorizontalAlignment="Center"/>
-                            </Grid>
+                            <controls:RankDisplay
+                                RankValue="{Binding RankedCareer.Damage.CurrentRank, Mode=OneWay}"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
                 <DataGridTemplateColumn
+                    x:Name="DataGridSupportColumn"
                     Header="Sort"
-                    MinWidth="75"
+                    Width="75"
+                    MinWidth="68"
                     CanUserResize="False"
                     CanUserSort="True"
                     SortMemberPath="RankedCareer.Support.CurrentRank.SkillRating">
+                    <DataGridTemplateColumn.HeaderTemplate>
+                        <DataTemplate>
+                            <ui:Image 
+                                Source="{StaticResource SupportDrawingImage}" 
+                                Width="18"
+                                Margin="7,0,0,0"
+                            />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.HeaderTemplate>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="*"/>
-                                    <RowDefinition Height="2*"/>
-                                </Grid.RowDefinitions>
-
-                                <Image Source="{StaticResource SupportDrawingImage}"/>
-
-                                <TextBlock Grid.Row="1"
-                                           Text="{Binding RankedCareer.Support.CurrentRank.SkillRating, FallbackValue=----}" 
-                                           Margin="{StaticResource SmallTopBottomMargin}"
-                                           Style="{StaticResource SubtitleTextStyle}" 
-                                           HorizontalAlignment="Center"/>
-                            </Grid>
+                            <controls:RankDisplay
+                                RankValue="{Binding RankedCareer.Support.CurrentRank, Mode=OneWay}"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
@@ -150,23 +172,91 @@
                     Header=""
                     CanUserSort="False"
                     CanUserResize="False"
-                    Width="*">
+                    Width="200"
+                    MinWidth="70">
                     
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <ui:Button 
-                                Content="Play" 
-                                Click="ButtonBase_OnClick" 
+                                Margin="{StaticResource SmallLeftMargin}"
+                                Click="OnPlayButtonClick" 
                                 MouseEnter="UIElement_OnMouseEnter"
-                                MouseLeave="UIElement_OnMouseLeave" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                MouseLeave="UIElement_OnMouseLeave" 
+                                HorizontalAlignment="Center" 
+                                VerticalAlignment="Center"
+                                Width="50"
+                                Height="40"
+                                Style="{DynamicResource AccentButton}">
+                                <ui:SymbolIcon Symbol="Play16" FontSize="20"/>
+
+                            </ui:Button>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
+                <DataGridTemplateColumn
+                    Header=""
+                    CanUserSort="False"
+                    CanUserResize="False"
+                    MinWidth="60"
+                    Width="70">
+
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Grid
+                                Margin="{StaticResource SmallLeftRightMargin}">
+                                <ui:Flyout
+                                    IsOpen="False"
+                                    x:Name="OptionsFlyout"
+                                    Closed="OnOptionsFlyoutClosed"
+                                    Placement="Left">
+                                    <StackPanel>
+                                        <UniformGrid 
+                                            Columns="2"
+                                            Margin="{StaticResource XSmallTopMargin}">
+                                            <ui:Button
+                                                Appearance="Success"
+                                                HorizontalAlignment="Stretch"
+                                                Margin="4, 0, 4, 0"
+                                                Click="OnOptionsSyncButtonClick">
+                                                <ui:SymbolIcon Symbol="ArrowCounterclockwise16"/>
+                                            </ui:Button>
+                                            <ui:Button
+                                                Appearance="Danger"
+                                                HorizontalAlignment="Stretch"
+                                                Margin="4, 0, 4, 0"
+                                                Click="OnOptionsRemoveButtonClick">
+                                                <ui:SymbolIcon Symbol="Delete16"/>
+                                            </ui:Button>
+                                        </UniformGrid>
+                                    </StackPanel>
+                                </ui:Flyout>
+                                <ui:Button 
+                                    Padding="0"
+                                    Click="OnAccountOptionsClicked" 
+                                    MouseEnter="UIElement_OnMouseEnter"
+                                    MouseLeave="UIElement_OnMouseLeave" 
+                                    HorizontalAlignment="Center" 
+                                    VerticalAlignment="Center"
+                                    Width="30"
+                                    Height="40"
+                                    Style="{DynamicResource AccentButton}"
+                                    Tag="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow}}">
+                                    <ui:SymbolIcon Symbol="Options16" FontSize="15"/>
+                                </ui:Button>
+                            </Grid>
+ 
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
 
             </ui:DataGrid.Columns>
         </ui:DataGrid>
+
+        <ui:SnackbarPresenter x:Name="SnackbarPresenter"/>
     </Grid>
 
 
 </Page>
+
+    

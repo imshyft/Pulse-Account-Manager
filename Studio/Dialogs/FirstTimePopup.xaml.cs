@@ -28,14 +28,14 @@ namespace Studio.Dialogs
     {
 
         private PathResolverService _pathResolverService;
-        private ConfigStorageService _storageService;
+        private PersistAndRestoreService _storageService;
         public FirstTimePopup(ContentPresenter contentPresenter)
         {
             InitializeComponent();
             DialogHost = contentPresenter;
 
             _pathResolverService = ((App)Application.Current).GetService<PathResolverService>();
-            _storageService = ((App)Application.Current).GetService<ConfigStorageService>();
+            _storageService = ((App)Application.Current).GetService<PersistAndRestoreService>();
 
             LocateOverwatchDirectory();
             LocateBattleNetConfigFile();

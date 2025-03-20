@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
-
+using System.Windows.Media;
 using MahApps.Metro.Controls;
 
 using Studio.Contracts.Services;
@@ -59,6 +59,7 @@ public partial class ShellWindow : FluentWindow, IShellWindow, INotifyPropertyCh
         InitializeComponent();
         DataContext = this;
         Instance = this;
+
     }
 
     public Frame GetNavigationFrame()

@@ -64,9 +64,9 @@ namespace Studio.Controls
             {
                 if (e.NewValue is RankedCareer career)
                 {
-                    control.TankDisplay.RankValue = career.Tank.CurrentRank;
-                    control.SupportDisplay.RankValue = career.Support.CurrentRank;
-                    control.DamageDisplay.RankValue = career.Damage.CurrentRank;
+                    control.TankDisplay.RankValue = career.Tank?.CurrentRank;
+                    control.SupportDisplay.RankValue = career.Support?.CurrentRank;
+                    control.DamageDisplay.RankValue = career.Damage?.CurrentRank;
                 }
             }
         }

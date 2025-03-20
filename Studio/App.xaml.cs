@@ -9,6 +9,8 @@ using Microsoft.Extensions.Hosting;
 
 using Studio.Contracts.Services;
 using Studio.Contracts.Views;
+using Studio.Contracts.Services;
+using Studio.Services;
 using Studio.Models;
 using Studio.Services;
 using Studio.Services.ApplicationServices;
@@ -63,17 +65,22 @@ public partial class App : Application
         // Activation Handlers
 
         // Core Services
+        services.AddSingleton<IFileService, FileService>();
         services.AddSingleton<FileService>();
 
         // Services
-        services.AddSingleton<ConfigStorageService>();
+        services.AddSingleton<IThemeSelectorService, ThemeSelectorService>();
+        services.AddSingleton<PersistAndRestoreService>();
+        //services.AddSingleton<PersistAndRestoreService>();
         services.AddSingleton<INavigationService, NavigationService>();
 
-
+#if DEBUG
         services.AddSingleton<UserProfileDataService, SampleUserProfileDataService>();
         services.AddSingleton<FavouriteProfileDataService, SampleFavouriteProfileDataService>();
-
-
+#else
+        services.AddSingleton<UserProfileDataService, StoredUserProfileDataService>();
+        services.AddSingleton<FavouriteProfileDataService, StoredFavouriteProfileDataService>();
+#endif
         services.AddSingleton<PathResolverService>();
         services.AddSingleton<ProfileDataFetchingService>();
         services.AddSingleton<BattleNetService>();

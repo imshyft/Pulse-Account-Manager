@@ -9,16 +9,16 @@ namespace Studio.Services
     // TODO : Create methods to set the email, close, and launch battle.net
     public class BattleNetService
     {
-        private readonly ConfigStorageService _configStorageService;
+        private readonly PersistAndRestoreService _persistAndRestoreService;
         private readonly string _battleNetConfigPath;
         private readonly string _overwatchLauncherPath;
 
         public BattleNetService()
         {
-            _configStorageService = ((App)Application.Current).GetService<ConfigStorageService>();
-            _battleNetConfigPath = _configStorageService.GetValue<string>("BattleNetConfigPath");
+            _persistAndRestoreService = ((App)Application.Current).GetService<PersistAndRestoreService>();
+            _battleNetConfigPath = _persistAndRestoreService.GetValue<string>("BattleNetConfigPath");
 
-            string overwatchDirectory = _configStorageService.GetValue<string>("OverwatchDirectory");
+            string overwatchDirectory = _persistAndRestoreService.GetValue<string>("OverwatchDirectory");
             _overwatchLauncherPath = Path.Combine(overwatchDirectory, "Overwatch Launcher.exe");
         }
 
@@ -36,6 +36,20 @@ namespace Studio.Services
         public void OpenBattleNet()
         {
             Process.Start(_overwatchLauncherPath);
+        }
+
+        public void OpenBattleNetWithAccount(string email)
+        {
+            CloseBattleNet();
+            SetBattleNetAccount(email);
+            OpenBattleNet();
+        }
+
+        public void OpenBattleNetWithEmptyAccount()
+        {
+            CloseBattleNet();
+            ResetBattleNetAccount();
+            OpenBattleNet();
         }
 
         public void SetBattleNetAccount(string email)

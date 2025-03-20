@@ -20,7 +20,7 @@ namespace Studio.Services.Data
                     new RankMoment()
                     {
                         Date = _randomDates[j],
-                        Rank = Rank.RankFromSR(_rnd.Next(500, 5000))
+                        Rank = Rank.RankFromSr(_rnd.Next(500, 5000))
                     })
                 .ToList();
         }
@@ -39,35 +39,37 @@ namespace Studio.Services.Data
                     date += _rnd.Next(80000, 160000);
                 }
 
+                bool missingDetails = _rnd.NextDouble() < 0.3;
+
                 data.Add(new UserData()
                 {
                     Battletag = new Battletag("Username", _rnd.Next(1000, 9999).ToString()),
                     //Username = "Username",
                     //Tag = _rnd.Next(1000, 9999).ToString(),
-                    Avatar = _rnd.NextDouble() > 0.3 ? 
-                        $"https://d15f34w2p8l1cc.cloudfront.net/overwatch/daeddd96e58a2150afa6ffc3c5503ae7f96afc2e22899210d444f45dee508c6c.png" : null,
-                    CustomId = "Name",
-                    Email = "email@123.com",
+                    Avatar = missingDetails ? 
+                        null : $"https://d15f34w2p8l1cc.cloudfront.net/overwatch/daeddd96e58a2150afa6ffc3c5503ae7f96afc2e22899210d444f45dee508c6c.png",
+                    CustomId = $"Name{_rnd.Next(1000)}",
+                    Email = missingDetails ? null : "email@123.com",
                     LastUpdate = _rnd.Next(1, 1000000),
                     RankedCareer = new RankedCareer()
                     {
                         Damage = new Damage()
                         {
-                            CurrentRank = _rnd.NextDouble() > 0.4 ? Rank.RankFromSR(_rnd.Next(500, 5000)) : null,
+                            CurrentRank = _rnd.NextDouble() > 0.4 ? Rank.RankFromSr(_rnd.Next(500, 5000)) : null,
                             PeakRank = RandomRankMoments(1)[0],
                             RankMoments = RandomRankMoments(rankMoments)
                         },
 
                         Support = new Support()
                         {
-                            CurrentRank = _rnd.NextDouble() > 0.4 ? Rank.RankFromSR(_rnd.Next(500, 5000)) : null,
+                            CurrentRank = _rnd.NextDouble() > 0.4 ? Rank.RankFromSr(_rnd.Next(500, 5000)) : null,
                             PeakRank = RandomRankMoments(1)[0],
                             RankMoments = RandomRankMoments(rankMoments)
                         },
 
                         Tank = new Tank()
                         {
-                            CurrentRank = _rnd.NextDouble() > 0.4 ? Rank.RankFromSR(_rnd.Next(500, 5000)) : null,
+                            CurrentRank = _rnd.NextDouble() > 0.4 ? Rank.RankFromSr(_rnd.Next(500, 5000)) : null,
                             PeakRank = RandomRankMoments(1)[0],
                             RankMoments = RandomRankMoments(rankMoments)
                         },

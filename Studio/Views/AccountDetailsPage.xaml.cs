@@ -32,7 +32,6 @@ namespace Studio.Views
     /// Interaction logic for AccountDetailsPage.xaml
     /// </summary>
     
-    // TODO : like all of the ui
     public partial class AccountDetailsPage : Page
     {
         public UserData Profile { get; set; }
@@ -46,32 +45,23 @@ namespace Studio.Views
 
             Profile = profile;
 
-            List<DateTimePoint> tankDateTimePoints = GetDateTimePoints(Profile.RankedCareer.Tank);
-            List<DateTimePoint> damageDateTimePoints = GetDateTimePoints(Profile.RankedCareer.Damage);
-            List<DateTimePoint> supportDateTimePoints = GetDateTimePoints(Profile.RankedCareer.Support);
+            var series = new List<ISeries>();
 
-            LineSeries<DateTimePoint> lineFormat = new()
-            {
-                Fill = null,
-                Stroke = new SolidColorPaint
-                {
-                    Color = SKColors.CornflowerBlue,
-                    StrokeCap = SKStrokeCap.Round,
-                    StrokeThickness = 6,
-                },
-            };
+            if (Profile.RankedCareer.Tank != null)
+                series.Add(new RankLineSeries(GetDateTimePoints(Profile.RankedCareer.Tank), SKColors.LightSkyBlue));
 
-            ISeries[] series =
-            {
-                new RankLineSeries(tankDateTimePoints, SKColors.LightSkyBlue),
-                new RankLineSeries(damageDateTimePoints, SKColors.IndianRed),
-                new RankLineSeries(supportDateTimePoints, SKColors.LightGreen)
-            };
-            Series = series;
+            if (Profile.RankedCareer.Damage != null)
+                series.Add(new RankLineSeries(GetDateTimePoints(Profile.RankedCareer.Damage), SKColors.IndianRed));
+
+            if (Profile.RankedCareer.Support != null)
+                series.Add(new RankLineSeries(GetDateTimePoints(Profile.RankedCareer.Support), SKColors.LightGreen));
+
+
+            Series = series.ToArray();
 
             XAxes = new ICartesianAxis[] { new DateTimeAxis(TimeSpan.FromDays(20), date => date.ToString("M/d")) };
 
-            RankDisplay.Career = Profile.RankedCareer;
+            //RankDisplay.Career = Profile.RankedCareer;
 
         }
 
@@ -113,5 +103,11 @@ namespace Studio.Views
         }
 
 
+        private void OnBackButtonClick(object sender, RoutedEventArgs e)
+        {
+
+            NavigationService?.Navigate(new AccountListPage());
+
+        }
     }
 }

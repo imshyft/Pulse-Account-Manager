@@ -11,6 +11,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
 
+
                 <ResourceDictionary Source="/Styles/_FontSizes.xaml" />
                 <ResourceDictionary Source="/Styles/_Thickness.xaml" />
                 <ResourceDictionary Source="/Styles/MetroWindow.xaml" />
@@ -27,9 +28,10 @@
                 <ResourceDictionary Source="/Resources/Drawings.xaml"/>
 
                 <ui:ThemesDictionary Theme="Dark" />
-                <!--<ResourceDictionary Source="pack://application:,,,/Wpf.Ui;component/Resources/Theme/Dark.xaml" />-->
                 <ui:ControlsDictionary />
-                <!--<ResourceDictionary Source="/Styles/UiTheme.xaml"/>-->
+
+                <ResourceDictionary Source="Styles/Themes/RosePine.xaml"/>
+                <ResourceDictionary Source="Styles/UiTheme.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

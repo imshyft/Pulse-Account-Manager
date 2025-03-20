@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
@@ -16,7 +17,7 @@ using Studio.Services.Data;
 using Studio.Services.Files;
 using Studio.Services.Storage;
 using Wpf.Ui.Controls;
-
+using Button = Wpf.Ui.Controls.Button;
 using TextBox = Wpf.Ui.Controls.TextBox;
 
 namespace Studio.Views;
@@ -28,12 +29,12 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
     // TODO : Add Escape for back navigation
     // TODO : Add flyouts to introduce main actions (adding profiles, favourites) on first time launch
     public ObservableCollection<UserData> FilteredProfiles { get; set; } = new();
-
+    private bool isPanelShowingFavourites { get; set; } = true;
 
     private readonly FavouriteProfileDataService _favouriteProfiles;
     private readonly UserProfileDataService _userProfiles;
 
-    private readonly ConfigStorageService _persistAndRestoreService;
+    private readonly PersistAndRestoreService _persistAndRestoreService;
     private readonly PathResolverService _pathResolverService;
     private bool IsFavouritesPanelCollapsed { get; set; } = false;
 
@@ -45,9 +46,12 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
         _favouriteProfiles = ((App)Application.Current).GetService<FavouriteProfileDataService>();
         _userProfiles = ((App)Application.Current).GetService<UserProfileDataService>();
 
-        FilteredProfiles = _favouriteProfiles.Profiles;
+        foreach (var profile in _favouriteProfiles.Profiles)
+        {
+            FilteredProfiles.Add(profile);
+        }
 
-        _persistAndRestoreService = ((App)Application.Current).GetService<ConfigStorageService>();
+        _persistAndRestoreService = ((App)Application.Current).GetService<PersistAndRestoreService>();
 
         OpenAccountList();
         
@@ -155,9 +159,16 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
 
     private void OnFavouritesSearchTextChanged(object sender, TextChangedEventArgs e)
     {
+        FilterSearchPanel();
+    }
+
+    private void FilterSearchPanel()
+    {
         //https://learn.microsoft.com/en-us/windows/apps/design/controls/listview-filtering
-        string text = (sender as TextBox).Text;
-        var filtered = _favouriteProfiles.Profiles.Where(p => p.Battletag.Username.Contains(text, StringComparison.CurrentCultureIgnoreCase));
+        string text = FilterTextBox.Text;
+
+        ProfileDataService profileSource = isPanelShowingFavourites ? _favouriteProfiles : _userProfiles;
+        var filtered = profileSource.Profiles.Where(p => p.CustomId.Contains(text, StringComparison.CurrentCultureIgnoreCase));
 
         for (int i = FilteredProfiles.Count - 1; i >= 0; i--)
         {
@@ -176,31 +187,33 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
                 FilteredProfiles.Add(item);
             }
         }
-        
     }
-
     private void OnFavouritesPanelButtonClick(object sender, RoutedEventArgs e)
     {
-        int expandedWidth = 250;
-        int collapsedWidth = 75;
+            int expandedWidth = 250;
+            int collapsedWidth = 75;
 
-        Storyboard storyboard = new Storyboard();
+            Storyboard storyboard = new Storyboard();
 
-        Duration duration = new Duration(TimeSpan.FromMilliseconds(500));
-        CubicEase ease = new CubicEase { EasingMode = EasingMode.EaseOut };
+            Duration duration = new Duration(TimeSpan.FromMilliseconds(500));
+            CubicEase ease = new CubicEase { EasingMode = EasingMode.EaseOut };
 
-        DoubleAnimation animation = new DoubleAnimation();
-        animation.EasingFunction = ease;
-        animation.Duration = duration;
-        storyboard.Children.Add(animation);
-        animation.From = IsFavouritesPanelCollapsed ? collapsedWidth : expandedWidth;
-        animation.To = IsFavouritesPanelCollapsed ? expandedWidth : collapsedWidth;
-        Storyboard.SetTarget(animation, FavouritesColumn);
-        Storyboard.SetTargetProperty(animation, new PropertyPath("(ColumnDefinition.MaxWidth)"));
+            DoubleAnimation animation = new DoubleAnimation();
+            animation.EasingFunction = ease;
+            animation.Duration = duration;
+            storyboard.Children.Add(animation);
+            animation.From = IsFavouritesPanelCollapsed ? collapsedWidth : expandedWidth;
+            animation.To = IsFavouritesPanelCollapsed ? expandedWidth : collapsedWidth;
+            Storyboard.SetTarget(animation, FavouritesColumn);
+            Storyboard.SetTargetProperty(animation, new PropertyPath("(ColumnDefinition.MaxWidth)"));
 
-        storyboard.Begin();
+            storyboard.Begin();
 
-        IsFavouritesPanelCollapsed = !IsFavouritesPanelCollapsed;
+            PanelCollapseButtonSymbol.Symbol = IsFavouritesPanelCollapsed
+                ? SymbolRegular.ChevronDoubleRight20
+                : SymbolRegular.ChevronDoubleLeft20;
+
+            IsFavouritesPanelCollapsed = !IsFavouritesPanelCollapsed;
         
     }
 
@@ -225,4 +238,57 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
             _userProfiles.SaveProfile(profile);
         }
     }
+    private async void OnAddFavouriteProfileButtonClick(object sender, RoutedEventArgs e)
+    {
+        if (ShellWindow.Instance == null)
+            return;
+
+        ContentPresenter dialogPresenter = ShellWindow.Instance.DialogPresenter;
+        if (dialogPresenter == null)
+            return;
+
+
+        var dialog = new AddFavouriteProfilePrompt(dialogPresenter);
+
+
+        // Show the dialog and wait for user input
+        var result = await dialog.ShowAsync();
+        if (result == ContentDialogResult.Primary)
+        {
+            UserData profile = dialog.Profile;
+            _favouriteProfiles.SaveProfile(profile);
+            FilterSearchPanel();
+        }
+    }
+
+    private void OnFavouriteUserToggleButtonClick(object sender, RoutedEventArgs e)
+    {
+        Button button = sender as Button;
+        if (isPanelShowingFavourites)
+        {
+            FilteredProfiles.Clear();
+            foreach (var profile in _userProfiles.Profiles)
+            {
+                FilteredProfiles.Add(profile);
+            }
+
+            PanelToggleSymbol.Symbol =SymbolRegular.Person48;
+        }
+        else
+        {
+            FilteredProfiles.Clear();
+            foreach (var profile in _favouriteProfiles.Profiles)
+            {
+                FilteredProfiles.Add(profile);
+            }
+
+            PanelToggleSymbol.Symbol = SymbolRegular.Star48;
+        }
+
+        isPanelShowingFavourites = !isPanelShowingFavourites;
+
+        FilterSearchPanel();
+    }
+
+
 }

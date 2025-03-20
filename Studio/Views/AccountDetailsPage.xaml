@@ -6,12 +6,16 @@
       xmlns:local="clr-namespace:Studio.Views"
       xmlns:controls="clr-namespace:Studio.Controls"
       xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
       mc:Ignorable="d" 
+      xmlns:data="clr-namespace:Studio.Services.Data"
+      d:DataContext="{d:DesignInstance Type=data:DesignTimeSampleData, IsDesignTimeCreatable=True}"
       d:DesignHeight="450" d:DesignWidth="800"
       KeepAlive="True"
       Title="AccountDetailsPage">
 
-    <Grid>
+    <Grid
+        Margin="{StaticResource SmallLeftTopRightBottomMargin}">
         <Grid.RowDefinitions>
             <RowDefinition Height="2*" MinHeight="50"/>
             <RowDefinition Height="2*"/>
@@ -27,15 +31,16 @@
                     <ColumnDefinition Width="*" MinWidth="200"/>
                     <ColumnDefinition Width="5*"/>
                 </Grid.ColumnDefinitions>
-                <Image>
-                    <Image.Source>
+                <ui:Image
+                    CornerRadius="15">
+                    <ui:Image.Source>
                         <Binding Path="Profile.Avatar" >
                             <Binding.TargetNullValue>
                                 <ImageSource>/Resources/PlaceholderPlayerIcon.png</ImageSource>
                             </Binding.TargetNullValue>
                         </Binding>
-                    </Image.Source>
-                </Image>
+                    </ui:Image.Source>
+                </ui:Image>
                 <Grid
                     Grid.Column="1"
                     MinWidth="100">
@@ -43,59 +48,36 @@
                         <RowDefinition Height="2*"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
-                    <TextBlock
+                    <ui:TextBlock
                         Text="{Binding Profile.CustomId}"
-                        Style="{StaticResource PageTitleStyle}"
-                        FontSize="70"></TextBlock>
-                    <TextBlock
+                        Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                        VerticalAlignment="Bottom"
+                        FontTypography="Title"
+                        FontSize="70"></ui:TextBlock>
+                    <ui:TextBlock
                         Grid.Row="1"
+                        Foreground="{StaticResource TextFillColorSecondaryBrush}"
                         Text="{Binding Profile.BattletagString}"
-                        Style="{StaticResource SubtitleTextStyle}"
-                        FontSize="30"></TextBlock>
+                        VerticalAlignment="Top"
+                        FontTypography="Subtitle"
+                        FontSize="30"></ui:TextBlock>
                 </Grid>
             </Grid>
         </Viewbox>
-
+        <ui:Button
+            Grid.Row="0"
+            Grid.Column="1"
+            VerticalAlignment="Top"
+            HorizontalAlignment="Right"
+            Click="OnBackButtonClick">
+            <ui:SymbolIcon Symbol="ArrowPrevious12" FontSize="20"/>
+        </ui:Button>
+        
         <controls:MultiRankDisplay
             Grid.Row="1"
             Grid.Column="0"
+            Career="{Binding Profile.RankedCareer}"
             x:Name="RankDisplay"/>
-        <Viewbox    
-            Visibility="Collapsed"
-            Grid.Row="1"
-            Grid.Column="0">
-            <Grid
-                MinWidth="300"
-                Margin="{StaticResource SmallLeftTopRightBottomMargin}">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="2*"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-                <Image Source="{StaticResource TankDrawingImage}"/>
-                <Image Grid.Row="0" Grid.Column="1" Source="{StaticResource DamageDrawingImage}"/>
-                <Image Grid.Row="0" Grid.Column="2" Source="{StaticResource SupportDrawingImage}"/>
-
-                <TextBlock Grid.Column="0" Grid.Row="1" 
-                           Text="{Binding Profile.RankedCareer.Tank.CurrentRank.SkillRating}" 
-                           Style="{StaticResource SubtitleTextStyle}"
-                           TextAlignment="Center"/>
-                <TextBlock Grid.Column="1" Grid.Row="1" 
-                           Text="{Binding Profile.RankedCareer.Damage.CurrentRank.SkillRating}" 
-                           Style="{StaticResource SubtitleTextStyle}"
-                           TextAlignment="Center"/>
-                <TextBlock Grid.Column="2" Grid.Row="1" 
-                           Text="{Binding Profile.RankedCareer.Tank.CurrentRank.SkillRating}" 
-                           Style="{StaticResource SubtitleTextStyle}"
-                           TextAlignment="Center"/>
-            </Grid>
-        </Viewbox>
-
-
         
         <lvc:CartesianChart
             x:Name="Chart"

@@ -17,7 +17,7 @@ public class StoredUserProfileDataService : UserProfileDataService
     private readonly string _localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
     public StoredUserProfileDataService(FileService fileService, IOptions<AppConfig> appConfig)
     {
-        ProfileDirectory = Path.Combine(_localAppData, appConfig.Value.ProfilesPath);
+        ProfileDirectory = Path.Combine(_localAppData, appConfig.Value.ConfigurationFolderName, appConfig.Value.ProfilesPath);
 
         _fileService = fileService;
 
@@ -51,7 +51,7 @@ public class StoredUserProfileDataService : UserProfileDataService
 
     public override void LoadProfilesFromDisk()
     {
-        foreach (var file in Directory.GetFiles(ProfileDirectory))
+        foreach (string file in Directory.GetFiles(ProfileDirectory))
         {
             Profiles.Add(_fileService.Read<UserData>(file));
         }

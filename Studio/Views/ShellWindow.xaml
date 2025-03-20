@@ -7,6 +7,7 @@
     xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
     xmlns:properties="clr-namespace:Studio.Properties"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    Style="{DynamicResource DefaultFluentWindowStyle2}"
     ui:Design.Foreground="Black"
     ui:Design.Background="Black"
     mc:Ignorable="d"
@@ -16,7 +17,40 @@
     Unloaded="OnUnloaded"
     Title="{x:Static properties:Resources.AppDisplayName}">
     <Window.Resources>
-
+        <Style
+                x:Key="DefaultFluentWindowStyle2"
+                BasedOn="{StaticResource {x:Type Window}}"
+                TargetType="{x:Type ui:FluentWindow}">
+            <Setter Property="Background" Value="{DynamicResource WindowBackground}" />
+            <Setter Property="Foreground" Value="{DynamicResource WindowForeground}" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Height" Value="600" />
+            <Setter Property="MinHeight" Value="320" />
+            <Setter Property="Width" Value="1100" />
+            <Setter Property="MinWidth" Value="460" />
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="FontSize" Value="{DynamicResource ControlContentThemeFontSize}" />
+            <Setter Property="FontWeight" Value="Normal" />
+            <Setter Property="UseLayoutRounding" Value="True" />
+            <Setter Property="SnapsToDevicePixels" Value="True" />
+            <Setter Property="OverridesDefaultStyle" Value="True" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Window}">
+                        <AdornerDecorator>
+                            <ui:ClientAreaBorder
+                                    Background="#191724"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}">
+                                <ContentPresenter x:Name="ContentPresenter" />
+                            </ui:ClientAreaBorder>
+                        </AdornerDecorator>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -28,7 +62,7 @@
 
         <ui:TitleBar
             x:Name="TitleBar"
-            Title="TITLE"
+            Title="{x:Static properties:Resources.AppDisplayName}"
             Grid.Row="0"
             CloseWindowByDoubleClickOnIcon="True"
             Height="30">
@@ -44,6 +78,7 @@
 
             <ui:NavigationView.ContentOverlay>
                 <Frame
+                    Background="{DynamicResource ApplicationFrameBrush}"
                     Grid.Row="1"
                     x:Name="shellFrame"
                     NavigationUIVisibility="Hidden"
