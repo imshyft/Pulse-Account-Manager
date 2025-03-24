@@ -37,7 +37,7 @@ namespace Studio.Views
         public UserProfileDataService UserProfiles {get; set; }
 
         private BattleNetService _battleNetService;
-        private ProfileDataFetchingService _profileDataFetchingService;
+        private IProfileFetchingService _profileDataFetchingService;
 
         private bool _mouseOverButton = false;
         private bool _isFlyoutOpen;
@@ -51,7 +51,7 @@ namespace Studio.Views
 
             UserProfiles = ((App)Application.Current).GetService<UserProfileDataService>();
             _battleNetService = ((App)Application.Current).GetService<BattleNetService>();
-            _profileDataFetchingService = ((App)Application.Current).GetService<ProfileDataFetchingService>();
+            _profileDataFetchingService = ((App)Application.Current).GetService<IProfileFetchingService>();
 
             AccountDataGrid.SelectedItem = null;
         }
@@ -82,35 +82,39 @@ namespace Studio.Views
 
         private void OnPlayButtonClick(object sender, RoutedEventArgs e)
         {
-            UserData profile = ((FrameworkElement)sender).DataContext as UserData;
-            if (profile == null)
-                return;
-            if (profile.Email == null)
-            {
-                SnackbarPresenter.ImmediatelyDisplay(new Snackbar(SnackbarPresenter)
-                {
-                    AllowDrop = false,
-                    Appearance = ControlAppearance.Danger,
-                    Title = "Couldn't Launch Account",
-                    Content = "No email is associated with this account",
-                    Icon = new SymbolIcon(SymbolRegular.ErrorCircle12),
-                    Opacity = 0.9
-                });
-                return;
-            }
+            //UserData profile = ((FrameworkElement)sender).DataContext as UserData;
+            //if (profile == null)
+            //    return;
+            //if (profile.Email == null)
+            //{
+            //    SnackbarPresenter.ImmediatelyDisplay(new Snackbar(SnackbarPresenter)
+            //    {
+            //        AllowDrop = false,
+            //        Appearance = ControlAppearance.Danger,
+            //        Title = "Couldn't Launch Account",
+            //        Content = "No email is associated with this account",
+            //        Icon = new SymbolIcon(SymbolRegular.ErrorCircle12),
+            //        Opacity = 0.9
+            //    });
+            //    return;
+            //}
 
-            SnackbarPresenter.ImmediatelyDisplay(new Snackbar(SnackbarPresenter)
-            {
-                AllowDrop = false,
-                Appearance = ControlAppearance.Success,
-                Title = "Launching Account!",
-                Icon = new SymbolIcon(SymbolRegular.Checkmark12, 35),
-                Opacity = 0.9
-            });
+            //SnackbarPresenter.ImmediatelyDisplay(new Snackbar(SnackbarPresenter)
+            //{
+            //    AllowDrop = false,
+            //    Appearance = ControlAppearance.Success,
+            //    Title = "Launching Account!",
+            //    Icon = new SymbolIcon(SymbolRegular.Checkmark12, 35),
+            //    Opacity = 0.9
+            //});
 
-            _battleNetService.OpenBattleNetWithAccount(profile.Email);
+            //_battleNetService.OpenBattleNetWithAccount(profile.Email);
 
-            e.Handled = true;
+            //e.Handled = true;
+            BattleTag name = _battleNetService.ReadBattleTagFromMemory();
+
+
+            Debug.WriteLine(name);
         }
 
 

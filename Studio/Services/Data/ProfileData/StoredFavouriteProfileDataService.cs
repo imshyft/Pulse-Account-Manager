@@ -28,7 +28,7 @@ public class StoredFavouriteProfileDataService : FavouriteProfileDataService
         base.SaveProfile(profile);
     }
 
-    public override UserData ReadProfile(Battletag battletag)
+    public override UserData ReadProfile(BattleTag battletag)
     {
         string fileName = $"{battletag}.json";
         var data = _fileService.Read<UserData>(ProfileDirectory, fileName);

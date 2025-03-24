@@ -1,4 +1,5 @@
-﻿using Studio.Models;
+﻿using Studio.Contracts.Services;
+using Studio.Models;
 using Studio.Services;
 using Studio.Services.Data;
 using System;
@@ -27,7 +28,7 @@ namespace Studio.Dialogs
     {
         public bool IsBattleTagValid { get; set; }
 
-        private readonly ProfileDataFetchingService _profileFetchingService;
+        private readonly IProfileFetchingService _profileFetchingService;
         private readonly BattleNetService _battleNetService;
 
 
@@ -44,7 +45,7 @@ namespace Studio.Dialogs
 
             DataContext = this;
 
-            _profileFetchingService = ((App)Application.Current).GetService<ProfileDataFetchingService>();
+            _profileFetchingService = ((App)Application.Current).GetService<IProfileFetchingService>();
             _battleNetService = ((App)Application.Current).GetService<BattleNetService>();
         }
 
@@ -89,7 +90,7 @@ namespace Studio.Dialogs
             InformationText.Text =
                 "Great! Now wait for us to find the account, and confirm";
 
-            Battletag battletag = new Battletag(BattletagInputBox.Text);
+            BattleTag battletag = new BattleTag(BattletagInputBox.Text);
 
 
             var result = await _profileFetchingService.GetUserProfile(battletag);

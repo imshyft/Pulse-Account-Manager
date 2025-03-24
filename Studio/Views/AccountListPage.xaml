@@ -36,7 +36,9 @@
                     Header=""
                     MinWidth="60"
                     CanUserSort="False"
-                    CanUserResize="False">
+                    CanUserResize="False"
+                    CanUserReorder="False"
+                    >
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <ui:Image
@@ -63,7 +65,8 @@
                     CanUserSort="True"
                     CanUserResize="False"
                     SortDirection="Descending"
-                    SortMemberPath="Username">
+                    CanUserReorder="False"
+                    SortMemberPath="CustomId">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Viewbox
@@ -99,6 +102,7 @@
                     Width="75"
                     MinWidth="68"
                     CanUserResize="False"
+                    CanUserReorder="False"
                     CanUserSort="True"
                     SortMemberPath="RankedCareer.Tank.CurrentRank.SkillRating">
                     <DataGridTemplateColumn.HeaderTemplate>
@@ -124,6 +128,7 @@
                     Width="75"
                     MinWidth="68"
                     CanUserResize="False"
+                    CanUserReorder="False"
                     CanUserSort="True"
                     SortMemberPath="RankedCareer.Damage.CurrentRank.SkillRating">
                     <DataGridTemplateColumn.HeaderTemplate>
@@ -149,6 +154,7 @@
                     Width="75"
                     MinWidth="68"
                     CanUserResize="False"
+                    CanUserReorder="False"
                     CanUserSort="True"
                     SortMemberPath="RankedCareer.Support.CurrentRank.SkillRating">
                     <DataGridTemplateColumn.HeaderTemplate>
@@ -172,6 +178,7 @@
                     Header=""
                     CanUserSort="False"
                     CanUserResize="False"
+                    CanUserReorder="False"
                     Width="200"
                     MinWidth="70">
                     
@@ -198,6 +205,7 @@
                     Header=""
                     CanUserSort="False"
                     CanUserResize="False"
+                    CanUserReorder="False"
                     MinWidth="60"
                     Width="70">
 

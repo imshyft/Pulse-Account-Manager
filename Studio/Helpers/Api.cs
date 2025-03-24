@@ -27,7 +27,7 @@ namespace Studio.Helpers
                 if (response.IsSuccessStatusCode)
                 {
                     string result = response.Content.ReadAsStringAsync().Result;
-                    ApiResponse json_response = JsonHandler.DeserializeApiResponseJson(result);
+                    ApiResponse json_response = JsonConvert.DeserializeObject<ApiResponse>(result);
                     return json_response;
                 }
                 return null;
@@ -62,12 +62,6 @@ namespace Studio.Helpers
         public string Error { get; set; }
     }
 
-    public enum ProfileFetchOutcome
-    {
-        Success,
-        NotFound,
-        Failure
-    }
 
     public class ApiResponse
     {

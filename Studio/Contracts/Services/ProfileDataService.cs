@@ -23,7 +23,7 @@ namespace Studio.Contracts.Services
             Profiles.Remove(profile);
         }
 
-        public abstract UserData ReadProfile(Battletag battletag);
+        public abstract UserData ReadProfile(BattleTag battletag);
         public abstract void LoadProfilesFromDisk();
     }
 

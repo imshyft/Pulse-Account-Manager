@@ -209,11 +209,15 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
 
             storyboard.Begin();
 
+            
+
+
             PanelCollapseButtonSymbol.Symbol = IsFavouritesPanelCollapsed
                 ? SymbolRegular.ChevronDoubleRight20
                 : SymbolRegular.ChevronDoubleLeft20;
 
             IsFavouritesPanelCollapsed = !IsFavouritesPanelCollapsed;
+
         
     }
 

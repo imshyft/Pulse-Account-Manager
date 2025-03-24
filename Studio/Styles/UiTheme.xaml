@@ -13,6 +13,8 @@
     <BitmapImage 
         x:Key="PlaceholderAvatar" 
         UriSource="/Resources/PlaceholderPlayerIcon.png"/>
+    
+    <!--Accent Button-->
     <Style
         TargetType="ui:Button"
         x:Key="AccentButton"
@@ -33,5 +35,10 @@
                 <SolidColorBrush Color="{StaticResource AccentColor}" Opacity="0.7"/>
             </Setter.Value>
         </Setter>
+    </Style>
+
+    <Style TargetType="ScrollBar"
+           BasedOn="{StaticResource {x:Type ScrollBar}}">
+        <Setter Property="MaxWidth" Value="12"/>
     </Style>
 </ResourceDictionary>

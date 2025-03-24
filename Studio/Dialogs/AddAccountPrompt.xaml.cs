@@ -19,17 +19,19 @@ using Studio.Helpers;
 using Studio.Models;
 using Wpf.Ui.Controls;
 using Studio.Services.Data;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using Wpf.Ui.Input;
+using Studio.Contracts.Services;
 
 namespace Studio.Controls
 {
     /// <summary>
     /// Interaction logic for AddAccountPrompt.xaml
     /// </summary>
-    public partial class AddAccountPrompt : ContentDialog
+    public partial class AddAccountPrompt : ContentDialog, INotifyPropertyChanged
     {
-        public bool IsBattleTagValid { get; set; }
-
-        private readonly ProfileDataFetchingService _profileFetchingService;
+        private readonly IProfileFetchingService _profileFetchingService;
         private readonly BattleNetService _battleNetService;
 
 
@@ -46,116 +48,220 @@ namespace Studio.Controls
 
             DataContext = this;
 
-            _profileFetchingService = ((App)Application.Current).GetService<ProfileDataFetchingService>();
+            _profileFetchingService = ((App)Application.Current).GetService<IProfileFetchingService>();
             _battleNetService = ((App)Application.Current).GetService<BattleNetService>();
+
+            // Memory Reading non-functional as of now
+            // TODO : Find consistent btag in memory 
+            SelectManualEntryCommand.Execute(this);
         }
 
-        private void OnBattleTagInputTextChanged(object sender, TextChangedEventArgs e)
+        private string _infoText =
+            "Do you want to manually enter the BattleTag of the account or try to automatically fetch it by reading the memory of battle.net? (experimental)";
+        private bool _isSelectingMode = true;
+        private bool _isManualEntry;
+        private bool _isMemoryRead;
+        private string _battleTagInput;
+        private bool _isLoading;
+
+
+        private InfoBarSeverity _infoBarSeverity;
+        private string _infoBarTitle;
+        private string _infoBarMessage;
+        private bool _isInfoBarOpen;
+
+        public string InfoText
         {
-            string text = BattletagInputBox.Text;
-            if (text != "")
+            get => _infoText;
+            set { _infoText = value; OnPropertyChanged(); }
+        }
+
+        public InfoBarSeverity InfoBarSeverity
+        {
+            get => _infoBarSeverity;
+            set { _infoBarSeverity = value; OnPropertyChanged(); }
+        }
+
+        public string InfoBarTitle
+        {
+            get => _infoBarTitle;
+            set { _infoBarTitle = value; OnPropertyChanged(); }
+        }
+
+        public string InfoBarMessage
+        {
+            get => _infoBarMessage;
+            set { _infoBarMessage = value; OnPropertyChanged(); }
+        }
+
+        public bool IsInfoBarOpen
+        {
+            get => _isInfoBarOpen;
+            set { _isInfoBarOpen = value; OnPropertyChanged(); }
+        }
+        public bool IsSelectingMode
+        {
+            get => _isSelectingMode;
+            set { _isSelectingMode = value; OnPropertyChanged(); }
+        }
+
+        public bool IsManualEntry
+        {
+            get => _isManualEntry;
+            set { _isManualEntry = value; OnPropertyChanged(); }
+        }
+
+        public bool IsMemoryRead
+        {
+            get => _isMemoryRead;
+            set { _isMemoryRead = value; OnPropertyChanged(); }
+        }
+
+        public string BattleTagInput
+        {
+            get => _battleTagInput;
+            set
             {
-                string[] parts = text.Split("#");
-                if (parts.Length == 2)
-                {
-                    if (int.TryParse(parts[1], out _))
-                    {
-                        IsBattleTagValid = true;
-                        LaunchBnetButton.IsEnabled = true;
-
-                        Debug.WriteLine("Battletag Valid !");
-                        InformationBar.IsOpen = false;
-                        return;
-                    }
-
-                }
+                _battleTagInput = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(IsBattleTagValid));
             }
+        }
 
-            IsBattleTagValid = false;
-            InformationBar.IsOpen = true;
-            LaunchBnetButton.IsEnabled = false;
+        public bool IsBattleTagValid
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(BattleTagInput))
+                {
+                    string[] parts = BattleTagInput.Split("#");
+                    if (parts.Length == 2)
+                        return true;
+                }
+
+                return false;
+
+            }
         }
 
 
-
-        private async void OnLaunchBattlenetButtonClick(object sender, RoutedEventArgs e)
+        public bool IsLoading
         {
-
-            if (!IsBattleTagValid)
-                return;
-
-            BattletagInputBox.Visibility = Visibility.Collapsed;
-            LaunchBnetButton.Visibility = Visibility.Collapsed;
-
-            LaunchingBnetProgressBar.Visibility = Visibility.Visible;
+            get => _isLoading;
+            set { _isLoading = value; OnPropertyChanged(); }
+        }
 
 
-            InformationText.Text =
-                "Great! Now wait for Battle.net to open and log in while we fetch your account details, then once you're logged in, press Add Account";
+        public ICommand SelectManualEntryCommand => new RelayCommand<object>(_ =>
+        {
+            IsManualEntry = true;
+            IsMemoryRead = false;
+            IsSelectingMode = false;
 
-            Battletag battletag = new Battletag(BattletagInputBox.Text);
+            InfoText =
+                "Enter the Battle tag of the account you will log into. Once Battle.net is launched, log into the account and then continue.";
 
+        });
+
+        public ICommand SelectMemoryReadCommand => new RelayCommand<object>(async _ =>
+        {
+            IsMemoryRead = true;
+            IsManualEntry = false;
+            IsSelectingMode = false;
+
+            InfoText =
+                "We will try to read the Battletag from Battle.net's memory. If Battle.net isn't open, wait for it to open and try again.";
+
+            BattleTag battleTag = _battleNetService.ReadBattleTagFromMemory();
+            if (battleTag != null)
+            {
+                var result = await _profileFetchingService.GetUserProfile(battleTag);
+                switch (result.Error)
+                {
+                    case "Not Found":
+                        ShowError(
+                            "Profile could not be found",
+                            "We couldn't retrieve the details of the account, but you can still switch to it. Maybe the profile was private. "
+                            );
+                        break;
+                    case "":
+                        ShowSuccess("Profile Found", $"Found the profile at {result.Profile.Battletag}");
+                        break;
+                    default:
+                        ShowError("Unexpected Error Occurred", $"You can still swap to it, but we couldn't get the info. Error [{result.Error}]");
+                        break;
+                }
+
+                Profile = result.Profile;
+                IsPrimaryButtonEnabled = true;
+            }
+            else
+            {
+                ShowError("Couldn't read BattleTag", "We couldn't read the BattleTag. Make sure the Battle.net has completely opened and try again or manually enter it.");
+            }
+        });
+
+        public ICommand LaunchBattleNetCommand => new RelayCommand<object>(async _ =>
+        {
             _battleNetService.OpenBattleNetWithEmptyAccount();
 
-
-            var result = await _profileFetchingService.GetUserProfile(battletag);
-
-            LaunchingBnetProgressBar.Visibility = Visibility.Collapsed;
-            InformationBar.IsOpen = true;
+            BattleTag battleTag = new BattleTag(BattleTagInput);
+            var result = await _profileFetchingService.GetUserProfile(battleTag);
 
             switch (result.Error)
             {
                 case "Not Found":
-                    InformationBar.Title = "Profile Could not be found";
-                    InformationBar.Severity = InfoBarSeverity.Warning;
-                    InformationBar.Message =
-                        "We couldn't retrieve the details of the account, but you can still switch to it. Could it be a Private Profile?";
+                    ShowError(
+                        "Profile could not be found",
+                        "We couldn't retrieve the details of the account, but you can still switch to it. Maybe the battletag was incorrect or the profile was private. "
+                        );
                     break;
                 case "":
-                    InformationBar.Title = "Profile found";
-                    InformationBar.Severity = InfoBarSeverity.Success;
-                    InformationBar.Message = $"Successfully found the profile at {result.Profile.Battletag}!";
+                    ShowSuccess("Profile Found", $"Found the profile at {result.Profile.Battletag}");
                     break;
                 default:
-                    InformationBar.Title = "Couldn't contact the API";
-                    InformationBar.Severity = InfoBarSeverity.Error;
-                    InformationBar.Message =
-                        $"We couldn't retrieve the details of the account at the moment, but you can still switch to it. Try syncing again later. \nError Message: [{result.Error}]";
+                    ShowError("Unexpected Error Occurred", $"You can still swap to it, but we couldn't get the info. Error [{result.Error}]");
                     break;
             }
 
-            InformationBar.IsOpen = true;
-
             Profile = result.Profile;
-
             IsPrimaryButtonEnabled = true;
-        }
 
-        protected override void OnButtonClick(ContentDialogButton button)
+        });
+
+        public ICommand RetryMemoryReadCommand => new RelayCommand<object>(async _ =>
         {
-            if (button != ContentDialogButton.Primary)
-            {
-                base.OnButtonClick(button);
-                return;
-            }
+            SelectMemoryReadCommand.Execute(null);
+        });
 
-            string email = _battleNetService.GetBattleNetAccount();
-            if (string.IsNullOrEmpty(email))
-            {
-                InformationBar.Title = "Email not found";
-                InformationBar.Severity = InfoBarSeverity.Error;
-                InformationBar.Message =
-                    "Couldn't find the email in the config! Try waiting a bit or closing Battle.net and try again";
-                InformationBar.IsOpen = true;
-                return;
-            }
+        public ICommand CancelMemoryReadCommand => new RelayCommand<object>(_ =>
+        {
+            SelectManualEntryCommand.Execute(null);
+        });
 
-            InformationBar.IsOpen = false;
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string propertyName = null) =>
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
-            Profile.Email = email;
-
-            base.OnButtonClick(button);
+        public void ShowError(string title, string message)
+        {
+            InfoBarSeverity = InfoBarSeverity.Error;
+            InfoBarTitle = title;
+            InfoBarMessage = message;
+            IsInfoBarOpen = true;
         }
 
+        public void ShowSuccess(string title, string message)
+        {
+            InfoBarSeverity = InfoBarSeverity.Success;
+            InfoBarTitle = title;
+            InfoBarMessage = message;
+            IsInfoBarOpen = true;
+        }
+
+        public void CloseInfoBar()
+        {
+            IsInfoBarOpen = false;
+        }
     }
 }

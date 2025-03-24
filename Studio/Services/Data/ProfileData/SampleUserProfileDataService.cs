@@ -43,7 +43,7 @@ namespace Studio.Services.Data
 
                 data.Add(new UserData()
                 {
-                    Battletag = new Battletag("Username", _rnd.Next(1000, 9999).ToString()),
+                    Battletag = new BattleTag("Username", _rnd.Next(1000, 9999).ToString()),
                     //Username = "Username",
                     //Tag = _rnd.Next(1000, 9999).ToString(),
                     Avatar = missingDetails ? 
@@ -113,7 +113,7 @@ namespace Studio.Services.Data
             base.SaveProfile(profile);
         }
 
-        public override UserData ReadProfile(Battletag battletag)
+        public override UserData ReadProfile(BattleTag battletag)
         {
             return CreateProfiles(1)[0];
         }

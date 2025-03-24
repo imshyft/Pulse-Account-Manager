@@ -32,7 +32,8 @@
                     <ColumnDefinition Width="5*"/>
                 </Grid.ColumnDefinitions>
                 <ui:Image
-                    CornerRadius="15">
+                    CornerRadius="15"
+                    Width="160">
                     <ui:Image.Source>
                         <Binding Path="Profile.Avatar" >
                             <Binding.TargetNullValue>

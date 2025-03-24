@@ -18,6 +18,7 @@ using Studio.Services.Data;
 using Studio.Services.Files;
 using Studio.Services.Storage;
 using Studio.Views;
+using Studio.Services.Data.ProfileFetching;
 
 namespace Studio;
 
@@ -77,12 +78,14 @@ public partial class App : Application
 #if DEBUG
         services.AddSingleton<UserProfileDataService, SampleUserProfileDataService>();
         services.AddSingleton<FavouriteProfileDataService, SampleFavouriteProfileDataService>();
+        services.AddSingleton<IProfileFetchingService, NoApiProfileFetchingService>();
 #else
         services.AddSingleton<UserProfileDataService, StoredUserProfileDataService>();
         services.AddSingleton<FavouriteProfileDataService, StoredFavouriteProfileDataService>();
+        services.AddSingleton<IProfileFetchingService, PublicOverfastProfileFetchingService>();
 #endif
         services.AddSingleton<PathResolverService>();
-        services.AddSingleton<ProfileDataFetchingService>();
+        
         services.AddSingleton<BattleNetService>();
 
 

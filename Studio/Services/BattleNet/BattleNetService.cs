@@ -1,8 +1,13 @@
 ﻿using Studio.Services.Storage;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows;
+using System.Xml.Linq;
+using Studio.Models;
+using Studio.Services.BattleNet;
 
 namespace Studio.Services
 {
@@ -12,12 +17,14 @@ namespace Studio.Services
         private readonly PersistAndRestoreService _persistAndRestoreService;
         private readonly string _battleNetConfigPath;
         private readonly string _overwatchLauncherPath;
+        private readonly BattleNetMemoryReaderService _memoryReaderService;
+
 
         public BattleNetService()
         {
             _persistAndRestoreService = ((App)Application.Current).GetService<PersistAndRestoreService>();
             _battleNetConfigPath = _persistAndRestoreService.GetValue<string>("BattleNetConfigPath");
-
+            _memoryReaderService = new BattleNetMemoryReaderService();
             string overwatchDirectory = _persistAndRestoreService.GetValue<string>("OverwatchDirectory");
             _overwatchLauncherPath = Path.Combine(overwatchDirectory, "Overwatch Launcher.exe");
         }
@@ -80,6 +87,12 @@ namespace Studio.Services
                 string email = match.Groups[1].Value;
                 return email;
             }
+
+        }
+
+        public BattleTag ReadBattleTagFromMemory()
+        {
+            return _memoryReaderService.FindBattleTagInMemory();
 
         }
     }

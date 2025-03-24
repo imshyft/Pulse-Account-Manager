@@ -13,45 +13,84 @@
     </ui:ContentDialog.Resources>
     <Grid MaxWidth="300">
         <StackPanel>
+            <!-- Main Information Text -->
             <ui:TextBlock
-                x:Name="InformationText"
-                TextWrapping="Wrap"
-                HorizontalAlignment="Center"
-                TextAlignment="Center"
-                Style="{StaticResource BodyTextStyle}"
-                Margin="{StaticResource SmallLeftTopRightBottomMargin}"
-                Text="Enter the Battle tag of the account you will log into. This will log you out of Battle.net, where you can log in with a new account."/>
-            <ui:TextBox
-                x:Name="BattletagInputBox"
-                PlaceholderText="Enter Battletag..."
-                TextChanged="OnBattleTagInputTextChanged"/>
-            <ui:InfoBar
-                x:Name="InformationBar"
-                Margin="{StaticResource SmallTopMargin}"
-                Severity="Error"
-                Title="Invalid Battletag"
-                Message="Battletag must be written as ExampleName#1234"
-                IsOpen="False"/>
+            TextWrapping="Wrap"
+            HorizontalAlignment="Center"
+            TextAlignment="Center"
+            Style="{StaticResource BodyTextStyle}"
+            Margin="{StaticResource SmallLeftTopRightBottomMargin}"
+            Text="{Binding InfoText}"/>
+
+            <!-- Option Selection Buttons -->
+            <ui:Button
+            HorizontalAlignment="Stretch"
+            Visibility="{Binding IsSelectingMode, Converter={StaticResource BooleanToVisibilityConverter}}"
+            Margin="{StaticResource SmallTopMargin}"
+            Height="35"
+            Content="Manually enter battle.tag"
+            Command="{Binding SelectManualEntryCommand}"/>
 
             <ui:Button
-                x:Name="LaunchBnetButton"
+            HorizontalAlignment="Stretch"
+            Visibility="{Binding IsSelectingMode, Converter={StaticResource BooleanToVisibilityConverter}}"
+            Margin="{StaticResource SmallTopBottomMargin}"
+            Height="35"
+            Content="Read from Battle.Net memory"
+            Command="{Binding SelectMemoryReadCommand}"/>
+
+            <!-- Manual Entry UI -->
+            <StackPanel Visibility="{Binding IsManualEntry, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <ui:TextBlock Text="Enter your BattleTag:" 
+                          Margin="{StaticResource SmallTopMargin}"/>
+
+                <ui:TextBox
+                PlaceholderText="ExampleName#1234"
+                Text="{Binding BattleTagInput, UpdateSourceTrigger=PropertyChanged}"
+                Margin="{StaticResource SmallTopBottomMargin}"/>
+
+                <ui:Button
                 HorizontalAlignment="Stretch"
-                Margin="{StaticResource SmallTopBottomMargin}"
                 Height="35"
                 Content="Launch Battle.net"
                 IsEnabled="{Binding IsBattleTagValid}"
-                Click="OnLaunchBattlenetButtonClick"/>
+                Command="{Binding LaunchBattleNetCommand}"/>
+            </StackPanel>
 
+            <!-- Memory Read UI -->
+            <StackPanel Visibility="{Binding IsMemoryRead, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <ui:TextBlock Text="Attempting to read BattleTag from memory..." 
+                          Margin="{StaticResource SmallTopMargin}"/>
+
+                <ui:Button
+                HorizontalAlignment="Stretch"
+                Height="35"
+                Content="Retry Memory Read"
+                Command="{Binding RetryMemoryReadCommand}"
+                Margin="{StaticResource SmallTopMargin}"/>
+
+                <ui:Button
+                HorizontalAlignment="Stretch"
+                Height="35"
+                Content="Cancel"
+                Command="{Binding CancelMemoryReadCommand}"
+                Margin="{StaticResource SmallTopBottomMargin}"/>
+            </StackPanel>
+
+            <!-- Information Bar -->
+            <ui:InfoBar
+                x:Name="InformationBar"
+                Margin="{StaticResource SmallTopMargin}"
+                Severity="{Binding InfoBarSeverity}"
+                Title="{Binding InfoBarTitle}"
+                Message="{Binding InfoBarMessage}"
+                IsOpen="{Binding IsInfoBarOpen}"/>
+
+            <!-- Progress Bar -->
             <ProgressBar
-                x:Name="LaunchingBnetProgressBar"
-                IsIndeterminate="True"
-                Margin="{StaticResource SmallLeftRightMargin}"
-                Visibility="Collapsed"/>
-
-
-
+            IsIndeterminate="True"
+            Margin="{StaticResource SmallLeftRightMargin}"
+            Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}"/>
         </StackPanel>
-
-
     </Grid>
 </ui:ContentDialog>

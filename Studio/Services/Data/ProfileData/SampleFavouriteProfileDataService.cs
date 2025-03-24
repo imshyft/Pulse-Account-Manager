@@ -31,7 +31,7 @@ namespace Studio.Services.Data
             {
                 data.Add(new UserData()
                 {
-                    Battletag = new Battletag("Username", _rnd.Next(1000, 9999).ToString()),
+                    Battletag = new BattleTag("Username", _rnd.Next(1000, 9999).ToString()),
 
                     Avatar = $"https://d15f34w2p8l1cc.cloudfront.net/overwatch/daeddd96e58a2150afa6ffc3c5503ae7f96afc2e22899210d444f45dee508c6c.png",
                     CustomId = $"Name{_rnd.Next(1000)}",
@@ -75,7 +75,7 @@ namespace Studio.Services.Data
             base.SaveProfile(profile);
         }
 
-        public override UserData ReadProfile(Battletag battletag)
+        public override UserData ReadProfile(BattleTag battletag)
         {
             return CreateProfiles(1)[0];
         }
