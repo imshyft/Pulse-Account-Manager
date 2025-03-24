@@ -5,11 +5,14 @@
     <TargetFramework>net6.0-windows10.0.19041.0</TargetFramework>
     <RootNamespace>Studio</RootNamespace>
     <UseWPF>true</UseWPF>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
     <ImplicitUsings>enable</ImplicitUsings>
+    <ApplicationIcon>AccountLauncherLogo.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <FileVersion>0.1.0.0</FileVersion>
   </PropertyGroup>
   
   <ItemGroup>
+    <None Remove="Resources\AccountLauncherLogo.ico" />
     <None Remove="Resources\PatchNotesWebView\index.html" />
     <None Remove="Resources\PatchNotesWebView\script.js" />
     <None Remove="Resources\PatchNotesWebView\styles.css" />
@@ -30,6 +33,7 @@
   </ItemGroup>
   
   <ItemGroup>
+    <Content Include="AccountLauncherLogo.ico" />
     <Content Include="Resources\PatchNotesWebView\index.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -39,6 +43,9 @@
     <Content Include="Resources\PatchNotesWebView\styles.css">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Resource Include="Resources\AccountLauncherLogo.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="Resources\PlaceholderPlayerIcon.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>

@@ -17,6 +17,8 @@
 
     <Color x:Key="Theme.PrimaryAccentColor">#ebbcba</Color>
     <SolidColorBrush x:Key="Theme.ShowcaseBrush" Color="#ebbcba" options:Freeze="True" />
+
+
     <!--
     We've defined the most basic colors and brushes.
     Please add other colors and brushes you use in your application. You should have a look at
@@ -445,14 +447,14 @@
 
     <!--  ContentDialog  -->
     <SolidColorBrush x:Key="ContentDialogSmokeFill" Color="{StaticResource SmokeFillColorDefault}" />
-    <SolidColorBrush x:Key="ContentDialogBackground" Color="{StaticResource SolidBackgroundFillColorBase}" />
+    <SolidColorBrush x:Key="ContentDialogBackground" Color="{StaticResource ApplicationFrameColor}" />
     <SolidColorBrush x:Key="ContentDialogTopOverlay" Color="{StaticResource LayerFillColorAlt}" />
     <SolidColorBrush x:Key="ContentDialogBorderBrush" Color="{StaticResource SurfaceStrokeColorDefault}" />
     <SolidColorBrush x:Key="ContentDialogSeparatorBorderBrush" Color="{StaticResource CardStrokeColorDefault}" />
     <SolidColorBrush x:Key="ContentDialogForeground" Color="{StaticResource TextFillColorPrimary}" />
 
     <!--  ContextMenu  -->
-    <SolidColorBrush x:Key="ContextMenuBackground" Color="{StaticResource AcrylicBackgroundFillColorDefault}" />
+    <SolidColorBrush x:Key="ContextMenuBackground" Color="{StaticResource HighlightHighColor}" />
     <SolidColorBrush x:Key="ContextMenuBorderBrush" Color="{StaticResource SurfaceStrokeColorFlyout}" />
     <SolidColorBrush x:Key="ContextMenuForeground" Color="{StaticResource TextFillColorPrimary}" />
 

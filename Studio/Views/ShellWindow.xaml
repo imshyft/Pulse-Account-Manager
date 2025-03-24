@@ -62,10 +62,12 @@
 
         <ui:TitleBar
             x:Name="TitleBar"
-            Title="{x:Static properties:Resources.AppDisplayName}"
             Grid.Row="0"
             CloseWindowByDoubleClickOnIcon="True"
-            Height="30">
+            Height="40">
+            <ui:TitleBar.Icon>
+                <ui:ImageIcon Source="pack://application:,,,/Resources/AccountLauncherLogo.ico" Height="auto" Margin="2,-8,0,-8"/>
+            </ui:TitleBar.Icon>
         </ui:TitleBar>
 
         <ui:NavigationView

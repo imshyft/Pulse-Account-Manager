@@ -9,7 +9,10 @@
              d:DesignHeight="200" d:DesignWidth="400"
              Title="Add User Account">
     <ui:ContentDialog.Resources>
-        <Style BasedOn="{StaticResource {x:Type ui:ContentDialog}}" TargetType="{x:Type local:AddAccountPrompt}" />
+        <Style BasedOn="{StaticResource {x:Type ui:ContentDialog}}" TargetType="{x:Type local:AddAccountPrompt}">
+            
+        </Style>
+        
     </ui:ContentDialog.Resources>
     <Grid MaxWidth="300">
         <StackPanel>

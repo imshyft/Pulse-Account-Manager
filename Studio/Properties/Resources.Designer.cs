@@ -61,11 +61,21 @@ namespace Studio.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Overwatch Account Launcher.
+        ///   Looks up a localized string similar to Pulse.
         /// </summary>
         public static string AppDisplayName {
             get {
                 return ResourceManager.GetString("AppDisplayName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        public static byte[] ApplicationIcon {
+            get {
+                object obj = ResourceManager.GetObject("ApplicationIcon", resourceCulture);
+                return ((byte[])(obj));
             }
         }
         

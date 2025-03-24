@@ -91,7 +91,6 @@
                     Header="Name"
                     CanUserSort="True"
                     CanUserResize="False"
-                    SortDirection="Descending"
                     CanUserReorder="False"
                     SortMemberPath="CustomId">
                     <DataGridTemplateColumn.CellTemplate>
