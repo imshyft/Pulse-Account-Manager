@@ -59,7 +59,7 @@ namespace Studio.Services.Data
         {
             ApiResponse response = await FetchProfileFromApi(battletag);
 
-            UserData userData = new UserData
+            Profile userData = new Profile
             {
                 Battletag = battletag,
                 CustomId = battletag?.Username,

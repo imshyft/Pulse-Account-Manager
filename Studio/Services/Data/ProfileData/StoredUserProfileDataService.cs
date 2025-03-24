@@ -25,7 +25,7 @@ public class StoredUserProfileDataService : UserProfileDataService
             Directory.CreateDirectory(ProfileDirectory);
     }
 
-    public override void SaveProfile(UserData profile)
+    public override void SaveProfile(Profile profile)
     {
         string fileName = $"{profile.Battletag}.json";
         _fileService.Save(ProfileDirectory, fileName, profile);
@@ -33,14 +33,14 @@ public class StoredUserProfileDataService : UserProfileDataService
         base.SaveProfile(profile);
     }
 
-    public override UserData ReadProfile(BattleTag battletag)
+    public override Profile ReadProfile(BattleTag battletag)
     {
         string fileName = $"{battletag}.json";
-        var data = _fileService.Read<UserData>(ProfileDirectory, fileName);
+        var data = _fileService.Read<Profile>(ProfileDirectory, fileName);
         return data;
     }
 
-    public override void DeleteProfile(UserData profile)
+    public override void DeleteProfile(Profile profile)
     {
         string fileName = $"{profile.Battletag}.json";
 
@@ -53,7 +53,7 @@ public class StoredUserProfileDataService : UserProfileDataService
     {
         foreach (string file in Directory.GetFiles(ProfileDirectory))
         {
-            Profiles.Add(_fileService.Read<UserData>(file));
+            Profiles.Add(_fileService.Read<Profile>(file));
         }
     }
 

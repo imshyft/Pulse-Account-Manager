@@ -7,12 +7,13 @@
     xmlns:properties="clr-namespace:Studio.Properties"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+    xmlns:controls="clr-namespace:Studio.Controls"
     mc:Ignorable="d"
     xmlns:data="clr-namespace:Studio.Services.Data"
     d:DataContext="{d:DesignInstance Type=data:DesignTimeSampleData, IsDesignTimeCreatable=True}"
     d:DesignHeight="450" d:DesignWidth="800">
     <Page.Resources>
-        <DataTemplate x:Key="FavouritesDataTemplate">
+        <DataTemplate x:Key="DefaultPanelContentTemplate">
             <Grid 
                 Height="60"
                 ToolTipService.InitialShowDelay="50">
@@ -44,18 +45,155 @@
                     </ui:Image.Source>
                 </ui:Image>
 
+
                 <StackPanel Grid.Column="1"
-                            Margin="20, 8, 0, 0">
+                Margin="20, 8, 0, 0">
                     <TextBlock
-                        Text="{Binding CustomId}"
-                        Style="{StaticResource ListTitleStyle}"/>
+            Text="{Binding CustomId}"
+            Style="{StaticResource ListTitleStyle}"/>
+                    <TextBlock
+            Text="{Binding BattletagString}"
+            Style="{StaticResource ListSubTitleStyle}"/>
+                </StackPanel>
+            </Grid>
+            
+        </DataTemplate>
+        <DataTemplate x:Key="GroupSelectionContentTemplate">
+            <Grid 
+                Height="110"
+                ToolTipService.InitialShowDelay="50">
+                <Grid.ToolTip>
+                    <StackPanel>
+                        <TextBlock
+                            Text="{Binding CustomId}"
+                            Style="{StaticResource ListTitleStyle}"/>
+                        <TextBlock
+                            Text="{Binding BattletagString}"
+                            Style="{StaticResource ListSubTitleStyle}"/>
+                    </StackPanel>
+                </Grid.ToolTip>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="50"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <ui:Image
+                    Margin="10, 0, -4 ,0"
+                    CornerRadius="4">
+                    <ui:Image.Source>
+                        <Binding Path="Avatar" >
+                            <Binding.TargetNullValue>
+                                <StaticResource ResourceKey="PlaceholderAvatar"/>
+                            </Binding.TargetNullValue>
+                        </Binding>
+                    </ui:Image.Source>
+                </ui:Image>
+
+                <Grid Grid.Column="1"
+                Margin="10, 2, 0, 0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="20"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
                     <TextBlock
                         Text="{Binding BattletagString}"
-                        Style="{StaticResource ListSubTitleStyle}"/>
-                </StackPanel>
+                        Style="{StaticResource ListTitleStyle}"
+                        FontSize="14"/>
 
+
+                    <Grid
+                        Grid.Row="1"
+                        HorizontalAlignment="Stretch">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.Resources>
+                            <Style TargetType="{x:Type ui:Button}"
+                                   BasedOn="{StaticResource {x:Type ui:Button}}">
+                                <Setter Property="VerticalAlignment" Value="Stretch"/>
+                                <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                                <Setter Property="Appearance" Value="Transparent"/>
+                                <Setter Property="Padding" Value="0"/>
+                                <Setter Property="Opacity" Value="0.6"/>
+                                <Setter Property="Visibility" Value="Visible"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=Tag}" Value="{x:Null}">
+                                        <Setter Property="Visibility" Value="Hidden"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=Tag.IsSelectedForComparison}" Value="True">
+                                        <Setter Property="Opacity" Value="1"/>
+                                        <Setter Property="Appearance" Value="Success"/>
+                                    </DataTrigger>
+                                    <DataTrigger Value="False">
+                                        <DataTrigger.Binding>
+                                            <MultiBinding Converter="{StaticResource RangeToBooleanConverter}">
+                                                <Binding Path="DataContext.GroupSelectionService.Range" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Page}"/>
+                                                <Binding Path ="Tag.CurrentRank.SkillRating" RelativeSource="{RelativeSource Self}"/>
+                                            </MultiBinding>
+                                        </DataTrigger.Binding>
+                                        <Setter Property="Opacity" Value="0.2"/>
+                                        <Setter Property="Background">
+                                            <Setter.Value>
+                                                <SolidColorBrush Color="{StaticResource PaletteRedColor}" Opacity="0.3"/>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </DataTrigger>
+
+                                </Style.Triggers>
+                        
+                            </Style>
+                        </Grid.Resources>
+                        <ui:Button
+                            Click="OnSidePanelRoleButtonClick"
+                            Tag="{Binding RankedCareer.Tank}">
+                            <Viewbox>
+                                <controls:RankDisplay RankValue="{Binding Tag.CurrentRank, RelativeSource={RelativeSource AncestorType=ui:Button}}"/>
+                            </Viewbox>
+                        </ui:Button>
+                        <ui:Button
+                            Grid.Column="1"
+                            Click="OnSidePanelRoleButtonClick"
+                            Tag="{Binding RankedCareer.Damage}">
+                            <Viewbox>
+                                <controls:RankDisplay RankValue="{Binding Tag.CurrentRank, RelativeSource={RelativeSource AncestorType=ui:Button}}"/>
+                            </Viewbox>
+                        </ui:Button>
+                        <ui:Button
+                            Grid.Column="2"
+                            Click="OnSidePanelRoleButtonClick"
+                            Tag="{Binding RankedCareer.Support}">
+                            <Viewbox>
+                                <controls:RankDisplay RankValue="{Binding Tag.CurrentRank, RelativeSource={RelativeSource AncestorType=ui:Button}}"/>
+                            </Viewbox>
+                        </ui:Button>
+                    </Grid>
+
+                </Grid>
 
             </Grid>
+            
+        </DataTemplate>
+        <DataTemplate x:Key="FavouritesDataTemplate">
+            
+            <ContentControl 
+                    Grid.Column="1"
+                    Content="{Binding }">
+                <ContentControl.Style>
+                    <Style
+                            TargetType="{x:Type ContentControl}">
+                        <Setter Property="ContentTemplate" Value="{StaticResource DefaultPanelContentTemplate}"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=Page}, Path=DataContext.GroupSelectionService.IsEnabled}" Value="True">
+                                <Setter Property="ContentTemplate" Value="{StaticResource GroupSelectionContentTemplate}" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ContentControl.Style>
+            </ContentControl>
         </DataTemplate>
 
     </Page.Resources>
@@ -66,7 +204,7 @@
 
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition x:Name="FavouritesColumn" Width="250"/>
+            <ColumnDefinition x:Name="FavouritesColumn" MaxWidth="250"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="40"/>
@@ -81,13 +219,6 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <!--<ui:Button 
-                HorizontalAlignment="Stretch"
-                VerticalAlignment="Stretch"
-                Click="OnAddUserProfileButtonClick"
-                Style="{DynamicResource AccentButton}">
-                <ui:SymbolIcon Symbol="Add48"/>
-            </ui:Button>-->
             <ui:DropDownButton
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch"
@@ -114,13 +245,15 @@
             </Grid.ColumnDefinitions>
 
             <ui:Button
+                IsEnabled="{Binding GroupSelectionService.IsEnabled, Converter={StaticResource InverseBooleanConverter}}"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch"
                 HorizontalContentAlignment="Stretch"
                 Appearance="Transparent"
                 Click="OnFavouriteUserToggleButtonClick"
                 Style="{DynamicResource AccentButton}"
-                Margin="{StaticResource XSmallLeftRightMargin}">
+                Margin="{StaticResource XSmallLeftRightMargin}"
+                ToolTip="Toggle between favourites and user profiles">
                 <ui:SymbolIcon x:Name="PanelToggleSymbol"  Symbol="Star48"/>
             </ui:Button>
             <ui:TextBox
@@ -140,6 +273,10 @@
             NavigationUIVisibility="Hidden"
             Focusable="False" />
 
+        <ui:SnackbarPresenter 
+            x:Name="SnackbarPresenter"
+            Grid.Row="1"/>
+
 
         <ui:ListView 
             x:Name="FavouritesList"
@@ -152,26 +289,54 @@
             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
             VirtualizingPanel.ScrollUnit="Pixel"
             Panel.ZIndex="-1">
+            <ListView.ContextMenu>
+                <ContextMenu>
+                    <ui:MenuItem
+                        Header="Sync"
+                        Click="OnSidePanelItemSyncClick"/>
+                </ContextMenu>
+            </ListView.ContextMenu>
         </ui:ListView>
+
+
 
         <Grid
             Grid.Row="1"
             Grid.Column="1"
             Margin="4,0,0,0"
-            Width="65"
             Height="40"
             HorizontalAlignment="Left"
             VerticalAlignment="Bottom"
-            Background="{DynamicResource ApplicationFrameBrush}">
+            >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="65"/>
+                <ColumnDefinition Width="20"/>
+                <ColumnDefinition Width="65"/>
+            </Grid.ColumnDefinitions>
+            <Border
+                Grid.ColumnSpan="3"
+                Background="{DynamicResource ApplicationFrameBrush}"
+                Opacity="0.9"
+                CornerRadius="4,4,0,0"/>
+
             <ui:Button
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch"
-                Click="OnFavouritesPanelButtonClick"
+                Click="OnToggleOpenFavouritesPanelButtonClick"
                 CornerRadius="4,4, 0, 0"
                 Style="{DynamicResource AccentButton}"
-                >
+                ToolTip="Expand/Collapse the sidebar">
                 <ui:SymbolIcon x:Name="PanelCollapseButtonSymbol" Symbol="ChevronDoubleRight20" FontSize="25"/>
             </ui:Button>
+
+            <ToggleButton
+                Grid.Column="2"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                Click="OnToggleGroupSelectionButtonClick"
+                ToolTip="Toggle group selection mode">
+                <ui:SymbolIcon Symbol="PeopleCommunity16" FontSize="20"/>
+            </ToggleButton>
         </Grid>
 
 

@@ -10,20 +10,20 @@ namespace Studio.Contracts.Services
     {
         public string ProfileDirectory { get; protected set; }
 
-        public ObservableCollection<UserData> Profiles { get; set; } = new ObservableCollection<UserData>();
+        public ObservableCollection<Profile> Profiles { get; set; } = new ObservableCollection<Profile>();
 
 
-        public virtual void SaveProfile(UserData profile)
+        public virtual void SaveProfile(Profile profile)
         {
             Profiles.Add(profile);
         }
 
-        public virtual void DeleteProfile(UserData profile)
+        public virtual void DeleteProfile(Profile profile)
         {
             Profiles.Remove(profile);
         }
 
-        public abstract UserData ReadProfile(BattleTag battletag);
+        public abstract Profile ReadProfile(BattleTag battletag);
         public abstract void LoadProfilesFromDisk();
     }
 

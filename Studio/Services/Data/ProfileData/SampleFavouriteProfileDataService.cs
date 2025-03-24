@@ -10,6 +10,7 @@ namespace Studio.Services.Data
     {
 
         private readonly Random _rnd = new(1);
+        private int[] _randomDates;
 
 
         private List<RankMoment> RandomRankMoments(int count)
@@ -24,41 +25,53 @@ namespace Studio.Services.Data
                 .ToList();
         }
 
-        private List<UserData> CreateProfiles(int count)
+        private List<Profile> CreateProfiles(int count)
         {
-            List<UserData> data = new List<UserData>();
+            int rankMoments = 10;
+            List<Profile> data = new List<Profile>();
             for (int i = 0; i < count; i++)
             {
-                data.Add(new UserData()
+                _randomDates = new int[rankMoments];
+                int date = 1726641630;
+                for (int j = 0; j < rankMoments; j++)
+                {
+                    _randomDates[j] = date;
+                    date += _rnd.Next(80000, 160000);
+                }
+
+                bool missingDetails = _rnd.NextDouble() < 0.3;
+
+                data.Add(new Profile()
                 {
                     Battletag = new BattleTag("Username", _rnd.Next(1000, 9999).ToString()),
-
-                    Avatar = $"https://d15f34w2p8l1cc.cloudfront.net/overwatch/daeddd96e58a2150afa6ffc3c5503ae7f96afc2e22899210d444f45dee508c6c.png",
+                    //Username = "Username",
+                    //Tag = _rnd.Next(1000, 9999).ToString(),
+                    Avatar = missingDetails ?
+                        null : $"https://d15f34w2p8l1cc.cloudfront.net/overwatch/daeddd96e58a2150afa6ffc3c5503ae7f96afc2e22899210d444f45dee508c6c.png",
                     CustomId = $"Name{_rnd.Next(1000)}",
                     Email = null,
                     LastUpdate = _rnd.Next(1, 1000000),
                     RankedCareer = new RankedCareer()
                     {
-                        Damage = new Damage()
+                        Damage = _rnd.NextDouble() > 0.4 ? new Damage()
                         {
                             CurrentRank = Rank.RankFromSr(_rnd.Next(500, 5000)),
                             PeakRank = RandomRankMoments(1)[0],
-                            RankMoments = RandomRankMoments(10)
-                        },
+                            RankMoments = RandomRankMoments(rankMoments)
+                        } : null,
+                        Support = _rnd.NextDouble() > 0.4 ? new Support()
+                        {
+                            CurrentRank = Rank.RankFromSr(_rnd.Next(500, 5000)),
+                            PeakRank = RandomRankMoments(1)[0],
+                            RankMoments = RandomRankMoments(rankMoments)
+                        } : null,
 
-                        Support = new Support()
+                        Tank = _rnd.NextDouble() > 0.4 ? new Tank()
                         {
                             CurrentRank = Rank.RankFromSr(_rnd.Next(500, 5000)),
                             PeakRank = RandomRankMoments(1)[0],
-                            RankMoments = RandomRankMoments(10)
-                        },
-
-                        Tank = new Tank()
-                        {
-                            CurrentRank = Rank.RankFromSr(_rnd.Next(500, 5000)),
-                            PeakRank = RandomRankMoments(1)[0],
-                            RankMoments = RandomRankMoments(10)
-                        },
+                            RankMoments = RandomRankMoments(rankMoments)
+                        } : null,
                     },
                     TimesLaunched = _rnd.Next(3, 80),
                     TimesSwitched = _rnd.Next(10, 300)
@@ -69,18 +82,18 @@ namespace Studio.Services.Data
             return data;
         }
 
-        public override void SaveProfile(UserData profile)
+        public override void SaveProfile(Profile profile)
         {
             Debug.WriteLine("Save Favourite Profile Method Called.");
             base.SaveProfile(profile);
         }
 
-        public override UserData ReadProfile(BattleTag battletag)
+        public override Profile ReadProfile(BattleTag battletag)
         {
             return CreateProfiles(1)[0];
         }
 
-        public override void DeleteProfile(UserData profile)
+        public override void DeleteProfile(Profile profile)
         {
             Debug.WriteLine("Delete Favourite Profile Method Called.");
             base.DeleteProfile(profile);

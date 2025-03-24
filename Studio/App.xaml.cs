@@ -87,6 +87,7 @@ public partial class App : Application
         services.AddSingleton<PathResolverService>();
         
         services.AddSingleton<BattleNetService>();
+        services.AddSingleton<GroupSelectionService>();
 
 
         // Views

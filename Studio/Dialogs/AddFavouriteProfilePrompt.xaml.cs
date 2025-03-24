@@ -32,7 +32,7 @@ namespace Studio.Dialogs
         private readonly BattleNetService _battleNetService;
 
 
-        public UserData Profile { get; set; }
+        public Profile Profile { get; set; }
         public AddFavouriteProfilePrompt(ContentPresenter contentPresenter)
         {
             InitializeComponent();

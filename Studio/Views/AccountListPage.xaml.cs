@@ -35,6 +35,7 @@ namespace Studio.Views
     {
 
         public UserProfileDataService UserProfiles {get; set; }
+        public GroupSelectionService GroupSelectionService { get; set; }
 
         private BattleNetService _battleNetService;
         private IProfileFetchingService _profileDataFetchingService;
@@ -52,7 +53,8 @@ namespace Studio.Views
             UserProfiles = ((App)Application.Current).GetService<UserProfileDataService>();
             _battleNetService = ((App)Application.Current).GetService<BattleNetService>();
             _profileDataFetchingService = ((App)Application.Current).GetService<IProfileFetchingService>();
-
+            GroupSelectionService = ((App)Application.Current).GetService<GroupSelectionService>();
+            
             AccountDataGrid.SelectedItem = null;
         }
 
@@ -61,7 +63,7 @@ namespace Studio.Views
         {
             if (e.AddedItems.Count > 0 && !_mouseOverButton && !_isFlyoutOpen)
             {
-                NavigationService?.Navigate(new AccountDetailsPage((e.AddedItems[0] as UserData)));
+                //NavigationService?.Navigate(new AccountDetailsPage((e.AddedItems[0] as Profile)));
             }
 
             AccountDataGrid.SelectedItem = null;
@@ -74,7 +76,7 @@ namespace Studio.Views
                 var row = VisualTreeHelper.GetParent(source) as DataGridRow;
                 if (row != null && !_isFlyoutOpen)
                 {
-                    NavigationService?.Navigate(new AccountDetailsPage((row.DataContext as UserData)));
+                    //NavigationService?.Navigate(new AccountDetailsPage((row.DataContext as Profile)));
                 }
             }
         }
@@ -82,39 +84,36 @@ namespace Studio.Views
 
         private void OnPlayButtonClick(object sender, RoutedEventArgs e)
         {
-            //UserData profile = ((FrameworkElement)sender).DataContext as UserData;
-            //if (profile == null)
-            //    return;
-            //if (profile.Email == null)
-            //{
-            //    SnackbarPresenter.ImmediatelyDisplay(new Snackbar(SnackbarPresenter)
-            //    {
-            //        AllowDrop = false,
-            //        Appearance = ControlAppearance.Danger,
-            //        Title = "Couldn't Launch Account",
-            //        Content = "No email is associated with this account",
-            //        Icon = new SymbolIcon(SymbolRegular.ErrorCircle12),
-            //        Opacity = 0.9
-            //    });
-            //    return;
-            //}
+            Profile profile = ((FrameworkElement)sender).DataContext as Profile;
+            if (profile == null)
+                return;
+            if (profile.Email == null)
+            {
+                SnackbarPresenter.ImmediatelyDisplay(new Snackbar(SnackbarPresenter)
+                {
+                    AllowDrop = false,
+                    Appearance = ControlAppearance.Danger,
+                    Title = "Couldn't Launch Account",
+                    Content = "No email is associated with this account",
+                    Icon = new SymbolIcon(SymbolRegular.ErrorCircle12),
+                    Opacity = 0.9
+                });
+                return;
+            }
 
-            //SnackbarPresenter.ImmediatelyDisplay(new Snackbar(SnackbarPresenter)
-            //{
-            //    AllowDrop = false,
-            //    Appearance = ControlAppearance.Success,
-            //    Title = "Launching Account!",
-            //    Icon = new SymbolIcon(SymbolRegular.Checkmark12, 35),
-            //    Opacity = 0.9
-            //});
+            SnackbarPresenter.ImmediatelyDisplay(new Snackbar(SnackbarPresenter)
+            {
+                AllowDrop = false,
+                Appearance = ControlAppearance.Success,
+                Title = "Launching Account!",
+                Icon = new SymbolIcon(SymbolRegular.Checkmark12, 35),
+                Opacity = 0.9
+            });
 
-            //_battleNetService.OpenBattleNetWithAccount(profile.Email);
+            _battleNetService.OpenBattleNetWithAccount(profile.Email);
 
-            //e.Handled = true;
-            BattleTag name = _battleNetService.ReadBattleTagFromMemory();
+            e.Handled = true;
 
-
-            Debug.WriteLine(name);
         }
 
 
@@ -123,7 +122,7 @@ namespace Studio.Views
 
         private void OnAccountOptionsClicked(object sender, RoutedEventArgs e)
         {
-            if (((FrameworkElement)sender).DataContext is not UserData profile)
+            if (((FrameworkElement)sender).DataContext is not Profile profile)
                 return;
 
             var row = VisualTreeHelper.GetParent((DependencyObject)sender) as Grid;
@@ -141,7 +140,7 @@ namespace Studio.Views
         // TODO : make a better sync system that preserves history
         private async void OnOptionsSyncButtonClick(object sender, RoutedEventArgs e)
         {
-            if (((FrameworkElement)sender).DataContext is not UserData profile)
+            if (((FrameworkElement)sender).DataContext is not Profile profile)
                 return;
 
             var result = await _profileDataFetchingService.GetUserProfile(profile.Battletag);
@@ -155,7 +154,7 @@ namespace Studio.Views
 
             if (string.IsNullOrEmpty(result.Error))
             {
-                SnackbarPresenter.ImmediatelyDisplay(new Snackbar(SnackbarPresenter)
+                _ = SnackbarPresenter.ImmediatelyDisplay(new Snackbar(SnackbarPresenter)
                 {
                     Appearance = ControlAppearance.Success,
                     Title = "Synced Account",
@@ -167,7 +166,7 @@ namespace Studio.Views
             }
             else
             {
-                SnackbarPresenter.ImmediatelyDisplay(new Snackbar(SnackbarPresenter)
+                _ = SnackbarPresenter.ImmediatelyDisplay(new Snackbar(SnackbarPresenter)
                 {
                     Appearance = ControlAppearance.Danger,
                     Title = "Could not fetch account",
@@ -179,7 +178,7 @@ namespace Studio.Views
 
         private void OnOptionsRemoveButtonClick(object sender, RoutedEventArgs e)
         {
-            if (((FrameworkElement)sender).DataContext is not UserData profile)
+            if (((FrameworkElement)sender).DataContext is not Profile profile)
                 return;
 
             UserProfiles.DeleteProfile(profile);

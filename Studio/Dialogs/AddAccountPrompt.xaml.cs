@@ -35,7 +35,7 @@ namespace Studio.Controls
         private readonly BattleNetService _battleNetService;
 
 
-        public UserData Profile { get; set; }
+        public Profile Profile { get; set; }
         public AddAccountPrompt(ContentPresenter contentPresenter)
         {
             InitializeComponent();

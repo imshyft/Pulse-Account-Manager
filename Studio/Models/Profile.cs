@@ -1,13 +1,15 @@
 ﻿
 
 using Newtonsoft.Json;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace Studio.Models
 {
 
     #region Profile
 
-    public class UserData
+    public class Profile
     {
         public BattleTag Battletag { get; set; }
         public string BattletagString => Battletag?.ToString();
@@ -85,8 +87,19 @@ namespace Studio.Models
         public Damage Damage { get; set; }
     }
 
-    public abstract class Role
+    public abstract class Role : INotifyPropertyChanged
     {
+        private bool _isSelectedForComparison;
+        public bool IsSelectedForComparison
+        {
+            get => _isSelectedForComparison;
+            set
+            {
+                _isSelectedForComparison = value;
+                OnPropertyChanged();
+            }
+
+        }
         public abstract Roles Type { get; }
         public abstract List<RankMoment> RankMoments { get; set; }
         public abstract RankMoment PeakRank { get; set; }
@@ -130,6 +143,10 @@ namespace Studio.Models
                 }
             },
         };
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string propertyName = null) =>
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
     }
 

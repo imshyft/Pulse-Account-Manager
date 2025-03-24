@@ -22,26 +22,25 @@ public partial class ShellWindow : FluentWindow, IShellWindow, INotifyPropertyCh
     {
         new NavigationViewItem()
         {
-            Content = "Home",
             Icon = new SymbolIcon { Symbol = SymbolRegular.Person24 },
             TargetPageType = typeof(MainPage)
         },
-        new NavigationViewItem()
-        {
-            Content = "Patch",
-            Icon = new SymbolIcon { Symbol = SymbolRegular.DataHistogram24 },
-            TargetPageType = typeof(PatchNotesPage)
-        }
+        //new NavigationViewItem()
+        //{
+        //    Content = "Patch",
+        //    Icon = new SymbolIcon { Symbol = SymbolRegular.DataHistogram24 },
+        //    TargetPageType = typeof(PatchNotesPage)
+        //}
     };
 
     public ObservableCollection<object> FooterItems { get; private set; } = new()
     {
-        new NavigationViewItem()
-        {
-            Content = "Settings",
-            Icon = new SymbolIcon { Symbol = SymbolRegular.Settings24 },
-            TargetPageType = typeof(SettingsPage)
-        }
+        //new NavigationViewItem()
+        //{
+        //    Content = "Settings",
+        //    Icon = new SymbolIcon { Symbol = SymbolRegular.Settings24 },
+        //    TargetPageType = typeof(SettingsPage)
+        //}
     };
 
     private readonly INavigationService _navigationService;

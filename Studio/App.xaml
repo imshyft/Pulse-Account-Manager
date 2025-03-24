@@ -3,6 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:converters="clr-namespace:Studio.Helpers.Converters"
     Startup="OnStartup"
     Exit="OnExit"
     DispatcherUnhandledException="OnDispatcherUnhandledException">
@@ -32,6 +33,10 @@
 
                 <ResourceDictionary Source="Styles/Themes/RosePine.xaml"/>
                 <ResourceDictionary Source="Styles/UiTheme.xaml"/>
+                <ResourceDictionary>
+                    <converters:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
+                    <converters:RangeToBooleanConverter x:Key="RangeToBooleanConverter"/>
+                </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

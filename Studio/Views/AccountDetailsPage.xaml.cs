@@ -34,10 +34,10 @@ namespace Studio.Views
     
     public partial class AccountDetailsPage : Page
     {
-        public UserData Profile { get; set; }
+        public Profile Profile { get; set; }
         public ISeries[] Series { get; set; }
         public ICartesianAxis[] XAxes { get; set; }
-        public AccountDetailsPage(UserData profile)
+        public AccountDetailsPage(Profile profile)
         {
             InitializeComponent();
             DataContext = this;

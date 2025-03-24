@@ -10,7 +10,7 @@ namespace Studio.Services.Data
     public class SampleUserProfileDataService : UserProfileDataService
     {
 
-        private readonly Random _rnd = new(1);
+        private readonly Random _rnd = new();
         private int[] _randomDates;
 
         private List<RankMoment> RandomRankMoments(int count)
@@ -25,10 +25,10 @@ namespace Studio.Services.Data
                 .ToList();
         }
 
-        private List<UserData> CreateProfiles(int count)
+        private List<Profile> CreateProfiles(int count)
         {
             int rankMoments = 10;
-            List<UserData> data = new List<UserData>();
+            List<Profile> data = new List<Profile>();
             for (int i = 0; i < count; i++)
             {
                 _randomDates = new int[rankMoments];
@@ -41,7 +41,7 @@ namespace Studio.Services.Data
 
                 bool missingDetails = _rnd.NextDouble() < 0.3;
 
-                data.Add(new UserData()
+                data.Add(new Profile()
                 {
                     Battletag = new BattleTag("Username", _rnd.Next(1000, 9999).ToString()),
                     //Username = "Username",
@@ -77,48 +77,24 @@ namespace Studio.Services.Data
                     TimesLaunched = _rnd.Next(3, 80),
                     TimesSwitched = _rnd.Next(10, 300)
 
-
-                    //Account = new Account()
-                    //{
-                    //    Id = $"Test#{_rnd.Next(1000, 9999)}",
-                    //    Name = $"User{_rnd.Next(10,60)}",
-                    //    SymbolCode = _rnd.Next(5760, 5790)
-                    //},
-                    //AvatarId = "daeddd96e58a2150afa6ffc3c5503ae7f96afc2e22899210d444f45dee508c6c",
-                    //DamageRankHistory = Enumerable
-                    //    .Repeat(0, 10)
-                    //    .Select(x => _rnd.Next(2000, 4000))
-                    //    .ToArray(),
-                    //TankRankHistory = Enumerable
-                    //    .Repeat(0, 10)
-                    //    .Select(x => _rnd.Next(2000, 4000))
-                    //    .ToArray(),
-                    //SupportRankHistory = Enumerable
-                    //    .Repeat(0, 10)
-                    //    .Select(x => _rnd.Next(2000, 4000))
-                    //    .ToArray(),
-                    //TankRankActive = _rnd.Next(2000, 4000),
-                    //SupportRankActive = _rnd.Next(2000, 4000),
-                    //DamageRankActive = _rnd.Next(2000, 4000),
-
                 });
             }
 
             return data;
         }
 
-        public override void SaveProfile(UserData profile)
+        public override void SaveProfile(Profile profile)
         {
             Debug.WriteLine("Save User Profile Method Called.");
             base.SaveProfile(profile);
         }
 
-        public override UserData ReadProfile(BattleTag battletag)
+        public override Profile ReadProfile(BattleTag battletag)
         {
             return CreateProfiles(1)[0];
         }
 
-        public override void DeleteProfile(UserData profile)
+        public override void DeleteProfile(Profile profile)
         {
             Debug.WriteLine("Delete User Profile Method Called.");
             base.DeleteProfile(profile);

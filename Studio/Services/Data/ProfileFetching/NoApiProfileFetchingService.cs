@@ -20,7 +20,7 @@ namespace Studio.Services.Data.ProfileFetching
             var profileFetchResult = new ProfileFetchResult()
             {
                 Error = "",
-                Profile = new UserData()
+                Profile = new Profile()
                 {
                     Avatar = null,
                     Battletag = battletag,

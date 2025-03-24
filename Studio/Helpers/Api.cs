@@ -58,7 +58,7 @@ namespace Studio.Helpers
 
     public class ProfileFetchResult
     {
-        public UserData Profile { get; set; }
+        public Profile Profile { get; set; }
         public string Error { get; set; }
     }
 
