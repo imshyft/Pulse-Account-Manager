@@ -1,0 +1,308 @@
+﻿<Page x:Class="Studio.Views.AccountListPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:Studio.Views"
+      mc:Ignorable="d" 
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:properties="clr-namespace:Studio.Properties"
+      xmlns:controls="clr-namespace:Studio.Controls"
+      d:DesignHeight="450" d:DesignWidth="800"
+      xmlns:data="clr-namespace:Studio.Services.Data"
+      d:DataContext="{d:DesignInstance Type=data:DesignTimeSampleData, IsDesignTimeCreatable=True}"
+      Title="AccountListPage"
+      KeepAlive="True"
+      SizeChanged="OnPageSizeChanged">
+    <Page.Resources>
+        <Style
+            TargetType="{x:Type Border}"
+            x:Key="RankBorderStyle">
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="VerticalAlignment" Value="Stretch"/>
+            <Style.Triggers>
+                <DataTrigger Value="False">
+                    <DataTrigger.Binding>
+                        <MultiBinding Converter="{StaticResource RangeToBooleanConverter}">
+                            <Binding Path="DataContext.GroupSelectionService.Range" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Page}"/>
+                            <Binding Path ="Tag.CurrentRank.SkillRating" RelativeSource="{RelativeSource Self}"/>
+                        </MultiBinding>
+                    </DataTrigger.Binding>
+                    <Setter Property="Opacity" Value="0.2"/>
+                    <Setter Property="Background">
+                        <Setter.Value>
+                            <SolidColorBrush Color="{StaticResource PaletteRedColor}" Opacity="0.3"/>
+                        </Setter.Value>
+                    </Setter>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=Tag}" Value="{x:Null}">
+                    <Setter Property="Visibility" Value="Hidden"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </Page.Resources>
+    <Grid>
+        <ui:DataGrid
+            x:Name="AccountDataGrid"
+            ItemsSource="{Binding UserProfiles.Profiles, Mode=OneWay}"
+            AutoGenerateColumns="False"
+            RowHeight="100"
+            CanUserAddRows="False"
+            CanUserDeleteRows="False"
+            VirtualizingPanel.ScrollUnit="Pixel"
+            SelectionUnit="FullRow"
+            SelectionChanged="OnProfileListSelectionChanged"
+            MouseLeftButtonDown="UIElement_OnPreviewMouseLeftButtonDown"
+            HorizontalAlignment="Stretch"
+            IsReadOnly="True">
+
+            <ui:DataGrid.Columns>
+
+                <!--Avatar-->
+                <DataGridTemplateColumn
+                    Header=""
+                    MinWidth="60"
+                    CanUserSort="False"
+                    CanUserResize="False"
+                    CanUserReorder="False"
+                    >
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <ui:Image
+                                CornerRadius="4">
+                                <ui:Image.Source>
+                                    <Binding Path="Avatar" >
+                                        <Binding.TargetNullValue>
+                                            <StaticResource ResourceKey="PlaceholderAvatar"/>
+                                        </Binding.TargetNullValue>
+                                    </Binding>
+                                </ui:Image.Source>
+                            </ui:Image>
+
+
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <!--Name-->
+                <DataGridTemplateColumn
+                    MinWidth="150"
+                    Width="*"
+                    Header="Name"
+                    CanUserSort="True"
+                    CanUserResize="False"
+                    CanUserReorder="False"
+                    SortMemberPath="CustomId">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Viewbox
+                                HorizontalAlignment="Left"
+                                Margin="{StaticResource MediumLeftRightMargin}">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="25"/>
+                                        <RowDefinition Height="20"/>
+                                    </Grid.RowDefinitions>
+                                    <ui:TextBlock
+                                        Text="{Binding CustomId}"
+                                        FontTypography="Title"
+                                        FontSize="17"
+                                        VerticalAlignment="Top"/>
+                                    <TextBlock
+                                        Grid.Row="1"
+                                        FontSize="8"
+                                        Text="{Binding BattletagString}"
+                                        Style="{StaticResource ListSubTitleStyle}"/>
+                                </Grid>
+                            </Viewbox>
+
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <!--Skill Ranks-->
+
+                <DataGridTemplateColumn
+                    x:Name="DataGridTankColumn"
+                    Header="Sort"
+                    Width="75"
+                    MinWidth="68"
+                    CanUserResize="False"
+                    CanUserReorder="False"
+                    CanUserSort="True"
+                    SortMemberPath="RankedCareer.Tank.CurrentRank.SkillRating">
+                    <DataGridTemplateColumn.HeaderTemplate>
+                        <DataTemplate>
+                            <ui:Image 
+                                Source="{StaticResource TankDrawingImage}" 
+                                Width="18"
+                                Margin="7,0,0,0"
+                                />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.HeaderTemplate>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border
+                                Style="{StaticResource RankBorderStyle}"
+                                Tag="{Binding RankedCareer.Tank}">
+                                <controls:RankDisplay
+                                RankValue="{Binding RankedCareer.Tank.CurrentRank, Mode=OneWay}"/>
+                            </Border>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn
+                    x:Name="DataGridDamageColumn"
+                    Header="Sort"
+                    Width="75"
+                    MinWidth="68"
+                    CanUserResize="False"
+                    CanUserReorder="False"
+                    CanUserSort="True"
+                    SortMemberPath="RankedCareer.Damage.CurrentRank.SkillRating">
+                    <DataGridTemplateColumn.HeaderTemplate>
+                        <DataTemplate>
+                            <ui:Image 
+                                Source="{StaticResource DamageDrawingImage}" 
+                                Width="18"
+                                Margin="7,0,0,0"
+                            />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.HeaderTemplate>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border
+                                Style="{StaticResource RankBorderStyle}"
+                                Tag="{Binding RankedCareer.Damage}">
+                                <controls:RankDisplay
+                                RankValue="{Binding RankedCareer.Damage.CurrentRank, Mode=OneWay}"/>
+                            </Border>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn
+                    x:Name="DataGridSupportColumn"
+                    Header="Sort"
+                    Width="75"
+                    MinWidth="68"
+                    CanUserResize="False"
+                    CanUserReorder="False"
+                    CanUserSort="True"
+                    SortMemberPath="RankedCareer.Support.CurrentRank.SkillRating">
+                    <DataGridTemplateColumn.HeaderTemplate>
+                        <DataTemplate>
+                            <ui:Image 
+                                Source="{StaticResource SupportDrawingImage}" 
+                                Width="18"
+                                Margin="7,0,0,0"
+                            />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.HeaderTemplate>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border
+                                Style="{StaticResource RankBorderStyle}"
+                                Tag="{Binding RankedCareer.Support}">
+                                <controls:RankDisplay
+                                RankValue="{Binding RankedCareer.Support.CurrentRank, Mode=OneWay}"/>
+                            </Border>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn
+                    Header=""
+                    CanUserSort="False"
+                    CanUserResize="False"
+                    CanUserReorder="False"
+                    Width="200"
+                    MinWidth="70">
+                    
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <ui:Button 
+                                Margin="{StaticResource SmallLeftMargin}"
+                                Click="OnPlayButtonClick" 
+                                MouseEnter="UIElement_OnMouseEnter"
+                                MouseLeave="UIElement_OnMouseLeave" 
+                                HorizontalAlignment="Center" 
+                                VerticalAlignment="Center"
+                                Width="50"
+                                Height="40"
+                                Style="{DynamicResource AccentButton}">
+                                <ui:SymbolIcon Symbol="Play16" FontSize="20"/>
+
+                            </ui:Button>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn
+                    Header=""
+                    CanUserSort="False"
+                    CanUserResize="False"
+                    CanUserReorder="False"
+                    MinWidth="60"
+                    Width="70">
+
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Grid
+                                Margin="{StaticResource SmallLeftRightMargin}">
+                                <ui:Flyout
+                                    IsOpen="False"
+                                    x:Name="OptionsFlyout"
+                                    Closed="OnOptionsFlyoutClosed"
+                                    Placement="Left">
+                                    <StackPanel>
+                                        <UniformGrid 
+                                            Columns="2"
+                                            Margin="{StaticResource XSmallTopMargin}">
+                                            <ui:Button
+                                                Appearance="Success"
+                                                HorizontalAlignment="Stretch"
+                                                Margin="4, 0, 4, 0"
+                                                Click="OnOptionsSyncButtonClick">
+                                                <ui:SymbolIcon Symbol="ArrowCounterclockwise16"/>
+                                            </ui:Button>
+                                            <ui:Button
+                                                Appearance="Danger"
+                                                HorizontalAlignment="Stretch"
+                                                Margin="4, 0, 4, 0"
+                                                Click="OnOptionsRemoveButtonClick">
+                                                <ui:SymbolIcon Symbol="Delete16"/>
+                                            </ui:Button>
+                                        </UniformGrid>
+                                    </StackPanel>
+                                </ui:Flyout>
+                                <ui:Button 
+                                    Padding="0"
+                                    Click="OnAccountOptionsClicked" 
+                                    MouseEnter="UIElement_OnMouseEnter"
+                                    MouseLeave="UIElement_OnMouseLeave" 
+                                    HorizontalAlignment="Center" 
+                                    VerticalAlignment="Center"
+                                    Width="30"
+                                    Height="40"
+                                    Style="{DynamicResource AccentButton}"
+                                    Tag="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow}}">
+                                    <ui:SymbolIcon Symbol="Options16" FontSize="15"/>
+                                </ui:Button>
+                            </Grid>
+ 
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+            </ui:DataGrid.Columns>
+        </ui:DataGrid>
+
+        <ui:SnackbarPresenter x:Name="SnackbarPresenter"/>
+    </Grid>
+
+
+</Page>
+
+    

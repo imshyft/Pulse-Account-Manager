@@ -1,0 +1,129 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows10.0.19041.0</TargetFramework>
+    <RootNamespace>Studio</RootNamespace>
+    <UseWPF>true</UseWPF>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <ApplicationIcon>AccountLauncherLogo.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <FileVersion>0.1.0.0</FileVersion>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <None Remove="Resources\AccountLauncherLogo.ico" />
+    <None Remove="Resources\PatchNotesWebView\index.html" />
+    <None Remove="Resources\PatchNotesWebView\script.js" />
+    <None Remove="Resources\PatchNotesWebView\styles.css" />
+    <None Remove="Resources\PlaceholderPlayerIcon.png" />
+    <None Remove="Resources\RankIcons\Divisions\Bronze.png" />
+    <None Remove="Resources\RankIcons\Divisions\Champion.png" />
+    <None Remove="Resources\RankIcons\Divisions\Diamond.png" />
+    <None Remove="Resources\RankIcons\Divisions\Gold.png" />
+    <None Remove="Resources\RankIcons\Divisions\Grandmaster.png" />
+    <None Remove="Resources\RankIcons\Divisions\Master.png" />
+    <None Remove="Resources\RankIcons\Divisions\Platinum.png" />
+    <None Remove="Resources\RankIcons\Divisions\Silver.png" />
+    <None Remove="Resources\RankIcons\Tiers\1.png" />
+    <None Remove="Resources\RankIcons\Tiers\2.png" />
+    <None Remove="Resources\RankIcons\Tiers\3.png" />
+    <None Remove="Resources\RankIcons\Tiers\4.png" />
+    <None Remove="Resources\RankIcons\Tiers\5.png" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Content Include="AccountLauncherLogo.ico" />
+    <Content Include="Resources\PatchNotesWebView\index.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\PatchNotesWebView\script.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\PatchNotesWebView\styles.css">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Resource Include="Resources\AccountLauncherLogo.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\PlaceholderPlayerIcon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\RankIcons\Divisions\Bronze.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\RankIcons\Divisions\Champion.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\RankIcons\Divisions\Diamond.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\RankIcons\Divisions\Gold.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\RankIcons\Divisions\Grandmaster.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\RankIcons\Divisions\Master.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\RankIcons\Divisions\Platinum.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\RankIcons\Divisions\Silver.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\RankIcons\Tiers\1.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\RankIcons\Tiers\2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\RankIcons\Tiers\3.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\RankIcons\Tiers\4.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\RankIcons\Tiers\5.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="LiveChartsCore.SkiaSharpView.WPF" Version="2.0.0-rc5.4" />
+    <PackageReference Include="MahApps.Metro" Version="2.4.9" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3171-prerelease" />
+    <PackageReference Include="WPF-UI" Version="4.0.2" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\Studio.Core\Studio.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Windows\" />
+  </ItemGroup>
+</Project>

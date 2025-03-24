@@ -1,0 +1,95 @@
+﻿<ui:FluentWindow
+    x:Class="Studio.Views.ShellWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
+    xmlns:properties="clr-namespace:Studio.Properties"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    Style="{DynamicResource DefaultFluentWindowStyle2}"
+    ui:Design.Foreground="Black"
+    ui:Design.Background="Black"
+    mc:Ignorable="d"
+    MinWidth="800"
+    MinHeight="350"
+    Loaded="OnLoaded"
+    Unloaded="OnUnloaded"
+    Title="{x:Static properties:Resources.AppDisplayName}">
+    <Window.Resources>
+        <Style
+                x:Key="DefaultFluentWindowStyle2"
+                BasedOn="{StaticResource {x:Type Window}}"
+                TargetType="{x:Type ui:FluentWindow}">
+            <Setter Property="Background" Value="{DynamicResource WindowBackground}" />
+            <Setter Property="Foreground" Value="{DynamicResource WindowForeground}" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Height" Value="600" />
+            <Setter Property="MinHeight" Value="320" />
+            <Setter Property="Width" Value="1100" />
+            <Setter Property="MinWidth" Value="460" />
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="FontSize" Value="{DynamicResource ControlContentThemeFontSize}" />
+            <Setter Property="FontWeight" Value="Normal" />
+            <Setter Property="UseLayoutRounding" Value="True" />
+            <Setter Property="SnapsToDevicePixels" Value="True" />
+            <Setter Property="OverridesDefaultStyle" Value="True" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Window}">
+                        <AdornerDecorator>
+                            <ui:ClientAreaBorder
+                                    Background="#191724"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}">
+                                <ContentPresenter x:Name="ContentPresenter" />
+                            </ui:ClientAreaBorder>
+                        </AdornerDecorator>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+
+
+        <ui:TitleBar
+            x:Name="TitleBar"
+            Grid.Row="0"
+            CloseWindowByDoubleClickOnIcon="True"
+            Height="40">
+            <ui:TitleBar.Icon>
+                <ui:ImageIcon Source="pack://application:,,,/Resources/AccountLauncherLogo.ico" Height="auto" Margin="2,-8,0,-8"/>
+            </ui:TitleBar.Icon>
+        </ui:TitleBar>
+
+        <ui:NavigationView
+            Grid.Row="1"
+            PaneDisplayMode="LeftFluent"
+            CompactPaneLength="200"
+            MenuItemsSource="{Binding MenuItems, Mode=OneWay}"
+            FooterMenuItemsSource="{Binding FooterItems, Mode=OneWay}"
+            Navigating="OnNavigating">
+
+            <ui:NavigationView.ContentOverlay>
+                <Frame
+                    Background="{DynamicResource ApplicationFrameBrush}"
+                    Grid.Row="1"
+                    x:Name="shellFrame"
+                    NavigationUIVisibility="Hidden"
+                    Focusable="False" />
+            </ui:NavigationView.ContentOverlay>
+        </ui:NavigationView>
+        <ContentPresenter 
+            Grid.Row="0"
+            x:Name="RootContentDialogPresenter"
+            Grid.RowSpan="2"/>
+    </Grid>
+</ui:FluentWindow>

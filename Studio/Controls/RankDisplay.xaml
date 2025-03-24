@@ -1,0 +1,36 @@
+﻿<UserControl x:Class="Studio.Controls.RankDisplay"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+             xmlns:local="clr-namespace:Studio.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Viewbox
+        Margin="{StaticResource XSmallLeftTopRightBottomMargin}">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="50"/>
+                <RowDefinition Height="17"/>
+            </Grid.RowDefinitions>
+
+            <ui:Image
+                x:Name="RoleImage"/>
+
+            <ui:Image
+                Grid.Column="1"
+                x:Name="DivisionImage"/>
+            <ui:Image
+                Grid.Column="1"
+                Grid.Row="1"
+                x:Name="TierImage"
+                Margin="0,-3,0,0"/>
+        </Grid>
+    </Viewbox>
+
+</UserControl>

@@ -1,0 +1,99 @@
+﻿<ui:ContentDialog x:Class="Studio.Controls.AddAccountPrompt"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Studio.Controls"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+             mc:Ignorable="d" 
+             d:DesignHeight="200" d:DesignWidth="400"
+             Title="Add User Account">
+    <ui:ContentDialog.Resources>
+        <Style BasedOn="{StaticResource {x:Type ui:ContentDialog}}" TargetType="{x:Type local:AddAccountPrompt}">
+            
+        </Style>
+        
+    </ui:ContentDialog.Resources>
+    <Grid MaxWidth="300">
+        <StackPanel>
+            <!-- Main Information Text -->
+            <ui:TextBlock
+            TextWrapping="Wrap"
+            HorizontalAlignment="Center"
+            TextAlignment="Center"
+            Style="{StaticResource BodyTextStyle}"
+            Margin="{StaticResource SmallLeftTopRightBottomMargin}"
+            Text="{Binding InfoText}"/>
+
+            <!-- Option Selection Buttons -->
+            <ui:Button
+            HorizontalAlignment="Stretch"
+            Visibility="{Binding IsSelectingMode, Converter={StaticResource BooleanToVisibilityConverter}}"
+            Margin="{StaticResource SmallTopMargin}"
+            Height="35"
+            Content="Manually enter battle.tag"
+            Command="{Binding SelectManualEntryCommand}"/>
+
+            <ui:Button
+            HorizontalAlignment="Stretch"
+            Visibility="{Binding IsSelectingMode, Converter={StaticResource BooleanToVisibilityConverter}}"
+            Margin="{StaticResource SmallTopBottomMargin}"
+            Height="35"
+            Content="Read from Battle.Net memory"
+            Command="{Binding SelectMemoryReadCommand}"/>
+
+            <!-- Manual Entry UI -->
+            <StackPanel Visibility="{Binding IsManualEntry, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <ui:TextBlock Text="Enter your BattleTag:" 
+                          Margin="{StaticResource SmallTopMargin}"/>
+
+                <ui:TextBox
+                PlaceholderText="ExampleName#1234"
+                Text="{Binding BattleTagInput, UpdateSourceTrigger=PropertyChanged}"
+                Margin="{StaticResource SmallTopBottomMargin}"/>
+
+                <ui:Button
+                HorizontalAlignment="Stretch"
+                Height="35"
+                Content="Launch Battle.net"
+                IsEnabled="{Binding IsBattleTagValid}"
+                Command="{Binding LaunchBattleNetCommand}"/>
+            </StackPanel>
+
+            <!-- Memory Read UI -->
+            <StackPanel Visibility="{Binding IsMemoryRead, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <ui:TextBlock Text="Attempting to read BattleTag from memory..." 
+                          Margin="{StaticResource SmallTopMargin}"/>
+
+                <ui:Button
+                HorizontalAlignment="Stretch"
+                Height="35"
+                Content="Retry Memory Read"
+                Command="{Binding RetryMemoryReadCommand}"
+                Margin="{StaticResource SmallTopMargin}"/>
+
+                <ui:Button
+                HorizontalAlignment="Stretch"
+                Height="35"
+                Content="Cancel"
+                Command="{Binding CancelMemoryReadCommand}"
+                Margin="{StaticResource SmallTopBottomMargin}"/>
+            </StackPanel>
+
+            <!-- Information Bar -->
+            <ui:InfoBar
+                x:Name="InformationBar"
+                Margin="{StaticResource SmallTopMargin}"
+                Severity="{Binding InfoBarSeverity}"
+                Title="{Binding InfoBarTitle}"
+                Message="{Binding InfoBarMessage}"
+                IsOpen="{Binding IsInfoBarOpen}"/>
+
+            <!-- Progress Bar -->
+            <ProgressBar
+            IsIndeterminate="True"
+            Margin="{StaticResource SmallLeftRightMargin}"
+            Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+        </StackPanel>
+    </Grid>
+</ui:ContentDialog>
