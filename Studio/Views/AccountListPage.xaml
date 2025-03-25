@@ -7,6 +7,7 @@
       mc:Ignorable="d" 
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
       xmlns:properties="clr-namespace:Studio.Properties"
+      xmlns:c="clr-namespace:CalcBinding;assembly=CalcBinding"
       xmlns:controls="clr-namespace:Studio.Controls"
       d:DesignHeight="450" d:DesignWidth="800"
       xmlns:data="clr-namespace:Studio.Services.Data"
@@ -15,10 +16,12 @@
       KeepAlive="True"
       SizeChanged="OnPageSizeChanged">
     <Page.Resources>
-        <Style
+        <!--<Style
             TargetType="{x:Type Border}"
             x:Key="RankBorderStyle">
             <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="BorderThickness" Value="2"/>
+
             <Setter Property="VerticalAlignment" Value="Stretch"/>
             <Style.Triggers>
                 <DataTrigger Value="False">
@@ -29,15 +32,35 @@
                         </MultiBinding>
                     </DataTrigger.Binding>
                     <Setter Property="Opacity" Value="0.2"/>
-                    <Setter Property="Background">
+                    <Setter Property="BorderBrush">
                         <Setter.Value>
-                            <SolidColorBrush Color="{StaticResource PaletteRedColor}" Opacity="0.3"/>
+                            <SolidColorBrush Color="{StaticResource WideGroupColor}" Opacity="1"/>
                         </Setter.Value>
                     </Setter>
                 </DataTrigger>
                 <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=Tag}" Value="{x:Null}">
                     <Setter Property="Visibility" Value="Hidden"/>
                 </DataTrigger>
+            </Style.Triggers>
+        </Style>-->
+        <Style
+            TargetType="controls:RankDisplay">
+            <Style.Triggers>
+                <DataTrigger Value="False">
+                    <DataTrigger.Binding>
+                        <MultiBinding Converter="{StaticResource RangeToBooleanConverter}">
+                            <Binding Path="DataContext.GroupSelectionService.Range" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Page}"/>
+                            <Binding Path ="RankValue.SkillRating" RelativeSource="{RelativeSource Self}"/>
+                        </MultiBinding>
+                    </DataTrigger.Binding>
+                    
+                    <Setter Property="ShowWideGroupDecorator" Value="True"/>
+                    <Setter Property="Opacity" Value="0.4"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=RankValue}" Value="{x:Null}">
+                    <Setter Property="Opacity" Value="0.4"/>
+                </DataTrigger>
+
             </Style.Triggers>
         </Style>
     </Page.Resources>
@@ -54,8 +77,9 @@
             SelectionChanged="OnProfileListSelectionChanged"
             MouseLeftButtonDown="UIElement_OnPreviewMouseLeftButtonDown"
             HorizontalAlignment="Stretch"
+            Sorting="AccountDataGrid_Sorting"
             IsReadOnly="True">
-
+            
             <ui:DataGrid.Columns>
 
                 <!--Avatar-->
@@ -124,12 +148,13 @@
 
                 <DataGridTemplateColumn
                     x:Name="DataGridTankColumn"
-                    Header="Sort"
+                    Header=""
                     Width="75"
                     MinWidth="68"
                     CanUserResize="False"
                     CanUserReorder="False"
                     CanUserSort="True"
+                    
                     SortMemberPath="RankedCareer.Tank.CurrentRank.SkillRating">
                     <DataGridTemplateColumn.HeaderTemplate>
                         <DataTemplate>
@@ -137,17 +162,20 @@
                                 Source="{StaticResource TankDrawingImage}" 
                                 Width="18"
                                 Margin="7,0,0,0"
-                                />
+                            />
                         </DataTemplate>
                     </DataGridTemplateColumn.HeaderTemplate>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Border
-                                Style="{StaticResource RankBorderStyle}"
-                                Tag="{Binding RankedCareer.Tank}">
+                            <Grid
+                                Margin="0,10,0,10">
                                 <controls:RankDisplay
-                                RankValue="{Binding RankedCareer.Tank.CurrentRank, Mode=OneWay}"/>
-                            </Border>
+                                    RankValue="{Binding RankedCareer.Tank.CurrentRank, Mode=OneWay}"
+                                    Role="Tank">
+                                    
+                                </controls:RankDisplay>
+
+                            </Grid>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
@@ -172,12 +200,13 @@
                     </DataGridTemplateColumn.HeaderTemplate>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Border
-                                Style="{StaticResource RankBorderStyle}"
-                                Tag="{Binding RankedCareer.Damage}">
+                            <Grid
+                                Margin="0,10,0,10">
                                 <controls:RankDisplay
-                                RankValue="{Binding RankedCareer.Damage.CurrentRank, Mode=OneWay}"/>
-                            </Border>
+                                    
+                                    RankValue="{Binding RankedCareer.Damage.CurrentRank, Mode=OneWay}"
+                                    Role="Damage"/>
+                            </Grid>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
@@ -202,12 +231,12 @@
                     </DataGridTemplateColumn.HeaderTemplate>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Border
-                                Style="{StaticResource RankBorderStyle}"
-                                Tag="{Binding RankedCareer.Support}">
+                            <Grid
+                                Margin="0,10,0,10">
                                 <controls:RankDisplay
-                                RankValue="{Binding RankedCareer.Support.CurrentRank, Mode=OneWay}"/>
-                            </Border>
+                                    RankValue="{Binding RankedCareer.Support.CurrentRank, Mode=OneWay}"
+                                    Role="Support"/>
+                            </Grid>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>

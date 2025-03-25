@@ -5,7 +5,7 @@ VisualStudioVersion = 17.8.34330.188
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OverwatchAccountLauncher", "OverwatchAccountLauncher\OverwatchAccountLauncher.csproj", "{F3E73D28-C048-4A6D-90CE-D300F3BDE883}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Studio", "Studio\Studio.csproj", "{B40A518F-A0FA-489A-B2E3-CAD44D549C5F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pulse", "Studio\Pulse.csproj", "{B40A518F-A0FA-489A-B2E3-CAD44D549C5F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Studio.Core", "Studio.Core\Studio.Core.csproj", "{DC2B9DF4-4C4F-43A0-8237-72A21F80362C}"
 EndProject

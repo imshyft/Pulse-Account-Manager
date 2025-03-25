@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -56,6 +58,7 @@ namespace Studio.Views
             GroupSelectionService = ((App)Application.Current).GetService<GroupSelectionService>();
             
             AccountDataGrid.SelectedItem = null;
+            
         }
 
 
@@ -193,12 +196,49 @@ namespace Studio.Views
         private void OnPageSizeChanged(object sender, SizeChangedEventArgs e)
         {
             double width = e.NewSize.Width;
+            SetDataGridNoSortingHeader(0);
             for (int i = 2; i < 5; i++)
             {
                 if (width < 570)
                     AccountDataGrid.Columns[i].Visibility = Visibility.Collapsed;
                 else
                     AccountDataGrid.Columns[i].Visibility = Visibility.Visible;
+            }
+
+        }
+
+        private void AccountDataGrid_Sorting(object sender, DataGridSortingEventArgs e)
+        {
+            SetDataGridNoSortingHeader(e.Column.DisplayIndex);
+
+        }
+
+        private void SetDataGridNoSortingHeader(int index)
+        {
+            var headers = AccountDataGrid.FindChild<DataGridCellsPanel>();
+            for (int i = 2; i < 5; i++)
+            {
+                DataGridColumnHeader header = (DataGridColumnHeader)headers.Children[i];
+                SymbolIcon icon = header.FindChild<SymbolIcon>();
+                if (index != i)
+                {
+                    icon.Visibility = Visibility.Visible;
+                    icon.Symbol = SymbolRegular.LineHorizontal120;
+                }
+                else
+                {
+                    icon.Symbol = SymbolRegular.ArrowUp24;
+                }
+                
+            }
+            foreach (DataGridColumn column in AccountDataGrid.Columns)
+            {
+                
+                //if (column.CanUserSort && column.SortDirection == null)
+                //{
+                //    var sortIcon = column.HeaderTemplate.FindName("SortIcon", __) as SymbolIcon;
+                //    sortIcon.Symbol = SymbolRegular.LineHorizontal120;
+                //}
             }
         }
     }

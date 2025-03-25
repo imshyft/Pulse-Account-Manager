@@ -38,6 +38,12 @@ public class PersistAndRestoreService
     {
         var folderPath = Path.Combine(_localAppData, _appConfig.ConfigurationFolderName);
         var fileName = _appConfig.ConfigFileName;
+
+        if (!Directory.Exists(folderPath))
+        {
+            Directory.CreateDirectory(folderPath);
+        }
+
         var properties = _fileService.Read<IDictionary>(folderPath, fileName);
         if (properties != null)
         {

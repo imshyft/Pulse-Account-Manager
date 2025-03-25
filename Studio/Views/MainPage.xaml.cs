@@ -36,6 +36,7 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
     public bool IsPanelShowingFavourites { get; set; } = true;
 
     private readonly FavouriteProfileDataService _favouriteProfiles;
+    private readonly BattleNetService _battleNetService;
     private readonly UserProfileDataService _userProfiles;
     private IProfileFetchingService _profileDataFetchingService;
 
@@ -51,6 +52,7 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
         _userProfiles = ((App)Application.Current).GetService<UserProfileDataService>();
         GroupSelectionService = ((App)Application.Current).GetService<GroupSelectionService>();
         _profileDataFetchingService = ((App)Application.Current).GetService<IProfileFetchingService>();
+        _battleNetService = ((App)Application.Current).GetService<BattleNetService>();
 
 
 
@@ -67,6 +69,7 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
 
 
         CheckIfFirstLaunch();
+        _battleNetService.Initialize();
     }
 
     private async void CheckIfFirstLaunch()
@@ -87,6 +90,8 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
 
             _persistAndRestoreService.SetValue("IsFirstLaunch", false);
             _persistAndRestoreService.PersistData();
+
+            AddProfileDropDownButton.IsDropDownOpen = true;
         }
     }
     
@@ -315,12 +320,14 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
 
         if (isToggled)
         {
+            TogglePanelExpandButton.Opacity = 0.2;
             if (!IsPanelShowingFavourites)
                 TogglePanelProfileSource();
 
         }
         else
         {
+            TogglePanelExpandButton.Opacity = 1;
             GroupSelectionService.RemoveAllMembers();
         }
     }

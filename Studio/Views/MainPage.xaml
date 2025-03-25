@@ -13,6 +13,26 @@
     d:DataContext="{d:DesignInstance Type=data:DesignTimeSampleData, IsDesignTimeCreatable=True}"
     d:DesignHeight="450" d:DesignWidth="800">
     <Page.Resources>
+        <Style
+            TargetType="controls:RankDisplay">
+            <Style.Triggers>
+                <DataTrigger Value="False">
+                    <DataTrigger.Binding>
+                        <MultiBinding Converter="{StaticResource RangeToBooleanConverter}">
+                            <Binding Path="DataContext.GroupSelectionService.Range" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Page}"/>
+                            <Binding Path ="RankValue.SkillRating" RelativeSource="{RelativeSource Self}"/>
+                        </MultiBinding>
+                    </DataTrigger.Binding>
+
+                    <Setter Property="ShowWideGroupDecorator" Value="True"/>
+                    <Setter Property="Opacity" Value="0.4"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=RankValue}" Value="{x:Null}">
+                    <Setter Property="Opacity" Value="0.4"/>
+                </DataTrigger>
+
+            </Style.Triggers>
+        </Style>
         <DataTemplate x:Key="DefaultPanelContentTemplate">
             <Grid 
                 Height="60"
@@ -119,29 +139,18 @@
                                 <Setter Property="Appearance" Value="Transparent"/>
                                 <Setter Property="Padding" Value="0"/>
                                 <Setter Property="Opacity" Value="0.6"/>
+                                <Setter Property="Height" Value="80"/>
+                                <Setter Property="BorderThickness" Value="0"/>
                                 <Setter Property="Visibility" Value="Visible"/>
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=Tag}" Value="{x:Null}">
-                                        <Setter Property="Visibility" Value="Hidden"/>
+                                        <Setter Property="IsEnabled" Value="False"/>
                                     </DataTrigger>
                                     <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=Tag.IsSelectedForComparison}" Value="True">
                                         <Setter Property="Opacity" Value="1"/>
                                         <Setter Property="Appearance" Value="Success"/>
                                     </DataTrigger>
-                                    <DataTrigger Value="False">
-                                        <DataTrigger.Binding>
-                                            <MultiBinding Converter="{StaticResource RangeToBooleanConverter}">
-                                                <Binding Path="DataContext.GroupSelectionService.Range" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Page}"/>
-                                                <Binding Path ="Tag.CurrentRank.SkillRating" RelativeSource="{RelativeSource Self}"/>
-                                            </MultiBinding>
-                                        </DataTrigger.Binding>
-                                        <Setter Property="Opacity" Value="0.2"/>
-                                        <Setter Property="Background">
-                                            <Setter.Value>
-                                                <SolidColorBrush Color="{StaticResource PaletteRedColor}" Opacity="0.3"/>
-                                            </Setter.Value>
-                                        </Setter>
-                                    </DataTrigger>
+
 
                                 </Style.Triggers>
                         
@@ -151,7 +160,10 @@
                             Click="OnSidePanelRoleButtonClick"
                             Tag="{Binding RankedCareer.Tank}">
                             <Viewbox>
-                                <controls:RankDisplay RankValue="{Binding Tag.CurrentRank, RelativeSource={RelativeSource AncestorType=ui:Button}}"/>
+                                <controls:RankDisplay 
+                                    RankValue="{Binding Tag.CurrentRank, RelativeSource={RelativeSource AncestorType=ui:Button}}"
+                                    VerticalAlignment="Stretch"         
+                                    Role="Tank"/>
                             </Viewbox>
                         </ui:Button>
                         <ui:Button
@@ -159,7 +171,8 @@
                             Click="OnSidePanelRoleButtonClick"
                             Tag="{Binding RankedCareer.Damage}">
                             <Viewbox>
-                                <controls:RankDisplay RankValue="{Binding Tag.CurrentRank, RelativeSource={RelativeSource AncestorType=ui:Button}}"/>
+                                <controls:RankDisplay RankValue="{Binding Tag.CurrentRank, RelativeSource={RelativeSource AncestorType=ui:Button}}"
+                                                      Role="Damage"/>
                             </Viewbox>
                         </ui:Button>
                         <ui:Button
@@ -167,7 +180,8 @@
                             Click="OnSidePanelRoleButtonClick"
                             Tag="{Binding RankedCareer.Support}">
                             <Viewbox>
-                                <controls:RankDisplay RankValue="{Binding Tag.CurrentRank, RelativeSource={RelativeSource AncestorType=ui:Button}}"/>
+                                <controls:RankDisplay RankValue="{Binding Tag.CurrentRank, RelativeSource={RelativeSource AncestorType=ui:Button}}"
+                                                      Role="Support"/>
                             </Viewbox>
                         </ui:Button>
                     </Grid>
@@ -185,7 +199,7 @@
                 <ContentControl.Style>
                     <Style
                             TargetType="{x:Type ContentControl}">
-                        <Setter Property="ContentTemplate" Value="{StaticResource DefaultPanelContentTemplate}"/>
+                        <Setter Property="ContentTemplate" Value="{StaticResource GroupSelectionContentTemplate}"/>
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=Page}, Path=DataContext.GroupSelectionService.IsEnabled}" Value="True">
                                 <Setter Property="ContentTemplate" Value="{StaticResource GroupSelectionContentTemplate}" />
@@ -220,6 +234,7 @@
             </Grid.ColumnDefinitions>
 
             <ui:DropDownButton
+                x:Name="AddProfileDropDownButton"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch"
                 Style="{DynamicResource AccentButton}">
@@ -325,6 +340,7 @@
                 CornerRadius="4,4,0,0"/>
 
             <ui:Button
+                x:Name="TogglePanelExpandButton"
                 IsEnabled="{Binding GroupSelectionService.IsEnabled, Converter={StaticResource InverseBooleanConverter}}"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch"

@@ -42,6 +42,8 @@
         <Setter Property="MaxWidth" Value="12"/>
     </Style>
 
+    <Color x:Key="WideGroupColor">#fdc802</Color>
+    <SolidColorBrush x:Key="WideGroupBrush" Color="{StaticResource WideGroupColor}" />
 
     <Style TargetType="{x:Type ToggleButton}"
                         BasedOn="{StaticResource {x:Type ToggleButton}}">

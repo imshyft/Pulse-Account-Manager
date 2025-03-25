@@ -25,12 +25,16 @@ public partial class ShellWindow : FluentWindow, IShellWindow, INotifyPropertyCh
             Icon = new SymbolIcon { Symbol = SymbolRegular.Person24 },
             TargetPageType = typeof(MainPage)
         },
+
         //new NavigationViewItem()
         //{
         //    Content = "Patch",
         //    Icon = new SymbolIcon { Symbol = SymbolRegular.DataHistogram24 },
         //    TargetPageType = typeof(PatchNotesPage)
         //}
+
+        // LOKI : uncomment part above to show patch page
+
     };
 
     public ObservableCollection<object> FooterItems { get; private set; } = new()

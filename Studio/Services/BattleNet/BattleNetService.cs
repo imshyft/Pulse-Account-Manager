@@ -15,18 +15,32 @@ namespace Studio.Services
     public class BattleNetService
     {
         private readonly PersistAndRestoreService _persistAndRestoreService;
-        private readonly string _battleNetConfigPath;
-        private readonly string _overwatchLauncherPath;
+        private string _battleNetConfigPath;
+        private string _overwatchLauncherPath;
         private readonly BattleNetMemoryReaderService _memoryReaderService;
 
 
         public BattleNetService()
         {
             _persistAndRestoreService = ((App)Application.Current).GetService<PersistAndRestoreService>();
-            _battleNetConfigPath = _persistAndRestoreService.GetValue<string>("BattleNetConfigPath");
+            
             _memoryReaderService = new BattleNetMemoryReaderService();
+
+           
+        }
+
+        public bool Initialize()
+        {
+            _battleNetConfigPath = _persistAndRestoreService.GetValue<string>("BattleNetConfigPath");
+            if (string.IsNullOrEmpty(_battleNetConfigPath))
+                return false;
             string overwatchDirectory = _persistAndRestoreService.GetValue<string>("OverwatchDirectory");
+            if (string.IsNullOrEmpty(overwatchDirectory))
+                return false;
+
             _overwatchLauncherPath = Path.Combine(overwatchDirectory, "Overwatch Launcher.exe");
+
+            return true;
         }
 
         public void CloseBattleNet()
