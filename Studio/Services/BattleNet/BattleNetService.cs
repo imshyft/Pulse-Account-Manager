@@ -8,6 +8,11 @@ using System.Windows;
 using System.Xml.Linq;
 using Studio.Models;
 using Studio.Services.BattleNet;
+using System;
+using System.Windows.Media.Animation;
+using AngleSharp.Text;
+using System.Collections.Specialized;
+using System.Windows.Controls.Ribbon;
 
 namespace Studio.Services
 {
@@ -106,7 +111,21 @@ namespace Studio.Services
 
         public BattleTag ReadBattleTagFromMemory()
         {
-            return _memoryReaderService.FindBattleTagInMemory();
+            throw new NotImplementedException();
+        }
+
+        public string[] ReadFriendsListFromMemory()
+        {
+            Process process = Process.GetProcessesByName("Battle.net")[0];
+            if (process == null)
+            {
+                process = Process.Start(_overwatchLauncherPath);
+            }
+
+            //var friends = _memoryReaderService.FindBlizzardFriends(process.Id);
+
+
+            return BattleNetMemoryReaderService.GetFriendBattleTags(process.Handle);
 
         }
     }

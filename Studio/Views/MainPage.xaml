@@ -309,6 +309,9 @@
                     <ui:MenuItem
                         Header="Sync"
                         Click="OnSidePanelItemSyncClick"/>
+                    <ui:MenuItem
+                        Header="Delete"
+                        Click="OnSidePanelItemDeleteClick"/>
                 </ContextMenu>
             </ListView.ContextMenu>
         </ui:ListView>

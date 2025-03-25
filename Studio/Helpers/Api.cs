@@ -56,11 +56,7 @@ namespace Studio.Helpers
     // Overfast Api Response
 
 
-    public class ProfileFetchResult
-    {
-        public Profile Profile { get; set; }
-        public string Error { get; set; }
-    }
+
 
 
     public class ApiResponse

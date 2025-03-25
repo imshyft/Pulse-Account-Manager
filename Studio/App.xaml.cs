@@ -75,14 +75,16 @@ public partial class App : Application
         //services.AddSingleton<PersistAndRestoreService>();
         services.AddSingleton<INavigationService, NavigationService>();
 
-#if DEBUG
+#if SAMPLE
         services.AddSingleton<UserProfileDataService, SampleUserProfileDataService>();
         services.AddSingleton<FavouriteProfileDataService, SampleFavouriteProfileDataService>();
         services.AddSingleton<IProfileFetchingService, NoApiProfileFetchingService>();
 #else
         services.AddSingleton<UserProfileDataService, StoredUserProfileDataService>();
         services.AddSingleton<FavouriteProfileDataService, StoredFavouriteProfileDataService>();
-        services.AddSingleton<IProfileFetchingService, PublicOverfastProfileFetchingService>();
+        // Overfast vs Blizzard
+        //services.AddSingleton<IProfileFetchingService, PublicOverfastProfileFetchingService>();
+        services.AddSingleton<IProfileFetchingService, BlizzardProfileFetchingService>();
 #endif
         services.AddSingleton<PathResolverService>();
         

@@ -53,7 +53,7 @@ namespace Studio.Controls
 
             // Memory Reading non-functional as of now
             // TODO : Find consistent btag in memory 
-            SelectManualEntryCommand.Execute(this);
+            //SelectManualEntryCommand.Execute(this);
         }
 
         private string _infoText =
@@ -175,20 +175,20 @@ namespace Studio.Controls
             BattleTag battleTag = _battleNetService.ReadBattleTagFromMemory();
             if (battleTag != null)
             {
-                var result = await _profileFetchingService.GetUserProfile(battleTag);
-                switch (result.Error)
+                var result = await _profileFetchingService.FetchProfileAsync(battleTag);
+                switch (result.Outcome)
                 {
-                    case "Not Found":
+                    case ProfileFetchOutcome.NotFound:
                         ShowError(
                             "Profile could not be found",
                             "We couldn't retrieve the details of the account, but you can still switch to it. Maybe the profile was private. "
                             );
                         break;
-                    case "":
+                    case ProfileFetchOutcome.Success:
                         ShowSuccess("Profile Found", $"Found the profile at {result.Profile.Battletag}");
                         break;
-                    default:
-                        ShowError("Unexpected Error Occurred", $"You can still swap to it, but we couldn't get the info. Error [{result.Error}]");
+                    case ProfileFetchOutcome.Error:
+                        ShowError("Unexpected Error Occurred", $"You can still swap to it, but we couldn't get the info. Error [{result.ErrorMessage}]");
                         break;
                 }
 
@@ -206,21 +206,21 @@ namespace Studio.Controls
             _battleNetService.OpenBattleNetWithEmptyAccount();
 
             BattleTag battleTag = new BattleTag(BattleTagInput);
-            var result = await _profileFetchingService.GetUserProfile(battleTag);
+            var result = await _profileFetchingService.FetchProfileAsync(battleTag);
 
-            switch (result.Error)
+            switch (result.Outcome)
             {
-                case "Not Found":
+                case ProfileFetchOutcome.NotFound:
                     ShowError(
                         "Profile could not be found",
                         "We couldn't retrieve the details of the account, but you can still switch to it. Maybe the battletag was incorrect or the profile was private. "
                         );
                     break;
-                case "":
+                case ProfileFetchOutcome.Success:
                     ShowSuccess("Profile Found", $"Found the profile at {result.Profile.Battletag}");
                     break;
-                default:
-                    ShowError("Unexpected Error Occurred", $"You can still swap to it, but we couldn't get the info. Error [{result.Error}]");
+                case ProfileFetchOutcome.Error:
+                    ShowError("Unexpected Error Occurred", $"You can still swap to it, but we couldn't get the info. Error [{result.ErrorMessage}]");
                     break;
             }
 
@@ -262,6 +262,14 @@ namespace Studio.Controls
         public void CloseInfoBar()
         {
             IsInfoBarOpen = false;
+        }
+
+        protected override void OnButtonClick(ContentDialogButton button)
+        {
+            if (button == ContentDialogButton.Primary && !IsPrimaryButtonEnabled)
+                return;
+
+            base.OnButtonClick(button);
         }
     }
 }

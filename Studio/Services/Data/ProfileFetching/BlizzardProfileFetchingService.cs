@@ -1,48 +1,37 @@
-﻿using AngleSharp;
+﻿using Studio.Helpers;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Net.Http;
+using System.Net;
+using System.Text;
+using System.Threading.Tasks;
+using Windows.System;
+using HarfBuzzSharp;
+using Studio.Models;
+using LiveChartsCore.Kernel;
+using Newtonsoft.Json;
+using Studio.Contracts.Services;
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using OverwatchAccountLauncher.Classes;
-using Studio.Models;
-using System.Diagnostics;
-using System.IO;
-using System.Net;
-using System.Net.Http;
-using System.Text.Json;
+using AngleSharp;
 using System.Text.RegularExpressions;
-using System.Windows;
 
 
-
-namespace OverwatchAccountLauncher
+namespace Studio.Services.Data
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
-    public partial class MainWindow : Window
+    public class BlizzardProfileFetchingService : IProfileFetchingService
     {
-
-        public MainWindow()
+        public BlizzardProfileFetchingService()
         {
-            InitializeComponent();
+
         }
 
+        private static string BattletagToWebFormat(BattleTag battletag) =>
+            $"{battletag.Username}-{battletag.Tag}";
 
-        // Create New User And Save Data To File
-        private async void Button_Click_1(object sender, RoutedEventArgs e)
-        {
-            BattleTag battleTag = new BattleTag("FstAsFoxG4irl#1143");
-
-            BlizzardProfileFetchResult result = await FetchProfileAsync(battleTag);
-            if (result.Outcome  == BlizzardProfileFetchOutcome.Success)
-            {
-
-            }
-            
-        }
-
-        private async Task<BlizzardProfileFetchResult> FetchProfileAsync(BattleTag battleTag)
+        public async Task<ProfileFetchResult> FetchProfileAsync(BattleTag battleTag)
         {
             Profile profile = new Profile();
             profile.Battletag = battleTag;
@@ -51,7 +40,7 @@ namespace OverwatchAccountLauncher
             string errorMessage = "";
 
             string battleTagUrl = battleTag.ToString().Replace("#", "-");
-            string url = $"https://overwatch.blizzard.com/en-us/careers/{battleTagUrl}";
+            string url = $"https://overwatch.blizzard.com/en-us/career/{battleTagUrl}";
 
 
             using HttpClient client = new HttpClient();
@@ -63,10 +52,10 @@ namespace OverwatchAccountLauncher
             {
                 errorMessage = response.ReasonPhrase ?? "unexplained error.";
 
-                return new BlizzardProfileFetchResult()
+                return new ProfileFetchResult()
                 {
                     Profile = profile,
-                    Outcome = BlizzardProfileFetchOutcome.Error,
+                    Outcome = ProfileFetchOutcome.Error,
                     ErrorMessage = errorMessage
                 };
             }
@@ -79,19 +68,19 @@ namespace OverwatchAccountLauncher
             var document = await context.OpenAsync(req => req.Content(htmlContent));
 
 
-            
+
 
             if (document.QuerySelector(".error-contain") is not null)
             {
-                return new BlizzardProfileFetchResult()
+                return new ProfileFetchResult()
                 {
                     Profile = profile,
-                    Outcome = BlizzardProfileFetchOutcome.NotFound,
+                    Outcome = ProfileFetchOutcome.NotFound,
                 };
             }
-                
 
-            
+
+
 
             int unixNow = (int)DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
@@ -146,7 +135,7 @@ namespace OverwatchAccountLauncher
                 var divisionMatch = Regex.Match(divisionSource, @"_([^_-]+)-");
                 var tierMatch = Regex.Match(tierSource, @"_(\d+)-");
 
-                if (!tierMatch.Success || divisionMatch.Success)
+                if (!tierMatch.Success || !divisionMatch.Success)
                     continue;
 
                 string tierString = tierMatch.Groups[1].Value;
@@ -158,8 +147,9 @@ namespace OverwatchAccountLauncher
                 if (!int.TryParse(tierString, out int tier))
                     continue;
 
+                divisionString = divisionString.Remove(divisionString.Length - 4);
                 // remove 'Tier' from ending of division string
-                Rank currentRank = Rank.RankFromDivision(divisionString.Remove(divisionMatch.Length - 4), tier);
+                Rank currentRank = Rank.RankFromDivision(divisionString, tier);
                 RankMoment rankMoment = new()
                 {
                     Rank = currentRank,
@@ -168,40 +158,18 @@ namespace OverwatchAccountLauncher
 
                 role.PeakRank = rankMoment;
                 role.CurrentRank = currentRank;
-                role.RankMoments = [rankMoment];
+                role.RankMoments = new List<RankMoment> { rankMoment };
 
 
             }
-            return new BlizzardProfileFetchResult()
+            return new ProfileFetchResult()
             {
                 Profile = profile,
-                Outcome = BlizzardProfileFetchOutcome.Success,
+                Outcome = ProfileFetchOutcome.Success,
             };
         }
-        // Switch First Account
-        private void Button_Click_2(object sender, RoutedEventArgs e)
-        {
-            Mem.Test();
-        }
-
-        private void Button_Click_4(object sender, RoutedEventArgs e)
-        {
-
-        }
-    }
-
-    public class BlizzardProfileFetchResult
-    {
-        public Profile Profile { get; set; }
-        public BlizzardProfileFetchOutcome Outcome { get; set; }
-        public string? ErrorMessage { get; set; }
 
     }
 
-    public enum BlizzardProfileFetchOutcome
-    {
-        Success,
-        NotFound,
-        Error
-    }
+
 }

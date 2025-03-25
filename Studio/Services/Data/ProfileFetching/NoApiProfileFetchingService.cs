@@ -14,12 +14,12 @@ namespace Studio.Services.Data.ProfileFetching
     class NoApiProfileFetchingService : IProfileFetchingService
     {
 
-        public Task<ProfileFetchResult> GetUserProfile(BattleTag battletag)
+        public Task<ProfileFetchResult> FetchProfileAsync(BattleTag battletag)
         {
             Debug.WriteLine("Got Profile Details!");
             var profileFetchResult = new ProfileFetchResult()
             {
-                Error = "",
+                Outcome = ProfileFetchOutcome.Success,
                 Profile = new Profile()
                 {
                     Avatar = null,

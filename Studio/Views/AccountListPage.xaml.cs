@@ -146,7 +146,7 @@ namespace Studio.Views
             if (((FrameworkElement)sender).DataContext is not Profile profile)
                 return;
 
-            var result = await _profileDataFetchingService.GetUserProfile(profile.Battletag);
+            var result = await _profileDataFetchingService.FetchProfileAsync(profile.Battletag);
             SnackbarPresenter.AddToQue(new Snackbar(SnackbarPresenter)
             {
                 Appearance = ControlAppearance.Info,
@@ -155,7 +155,7 @@ namespace Studio.Views
                 Icon = new SymbolIcon(SymbolRegular.ArrowClockwise16),
             });
 
-            if (string.IsNullOrEmpty(result.Error))
+            if (result.Outcome == ProfileFetchOutcome.Success)
             {
                 _ = SnackbarPresenter.ImmediatelyDisplay(new Snackbar(SnackbarPresenter)
                 {

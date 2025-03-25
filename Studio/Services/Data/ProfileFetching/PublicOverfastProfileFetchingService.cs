@@ -13,6 +13,10 @@ using Studio.Models;
 using LiveChartsCore.Kernel;
 using Newtonsoft.Json;
 using Studio.Contracts.Services;
+using AngleSharp.Dom;
+using AngleSharp.Html.Dom;
+using AngleSharp;
+using System.Text.RegularExpressions;
 
 namespace Studio.Services.Data
 {
@@ -26,7 +30,8 @@ namespace Studio.Services.Data
         private static string BattletagToWebFormat(BattleTag battletag) =>
             $"{battletag.Username}-{battletag.Tag}";
 
-        private async Task<ApiResponse> FetchProfileFromApi(BattleTag battletag)
+
+        private async Task<ApiResponse> FetchProfileFromOverfastAsync(BattleTag battletag)
         {
             string accountId = BattletagToWebFormat(battletag);
             using (var client = new HttpClient(new HttpClientHandler { AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate }))
@@ -55,9 +60,9 @@ namespace Studio.Services.Data
             }
         }
 
-        public async Task<ProfileFetchResult> GetUserProfile(BattleTag battletag)
+        public async Task<ProfileFetchResult> FetchProfileAsync(BattleTag battletag)
         {
-            ApiResponse response = await FetchProfileFromApi(battletag);
+            ApiResponse response = await FetchProfileFromOverfastAsync(battletag);
 
             Profile userData = new Profile
             {
@@ -73,11 +78,20 @@ namespace Studio.Services.Data
 
             if (!string.IsNullOrEmpty(response.Error))
             {
-                return new ProfileFetchResult()
-                {
-                    Error = response.Error,
-                    Profile = userData
-                };
+                if (response.Error == "Not Found")
+                    return new ProfileFetchResult()
+                    {
+                        ErrorMessage = response.Error,
+                        Outcome = ProfileFetchOutcome.NotFound,
+                        Profile = userData
+                    };
+                else
+                    return new ProfileFetchResult()
+                    {
+                        ErrorMessage = response.Error,
+                        Outcome = ProfileFetchOutcome.Error,
+                        Profile = userData
+                    };
             }
 
             userData.LastUpdate = response.last_updated_at;
@@ -141,9 +155,14 @@ namespace Studio.Services.Data
             }
             return new ProfileFetchResult()
             {
-                Error = "",
+                Outcome = ProfileFetchOutcome.Success,
                 Profile = userData
             };
         }
+    }
+    public class OverfastFetchResult
+    {
+        public Profile Profile { get; set; }
+        public string Error { get; set; }
     }
 }

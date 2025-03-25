@@ -20,6 +20,7 @@ using Studio.Services.Data;
 using Studio.Services.Files;
 using Studio.Services.Storage;
 using Wpf.Ui.Controls;
+using static SkiaSharp.HarfBuzz.SKShaper;
 using Button = Wpf.Ui.Controls.Button;
 using TextBox = Wpf.Ui.Controls.TextBox;
 
@@ -170,10 +171,10 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
 
     private void OnFavouritesSearchTextChanged(object sender, TextChangedEventArgs e)
     {
-        FilterSearchPanel();
+        RefreshPanel();
     }
 
-    private void FilterSearchPanel()
+    private void RefreshPanel()
     {
         //https://learn.microsoft.com/en-us/windows/apps/design/controls/listview-filtering
         string text = FilterTextBox.Text;
@@ -255,6 +256,7 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
             Profile profile = dialog.Profile;
             _userProfiles.SaveProfile(profile);
         }
+        RefreshPanel();
     }
     private async void OnAddFavouriteProfileButtonClick(object sender, RoutedEventArgs e)
     {
@@ -274,8 +276,20 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
         if (result == ContentDialogResult.Primary)
         {
             Profile profile = dialog.Profile;
+
+            if (_favouriteProfiles.ContainsProfile(profile))
+            {
+                _ = SnackbarPresenter.ImmediatelyDisplay(new Snackbar(SnackbarPresenter)
+                {
+                    Appearance = ControlAppearance.Danger,
+                    Title = "Profile already exists!",
+                    Content = "You have already added this profile before, so we'll just update it",
+                    Icon = new SymbolIcon(SymbolRegular.Info16),
+                });
+            }
+
             _favouriteProfiles.SaveProfile(profile);
-            FilterSearchPanel();
+            RefreshPanel();
         }
     }
 
@@ -308,7 +322,7 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
 
         IsPanelShowingFavourites = !IsPanelShowingFavourites;
 
-        FilterSearchPanel();
+        RefreshPanel();
     }
 
     private void OnToggleGroupSelectionButtonClick(object sender, RoutedEventArgs e)
@@ -358,10 +372,10 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
         if (FavouritesList.SelectedItem is not Profile profile)
             return;
 
-        var result = await _profileDataFetchingService.GetUserProfile(profile.Battletag);
+        var result = await _profileDataFetchingService.FetchProfileAsync(profile.Battletag);
 
 
-        if (string.IsNullOrEmpty(result.Error))
+        if (result.Outcome == ProfileFetchOutcome.Success)
         {
             _ = SnackbarPresenter.ImmediatelyDisplay(new Snackbar(SnackbarPresenter)
             {
@@ -370,8 +384,19 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
                 Content = "Favourited profile successfully synced",
                 Icon = new SymbolIcon(SymbolRegular.ArrowClockwise16),
             });
-            _favouriteProfiles.DeleteProfile(profile);
-            _favouriteProfiles.SaveProfile(result.Profile);
+
+            if (IsPanelShowingFavourites)
+            {
+                _favouriteProfiles.DeleteProfile(profile);
+                _favouriteProfiles.SaveProfile(result.Profile);
+            }
+            else
+            {
+                _userProfiles.DeleteProfile(profile);
+                _userProfiles.SaveProfile(result.Profile);
+            }
+
+
         }
         else
         {
@@ -383,6 +408,26 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
                 Icon = new SymbolIcon(SymbolRegular.ErrorCircle24),
             });
         }
-   
+
+        RefreshPanel();
+
+
+    }
+
+    private void OnSidePanelItemDeleteClick(object sender, RoutedEventArgs e)
+    {
+        if (FavouritesList.SelectedItem is not Profile profile)
+            return;
+
+        if (IsPanelShowingFavourites)
+        {
+            _favouriteProfiles.DeleteProfile(profile);
+        }
+        else
+        {
+            _userProfiles.DeleteProfile(profile);
+        }
+
+        RefreshPanel();
     }
 }

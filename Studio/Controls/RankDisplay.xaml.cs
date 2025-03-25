@@ -153,7 +153,7 @@ namespace Studio.Controls
             {
                 case Roles.Tank:
                     control.RoleImage.Source = (ImageSource)App.Current.FindResource("TankDrawingImage");
-                    control.Background = (SolidColorBrush)new BrushConverter().ConvertFrom("#302ecc71");
+                    control.Background = (SolidColorBrush)new BrushConverter().ConvertFrom("#303498db");
                     break;
                 case Roles.Damage:
                     control.RoleImage.Source = (ImageSource)App.Current.FindResource("DamageDrawingImage");
@@ -161,8 +161,8 @@ namespace Studio.Controls
                     break;
                 case Roles.Support:
                     control.RoleImage.Source = (ImageSource)App.Current.FindResource("SupportDrawingImage");
-                    control.Background = (SolidColorBrush)new BrushConverter().ConvertFrom("#303498db");
-                    break;
+                    control.Background = (SolidColorBrush)new BrushConverter().ConvertFrom("#302ecc71");
+                    break; 
                 default:
                     control.Visibility = Visibility.Hidden;
                     control.Background = Brushes.Transparent;

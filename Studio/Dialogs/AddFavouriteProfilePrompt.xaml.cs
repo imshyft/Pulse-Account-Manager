@@ -47,6 +47,7 @@ namespace Studio.Dialogs
 
             _profileFetchingService = ((App)Application.Current).GetService<IProfileFetchingService>();
             _battleNetService = ((App)Application.Current).GetService<BattleNetService>();
+
         }
 
         private void OnBattleTagInputTextChanged(object sender, TextChangedEventArgs e)
@@ -93,30 +94,30 @@ namespace Studio.Dialogs
             BattleTag battletag = new BattleTag(BattletagInputBox.Text);
 
 
-            var result = await _profileFetchingService.GetUserProfile(battletag);
+            var result = await _profileFetchingService.FetchProfileAsync(battletag);
 
             LaunchingBnetProgressBar.Visibility = Visibility.Collapsed;
             InformationBar.IsOpen = true;
 
-            switch (result.Error)
+            switch (result.Outcome)
             {
-                case "Not Found":
+                case ProfileFetchOutcome.NotFound:
                     InformationBar.Title = "Profile Could not be found";
                     InformationBar.Severity = InfoBarSeverity.Warning;
                     InformationBar.Message =
                         "We couldn't retrieve the details of the account. Could it be a Private Profile?";
                     break;
-                case "":
+                case ProfileFetchOutcome.Success:
                     InformationBar.Title = "Profile found";
                     InformationBar.Severity = InfoBarSeverity.Success;
                     InformationBar.Message = $"Successfully found the profile at {result.Profile.Battletag}!";
                     IsPrimaryButtonEnabled = true;
                     break;
-                default:
+                case ProfileFetchOutcome.Error:
                     InformationBar.Title = "Couldn't contact the API";
                     InformationBar.Severity = InfoBarSeverity.Error;
                     InformationBar.Message =
-                        $"We couldn't contact the servers at the moment. Try connecting again later. \nError Message: [{result.Error}]";
+                        $"We couldn't contact the servers at the moment. Try connecting again later. \nError Message: [{result.ErrorMessage}]";
                     break;
             }
 
@@ -126,6 +127,12 @@ namespace Studio.Dialogs
 
         }
 
+        protected override void OnButtonClick(ContentDialogButton button)
+        {
+            if (button == ContentDialogButton.Primary && !IsPrimaryButtonEnabled)
+                return;
 
+            base.OnButtonClick(button);
+        }
     }
 }
