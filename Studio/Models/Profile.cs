@@ -26,6 +26,7 @@ namespace Studio.Models
 
     public class BattleTag
     {
+        public string FullTag => ToString();
         public string Username { get; set; }
         public string Tag { get; set; }
 

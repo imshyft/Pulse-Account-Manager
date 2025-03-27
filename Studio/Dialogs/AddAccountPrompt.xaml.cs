@@ -23,6 +23,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Wpf.Ui.Input;
 using Studio.Contracts.Services;
+using System.Windows.Media.Animation;
 
 namespace Studio.Controls
 {
@@ -51,9 +52,6 @@ namespace Studio.Controls
             _profileFetchingService = ((App)Application.Current).GetService<IProfileFetchingService>();
             _battleNetService = ((App)Application.Current).GetService<BattleNetService>();
 
-            // Memory Reading non-functional as of now
-            // TODO : Find consistent btag in memory 
-            //SelectManualEntryCommand.Execute(this);
         }
 
         private string _infoText =
@@ -61,6 +59,8 @@ namespace Studio.Controls
         private bool _isSelectingMode = true;
         private bool _isManualEntry;
         private bool _isMemoryRead;
+        private bool _isMemoryReadSuccessful;
+        private bool _isAwaitingMemoryRead;
         private string _battleTagInput;
         private bool _isLoading;
 
@@ -73,7 +73,20 @@ namespace Studio.Controls
         public string InfoText
         {
             get => _infoText;
-            set { _infoText = value; OnPropertyChanged(); }
+            set
+            {
+                _infoText = value;
+                OnPropertyChanged();
+                var opacityAnimation = new DoubleAnimation
+                {
+                    To = 1, // Target Opacity
+                    From = 0,
+                    Duration = TimeSpan.FromSeconds(2),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                };
+
+                InformationText.BeginAnimation(OpacityProperty, opacityAnimation);
+            }
         }
 
         public InfoBarSeverity InfoBarSeverity
@@ -116,6 +129,19 @@ namespace Studio.Controls
             get => _isMemoryRead;
             set { _isMemoryRead = value; OnPropertyChanged(); }
         }
+
+        public bool IsMemoryReadSuccessful
+        {
+            get => _isMemoryReadSuccessful;
+            set { _isMemoryReadSuccessful = value; OnPropertyChanged(); }
+        }
+        public bool IsAwaitingMemoryRead
+        {
+            get => _isAwaitingMemoryRead;
+            set { _isAwaitingMemoryRead = value; OnPropertyChanged(); }
+        }
+
+
 
         public string BattleTagInput
         {
@@ -165,17 +191,25 @@ namespace Studio.Controls
 
         public ICommand SelectMemoryReadCommand => new RelayCommand<object>(async _ =>
         {
+            CloseInfoBar();
+            IsAwaitingMemoryRead = true;
             IsMemoryRead = true;
             IsManualEntry = false;
             IsSelectingMode = false;
 
-            InfoText =
-                "We will try to read the Battletag from Battle.net's memory. If Battle.net isn't open, wait for it to open and try again.";
+
 
             BattleTag battleTag = _battleNetService.ReadBattleTagFromMemory();
+
             if (battleTag != null)
             {
+                IsMemoryReadSuccessful = true;
+                IsAwaitingMemoryRead = false;
+                AutoBattleTagResultTextBox.Text = battleTag.ToString();
+                InfoText = "Now that we've found the account, wait for us to get the profile data and then confirm";
+                IsLoading = true;
                 var result = await _profileFetchingService.FetchProfileAsync(battleTag);
+                IsLoading = false;
                 switch (result.Outcome)
                 {
                     case ProfileFetchOutcome.NotFound:
@@ -193,6 +227,7 @@ namespace Studio.Controls
                 }
 
                 Profile = result.Profile;
+                
                 IsPrimaryButtonEnabled = true;
             }
             else
@@ -204,7 +239,7 @@ namespace Studio.Controls
         public ICommand LaunchBattleNetCommand => new RelayCommand<object>(async _ =>
         {
             _battleNetService.OpenBattleNetWithEmptyAccount();
-
+            InfoText = "Great! Now while we fetch the account details, log in to the same account through Battle.net, and once its fully loaded press Add Account";
             BattleTag battleTag = new BattleTag(BattleTagInput);
             var result = await _profileFetchingService.FetchProfileAsync(battleTag);
 
@@ -217,7 +252,7 @@ namespace Studio.Controls
                         );
                     break;
                 case ProfileFetchOutcome.Success:
-                    ShowSuccess("Profile Found", $"Found the profile at {result.Profile.Battletag}");
+                    ShowSuccess("Profile Found", $"Found the profile at {result.Profile.Battletag}. Now just log in through Battle.net to register the email and confirm");
                     break;
                 case ProfileFetchOutcome.Error:
                     ShowError("Unexpected Error Occurred", $"You can still swap to it, but we couldn't get the info. Error [{result.ErrorMessage}]");
@@ -269,6 +304,7 @@ namespace Studio.Controls
             if (button == ContentDialogButton.Primary && !IsPrimaryButtonEnabled)
                 return;
 
+            
             base.OnButtonClick(button);
         }
     }

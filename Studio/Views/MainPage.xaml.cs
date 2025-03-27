@@ -29,8 +29,8 @@ namespace Studio.Views;
 
 public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
 {
-    // TODO : Find somewhere for button to add favourite (maybe move expand/collapse btn?)
-    // TODO : Add Escape for back navigation
+
+
     // TODO : Add flyouts to introduce main actions (adding profiles, favourites) on first time launch
     public ObservableCollection<Profile> FilteredProfiles { get; set; } = new();
     public GroupSelectionService GroupSelectionService { get; set; }
@@ -43,6 +43,9 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
 
     private readonly PersistAndRestoreService _persistAndRestoreService;
     private bool IsFavouritesPanelCollapsed { get; set; } = false;
+
+    private int _flyoutOpenId = 0;
+    private Flyout[] _flyouts;
 
     public MainPage()
     {
@@ -67,7 +70,6 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
         OpenAccountList();
         
         PreviewMouseDown += OnPreviewMouseDown;
-
 
         CheckIfFirstLaunch();
         _battleNetService.Initialize();
@@ -254,6 +256,8 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
         if (result == ContentDialogResult.Primary)
         {
             Profile profile = dialog.Profile;
+            string email = _battleNetService.GetBattleNetAccount();
+            profile.Email = email;
             _userProfiles.SaveProfile(profile);
         }
         RefreshPanel();
@@ -337,10 +341,20 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
             TogglePanelExpandButton.Opacity = 0.2;
             if (!IsPanelShowingFavourites)
                 TogglePanelProfileSource();
+            _ = SnackbarPresenter.ImmediatelyDisplay(new Snackbar(SnackbarPresenter)
+            {
+                Appearance = ControlAppearance.Transparent,
+                Title = "Group Selection Mode",
+                Content = "Click on the ranks of the roles your friends will play on on the side panel to see which accounts are in range",
+                Timeout = TimeSpan.FromSeconds(10),
+                
+                Icon = new SymbolIcon(SymbolRegular.ArrowClockwise16),
+            });
 
         }
         else
         {
+            SnackbarPresenter.HideCurrent();
             TogglePanelExpandButton.Opacity = 1;
             GroupSelectionService.RemoveAllMembers();
         }
@@ -430,4 +444,6 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
 
         RefreshPanel();
     }
+
+
 }

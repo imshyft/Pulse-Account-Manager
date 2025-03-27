@@ -35,6 +35,7 @@ namespace Studio.Services.Data
         {
             Profile profile = new Profile();
             profile.Battletag = battleTag;
+            profile.CustomId = battleTag.Username;
 
 
             string errorMessage = "";
@@ -51,6 +52,17 @@ namespace Studio.Services.Data
             if (response.StatusCode != HttpStatusCode.OK)
             {
                 errorMessage = response.ReasonPhrase ?? "unexplained error.";
+
+                if (response.StatusCode == HttpStatusCode.NotFound)
+                {
+                    return new ProfileFetchResult()
+                    {
+                        Profile = profile,
+                        Outcome = ProfileFetchOutcome.NotFound,
+                        ErrorMessage = errorMessage
+                    };
+                }
+                
 
                 return new ProfileFetchResult()
                 {

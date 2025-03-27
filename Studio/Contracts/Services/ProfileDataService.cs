@@ -18,7 +18,7 @@ namespace Studio.Contracts.Services
             Profile duplicate = FindDuplicateProfile(profile);
             if (duplicate != null)
             {
-                DeleteProfile(duplicate);
+                Profiles.Remove(duplicate);
             }
 
             Profiles.Add(profile);

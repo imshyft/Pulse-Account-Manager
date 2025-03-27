@@ -15,6 +15,8 @@
     MinHeight="350"
     Loaded="OnLoaded"
     Unloaded="OnUnloaded"
+    WindowBackdropType="Mica"
+    ExtendsContentIntoTitleBar="True"
     Title="{x:Static properties:Resources.AppDisplayName}">
     <Window.Resources>
         <Style
@@ -52,6 +54,9 @@
             </Setter>
         </Style>
     </Window.Resources>
+    <WindowChrome.WindowChrome>
+        <WindowChrome GlassFrameThickness="0"/>
+    </WindowChrome.WindowChrome>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -63,7 +68,6 @@
         <ui:TitleBar
             x:Name="TitleBar"
             Grid.Row="0"
-            CloseWindowByDoubleClickOnIcon="True"
             Height="40">
             <ui:TitleBar.Icon>
                 <ui:ImageIcon Source="pack://application:,,,/Resources/AccountLauncherLogo.ico" Height="auto" Margin="2,-8,0,-8"/>

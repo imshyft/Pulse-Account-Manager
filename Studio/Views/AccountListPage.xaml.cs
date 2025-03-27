@@ -44,7 +44,7 @@ namespace Studio.Views
 
         private bool _mouseOverButton = false;
         private bool _isFlyoutOpen;
-
+        private bool _isCollapsedView = false;
         public Visibility RankColumnsVisibility { get; set; }
         public AccountListPage()
         {
@@ -200,9 +200,15 @@ namespace Studio.Views
             for (int i = 2; i < 5; i++)
             {
                 if (width < 570)
+                {
+                    _isCollapsedView = true;
                     AccountDataGrid.Columns[i].Visibility = Visibility.Collapsed;
+                }
                 else
+                {
+                    _isCollapsedView = false;
                     AccountDataGrid.Columns[i].Visibility = Visibility.Visible;
+                }
             }
 
         }
@@ -215,6 +221,8 @@ namespace Studio.Views
 
         private void SetDataGridNoSortingHeader(int index)
         {
+            if (_isCollapsedView)
+                return;
             var headers = AccountDataGrid.FindChild<DataGridCellsPanel>();
             for (int i = 2; i < 5; i++)
             {
@@ -231,15 +239,7 @@ namespace Studio.Views
                 }
                 
             }
-            foreach (DataGridColumn column in AccountDataGrid.Columns)
-            {
-                
-                //if (column.CanUserSort && column.SortDirection == null)
-                //{
-                //    var sortIcon = column.HeaderTemplate.FindName("SortIcon", __) as SymbolIcon;
-                //    sortIcon.Symbol = SymbolRegular.LineHorizontal120;
-                //}
-            }
+
         }
     }
 }

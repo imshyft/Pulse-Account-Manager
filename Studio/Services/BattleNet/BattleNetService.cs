@@ -16,7 +16,6 @@ using System.Windows.Controls.Ribbon;
 
 namespace Studio.Services
 {
-    // TODO : Create methods to set the email, close, and launch battle.net
     public class BattleNetService
     {
         private readonly PersistAndRestoreService _persistAndRestoreService;
@@ -111,21 +110,49 @@ namespace Studio.Services
 
         public BattleTag ReadBattleTagFromMemory()
         {
-            throw new NotImplementedException();
-        }
-
-        public string[] ReadFriendsListFromMemory()
-        {
-            Process process = Process.GetProcessesByName("Battle.net")[0];
-            if (process == null)
+            Process[] processes = Process.GetProcessesByName("Battle.net");
+            Process process;
+            if (processes.Length == 0)
             {
                 process = Process.Start(_overwatchLauncherPath);
+            }
+            else
+            {
+                process = processes[0];
             }
 
             //var friends = _memoryReaderService.FindBlizzardFriends(process.Id);
 
 
-            return BattleNetMemoryReaderService.GetFriendBattleTags(process.Handle);
+            var tag = BattleNetMemoryReaderService.GetUserBattleTag(process.Handle);
+            if (tag == null)
+                return null;
+
+            BattleTag battleTag = new BattleTag(tag);
+
+            return battleTag;
+        }
+
+        public BattleTag[] ReadFriendsListFromMemory()
+        {
+            Process[] processes = Process.GetProcessesByName("Battle.net");
+            Process process;
+            if (processes.Length == 0)
+            {
+                process = Process.Start(_overwatchLauncherPath);
+            }
+            else
+            {
+                process = processes[0];
+            }
+
+            //var friends = _memoryReaderService.FindBlizzardFriends(process.Id);
+
+
+            var tags = BattleNetMemoryReaderService.GetFriendBattleTags(process.Handle);
+            BattleTag[] battleTags = tags.Select(x => new BattleTag(x)).ToArray();
+
+            return battleTags;
 
         }
     }

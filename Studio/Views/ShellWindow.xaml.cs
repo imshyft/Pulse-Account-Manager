@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Shell;
 using MahApps.Metro.Controls;
 
 using Studio.Contracts.Services;
@@ -13,7 +14,7 @@ using Wpf.Ui.Controls;
 
 namespace Studio.Views;
 
-// TODO : Add the Template Studio Theming package, and try to make it change wpf-ui theme
+
 public partial class ShellWindow : FluentWindow, IShellWindow, INotifyPropertyChanged
 {
     public static ShellWindow Instance { get; private set; }
@@ -58,6 +59,7 @@ public partial class ShellWindow : FluentWindow, IShellWindow, INotifyPropertyCh
 
     public ShellWindow(INavigationService navigationService, UserProfileDataService profileDataService)
     {
+        
         _navigationService = navigationService;
         InitializeComponent();
         DataContext = this;

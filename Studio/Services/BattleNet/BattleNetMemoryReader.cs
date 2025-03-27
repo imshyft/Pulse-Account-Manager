@@ -23,6 +23,9 @@ namespace Studio.Services.BattleNet
         [DllImport(_dllImportPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr GetFriendBattleTags(IntPtr processHandle, out int outSize);
 
+        [DllImport(_dllImportPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr GetUserBattleTag(IntPtr processHandle, out int outSize);
+
 
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern bool VirtualFree(IntPtr lpAddress, uint dwSize, uint dwFreeType);
@@ -44,6 +47,27 @@ namespace Studio.Services.BattleNet
             VirtualFree(ptrArray, 0, 0x8000); // 0x8000 = MEM_RELEASE, to free the allocated memory
 
             return result;
+        }
+
+        public static string GetUserBattleTag(IntPtr processHandle)
+        {
+            int size;
+            IntPtr ptrArray = GetUserBattleTag(processHandle, out size);
+
+            string[] result = new string[size];
+
+            for (int i = 0; i < size; i++)
+            {
+                IntPtr strPtr = Marshal.ReadIntPtr(ptrArray, i * IntPtr.Size);
+                result[i] = Marshal.PtrToStringAnsi(strPtr);
+            }
+
+
+            VirtualFree(ptrArray, 0, 0x8000); // 0x8000 = MEM_RELEASE, to free the allocated memory
+
+            if (result.Length > 0)
+                return result[0];
+            else return null;
         }
     }
 }

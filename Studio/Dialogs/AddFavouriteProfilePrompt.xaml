@@ -7,48 +7,110 @@
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
       xmlns:controls="clr-namespace:Studio.Controls"
       mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="800"
+      d:DesignHeight="800" d:DesignWidth="800"
       Title="Add Favourite Profile">
     <ui:ContentDialog.Resources>
         <Style BasedOn="{StaticResource {x:Type ui:ContentDialog}}" TargetType="{x:Type local:AddFavouriteProfilePrompt}" />
     </ui:ContentDialog.Resources>
     <Grid MaxWidth="300">
         <StackPanel>
+            <!-- Main Information Text -->
             <ui:TextBlock
-                x:Name="InformationText"
-                TextWrapping="Wrap"
-                HorizontalAlignment="Center"
-                TextAlignment="Center"
-                Style="{StaticResource BodyTextStyle}"
-                Margin="{StaticResource SmallLeftTopRightBottomMargin}"
-                Text="Enter the BattleTag of the account you want to monitor (not your account to log in to, rather your friends' to look at) and hit connect."/>
-            <ui:TextBox
-                x:Name="BattletagInputBox"
-                PlaceholderText="Enter Battletag..."
-                TextChanged="OnBattleTagInputTextChanged"/>
+            x:Name="InformationText"
+            TextWrapping="Wrap"
+            HorizontalAlignment="Center"
+            TextAlignment="Center"
+            Style="{StaticResource BodyTextStyle}"
+            Margin="{StaticResource SmallLeftTopRightBottomMargin}"
+            Text="{Binding InfoText}"/>
+
+            <!-- Option Selection Buttons -->
+            <ui:Button
+            HorizontalAlignment="Stretch"
+            Visibility="{Binding IsSelectingMode, Converter={StaticResource BooleanToVisibilityConverter}}"
+            Margin="{StaticResource SmallTopMargin}"
+            Height="35"
+            Content="Manually enter battle.tag"
+            Command="{Binding SelectManualEntryCommand}"/>
+
+            <ui:Button
+            HorizontalAlignment="Stretch"
+            Visibility="{Binding IsSelectingMode, Converter={StaticResource BooleanToVisibilityConverter}}"
+            Margin="{StaticResource SmallTopBottomMargin}"
+            Height="35"
+            Content="Read from Battle.Net memory"
+            Command="{Binding SelectMemoryReadCommand}"/>
+
+            <!-- Manual Entry UI -->
+            <StackPanel Visibility="{Binding IsManualEntry, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <ui:TextBlock Text="Enter your BattleTag:" 
+                          Margin="{StaticResource SmallTopMargin}"/>
+
+                <ui:TextBox
+                PlaceholderText="ExampleName#1234"
+                Text="{Binding BattleTagManualInput, UpdateSourceTrigger=PropertyChanged}"
+                Margin="{StaticResource SmallTopBottomMargin}"/>
+
+                <ui:Button
+                HorizontalAlignment="Stretch"
+                Height="35"
+                Content="Add Profile"
+                IsEnabled="{Binding IsBattleTagValid}"
+                Command="{Binding AddFriendManual}"/>
+            </StackPanel>
+
+            <!-- Memory Read UI -->
+            <StackPanel Visibility="{Binding IsMemoryRead, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <StackPanel Visibility="{Binding IsAwaitingMemoryRead, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <ui:Button
+                        HorizontalAlignment="Stretch"
+                        Height="35"
+                        Content="Retry Memory Read"
+                        Command="{Binding RetryMemoryReadCommand}"
+                        Margin="{StaticResource SmallTopMargin}"/>
+
+                    <ui:Button
+                        HorizontalAlignment="Stretch"
+                        Height="35"
+                        Content="Go Back"
+                        Command="{Binding CancelMemoryReadCommand}"
+                        Margin="{StaticResource SmallTopBottomMargin}"/>
+                </StackPanel>
+                <StackPanel Visibility="{Binding IsMemoryReadSuccessful, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <ui:AutoSuggestBox
+                        x:Name="AutoBattleNetSuggestBox"
+                        HorizontalAlignment="Stretch"
+                        Height="35"
+                        OriginalItemsSource="{Binding MemoryBattleTags}"
+                        DisplayMemberPath="FullTag"
+                        PlaceholderText="Search from friends..."
+                        Margin="{StaticResource SmallTopMargin}"/>
+
+                    <ui:Button
+                        HorizontalAlignment="Stretch"
+                        Height="35"
+                        Content="Add Friend"
+                        Command="{Binding AddFriendFromMemory}"
+                        Margin="{StaticResource SmallTopBottomMargin}"/>
+                </StackPanel>
+
+
+            </StackPanel>
+
+            <!-- Information Bar -->
             <ui:InfoBar
                 x:Name="InformationBar"
                 Margin="{StaticResource SmallTopMargin}"
-                Severity="Error"
-                Title="Invalid Battletag"
-                Message="Battletag must be written as ExampleName#1234"
-                IsOpen="False"/>
+                Severity="{Binding InfoBarSeverity}"
+                Title="{Binding InfoBarTitle}"
+                Message="{Binding InfoBarMessage}"
+                IsOpen="{Binding IsInfoBarOpen}"/>
 
-            <ui:Button
-                x:Name="LaunchBnetButton"
-                HorizontalAlignment="Stretch"
-                Margin="{StaticResource SmallTopBottomMargin}"
-                Height="35"
-                Content="Connect"
-                IsEnabled="{Binding IsBattleTagValid}"
-                Click="OnLaunchBattlenetButtonClick"/>
-
+            <!-- Progress Bar -->
             <ProgressBar
-                x:Name="LaunchingBnetProgressBar"
-                IsIndeterminate="True"
-                Margin="{StaticResource SmallLeftRightMargin}"
-                Visibility="Collapsed"/>
+            IsIndeterminate="True"
+            Margin="{StaticResource SmallLeftRightMargin}"
+            Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}"/>
         </StackPanel>
-
     </Grid>
 </ui:ContentDialog>

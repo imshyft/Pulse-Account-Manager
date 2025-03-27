@@ -199,7 +199,7 @@
                 <ContentControl.Style>
                     <Style
                             TargetType="{x:Type ContentControl}">
-                        <Setter Property="ContentTemplate" Value="{StaticResource GroupSelectionContentTemplate}"/>
+                        <Setter Property="ContentTemplate" Value="{StaticResource DefaultPanelContentTemplate}"/>
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=Page}, Path=DataContext.GroupSelectionService.IsEnabled}" Value="True">
                                 <Setter Property="ContentTemplate" Value="{StaticResource GroupSelectionContentTemplate}" />
@@ -237,14 +237,20 @@
                 x:Name="AddProfileDropDownButton"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch"
+                ToolTip="Add a account to switch to or monitor"
+                ToolTipService.InitialShowDelay="500"
                 Style="{DynamicResource AccentButton}">
-                <ui:SymbolIcon Symbol="Add48"/>
+                <Grid>
+                    <ui:SymbolIcon Symbol="Add48"/>
+                </Grid>
+                
                 <ui:DropDownButton.Flyout>
                     <ContextMenu>
                         <MenuItem Header="User" Click="OnAddUserProfileButtonClick"/>
                         <MenuItem Header="Favourite" Click="OnAddFavouriteProfileButtonClick"/>
                     </ContextMenu>
                 </ui:DropDownButton.Flyout>
+                
             </ui:DropDownButton>
 
         </Grid>
@@ -260,6 +266,7 @@
             </Grid.ColumnDefinitions>
 
             <ui:Button
+                ToolTipService.InitialShowDelay="500"
                 IsEnabled="{Binding GroupSelectionService.IsEnabled, Converter={StaticResource InverseBooleanConverter}}"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch"
@@ -269,7 +276,10 @@
                 Style="{DynamicResource AccentButton}"
                 Margin="{StaticResource XSmallLeftRightMargin}"
                 ToolTip="Toggle between favourites and user profiles">
-                <ui:SymbolIcon x:Name="PanelToggleSymbol"  Symbol="Star48"/>
+                <Grid>
+                    <ui:SymbolIcon x:Name="PanelToggleSymbol"  Symbol="Star48"/>
+                </Grid>
+                
             </ui:Button>
             <ui:TextBox
                 x:Name="FilterTextBox"
@@ -350,17 +360,25 @@
                 Click="OnToggleOpenFavouritesPanelButtonClick"
                 CornerRadius="4,4, 0, 0"
                 Style="{DynamicResource AccentButton}"
+                ToolTipService.InitialShowDelay="500"
                 ToolTip="Expand/Collapse the sidebar">
-                <ui:SymbolIcon x:Name="PanelCollapseButtonSymbol" Symbol="ChevronDoubleRight20" FontSize="25"/>
+                <Grid>
+                    <ui:SymbolIcon x:Name="PanelCollapseButtonSymbol" Symbol="ChevronDoubleRight20" FontSize="25"/>
+                </Grid>
+                
             </ui:Button>
 
             <ToggleButton
+
                 Grid.Column="2"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch"
                 Click="OnToggleGroupSelectionButtonClick"
+                ToolTipService.InitialShowDelay="500"
                 ToolTip="Toggle group selection mode">
-                <ui:SymbolIcon Symbol="PeopleCommunity16" FontSize="20"/>
+                <Grid>
+                    <ui:SymbolIcon Symbol="PeopleCommunity16" FontSize="20"/>
+                </Grid>
             </ToggleButton>
         </Grid>
 

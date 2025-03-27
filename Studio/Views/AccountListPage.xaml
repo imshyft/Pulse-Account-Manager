@@ -258,6 +258,8 @@
                                 HorizontalAlignment="Center" 
                                 VerticalAlignment="Center"
                                 Width="50"
+                                ToolTip="Switch to the account"
+                                ToolTipService.InitialShowDelay="500"
                                 Height="40"
                                 Style="{DynamicResource AccentButton}">
                                 <ui:SymbolIcon Symbol="Play16" FontSize="20"/>

@@ -10,7 +10,6 @@ using Studio.Services.Files;
 
 namespace Studio.Services.Storage;
 
-// TODO : split this into multiple services (one for userprofiles, favourites, general settings etc)
 public class PersistAndRestoreService
 {
     private readonly FileService _fileService;
