@@ -8,25 +8,43 @@ using System.Windows;
 using System.Xml.Linq;
 using Studio.Models;
 using Studio.Services.BattleNet;
+using System;
+using System.Windows.Media.Animation;
+using AngleSharp.Text;
+using System.Collections.Specialized;
+using System.Windows.Controls.Ribbon;
 
 namespace Studio.Services
 {
-    // TODO : Create methods to set the email, close, and launch battle.net
     public class BattleNetService
     {
         private readonly PersistAndRestoreService _persistAndRestoreService;
-        private readonly string _battleNetConfigPath;
-        private readonly string _overwatchLauncherPath;
+        private string _battleNetConfigPath;
+        private string _overwatchLauncherPath;
         private readonly BattleNetMemoryReaderService _memoryReaderService;
 
 
         public BattleNetService()
         {
             _persistAndRestoreService = ((App)Application.Current).GetService<PersistAndRestoreService>();
-            _battleNetConfigPath = _persistAndRestoreService.GetValue<string>("BattleNetConfigPath");
+            
             _memoryReaderService = new BattleNetMemoryReaderService();
+
+           
+        }
+
+        public bool Initialize()
+        {
+            _battleNetConfigPath = _persistAndRestoreService.GetValue<string>("BattleNetConfigPath");
+            if (string.IsNullOrEmpty(_battleNetConfigPath))
+                return false;
             string overwatchDirectory = _persistAndRestoreService.GetValue<string>("OverwatchDirectory");
+            if (string.IsNullOrEmpty(overwatchDirectory))
+                return false;
+
             _overwatchLauncherPath = Path.Combine(overwatchDirectory, "Overwatch Launcher.exe");
+
+            return true;
         }
 
         public void CloseBattleNet()
@@ -92,7 +110,49 @@ namespace Studio.Services
 
         public BattleTag ReadBattleTagFromMemory()
         {
-            return _memoryReaderService.FindBattleTagInMemory();
+            Process[] processes = Process.GetProcessesByName("Battle.net");
+            Process process;
+            if (processes.Length == 0)
+            {
+                process = Process.Start(_overwatchLauncherPath);
+            }
+            else
+            {
+                process = processes[0];
+            }
+
+            //var friends = _memoryReaderService.FindBlizzardFriends(process.Id);
+
+
+            var tag = BattleNetMemoryReaderService.GetUserBattleTag(process.Handle);
+            if (tag == null)
+                return null;
+
+            BattleTag battleTag = new BattleTag(tag);
+
+            return battleTag;
+        }
+
+        public BattleTag[] ReadFriendsListFromMemory()
+        {
+            Process[] processes = Process.GetProcessesByName("Battle.net");
+            Process process;
+            if (processes.Length == 0)
+            {
+                process = Process.Start(_overwatchLauncherPath);
+            }
+            else
+            {
+                process = processes[0];
+            }
+
+            //var friends = _memoryReaderService.FindBlizzardFriends(process.Id);
+
+
+            var tags = BattleNetMemoryReaderService.GetFriendBattleTags(process.Handle);
+            BattleTag[] battleTags = tags.Select(x => new BattleTag(x)).ToArray();
+
+            return battleTags;
 
         }
     }

@@ -26,6 +26,7 @@ namespace Studio.Models
 
     public class BattleTag
     {
+        public string FullTag => ToString();
         public string Username { get; set; }
         public string Tag { get; set; }
 
@@ -105,11 +106,16 @@ namespace Studio.Models
         public abstract RankMoment PeakRank { get; set; }
         public abstract Rank CurrentRank { get; set; }
 
+        [JsonIgnore]
         public abstract StatCollection StatCollection { get; set; }
+
+        [JsonIgnore]
         public static Dictionary<StatisticType, float> StatScalars { get; set; }
 
+        [JsonIgnore]
         public Dictionary<StatisticType, float> Scalars => ScalarCollection[Type];
 
+        [JsonIgnore]
         public static Dictionary<Roles, Dictionary<StatisticType, float>> ScalarCollection = new()
         {
             { Roles.Tank, new Dictionary<StatisticType, float>

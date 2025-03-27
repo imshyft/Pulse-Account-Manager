@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -42,7 +44,7 @@ namespace Studio.Views
 
         private bool _mouseOverButton = false;
         private bool _isFlyoutOpen;
-
+        private bool _isCollapsedView = false;
         public Visibility RankColumnsVisibility { get; set; }
         public AccountListPage()
         {
@@ -56,6 +58,7 @@ namespace Studio.Views
             GroupSelectionService = ((App)Application.Current).GetService<GroupSelectionService>();
             
             AccountDataGrid.SelectedItem = null;
+            
         }
 
 
@@ -143,7 +146,7 @@ namespace Studio.Views
             if (((FrameworkElement)sender).DataContext is not Profile profile)
                 return;
 
-            var result = await _profileDataFetchingService.GetUserProfile(profile.Battletag);
+            var result = await _profileDataFetchingService.FetchProfileAsync(profile.Battletag);
             SnackbarPresenter.AddToQue(new Snackbar(SnackbarPresenter)
             {
                 Appearance = ControlAppearance.Info,
@@ -152,7 +155,7 @@ namespace Studio.Views
                 Icon = new SymbolIcon(SymbolRegular.ArrowClockwise16),
             });
 
-            if (string.IsNullOrEmpty(result.Error))
+            if (result.Outcome == ProfileFetchOutcome.Success)
             {
                 _ = SnackbarPresenter.ImmediatelyDisplay(new Snackbar(SnackbarPresenter)
                 {
@@ -193,13 +196,50 @@ namespace Studio.Views
         private void OnPageSizeChanged(object sender, SizeChangedEventArgs e)
         {
             double width = e.NewSize.Width;
+            SetDataGridNoSortingHeader(0);
             for (int i = 2; i < 5; i++)
             {
                 if (width < 570)
+                {
+                    _isCollapsedView = true;
                     AccountDataGrid.Columns[i].Visibility = Visibility.Collapsed;
+                }
                 else
+                {
+                    _isCollapsedView = false;
                     AccountDataGrid.Columns[i].Visibility = Visibility.Visible;
+                }
             }
+
+        }
+
+        private void AccountDataGrid_Sorting(object sender, DataGridSortingEventArgs e)
+        {
+            SetDataGridNoSortingHeader(e.Column.DisplayIndex);
+
+        }
+
+        private void SetDataGridNoSortingHeader(int index)
+        {
+            if (_isCollapsedView)
+                return;
+            var headers = AccountDataGrid.FindChild<DataGridCellsPanel>();
+            for (int i = 2; i < 5; i++)
+            {
+                DataGridColumnHeader header = (DataGridColumnHeader)headers.Children[i];
+                SymbolIcon icon = header.FindChild<SymbolIcon>();
+                if (index != i)
+                {
+                    icon.Visibility = Visibility.Visible;
+                    icon.Symbol = SymbolRegular.LineHorizontal120;
+                }
+                else
+                {
+                    icon.Symbol = SymbolRegular.ArrowUp24;
+                }
+                
+            }
+
         }
     }
 }

@@ -15,12 +15,34 @@ namespace Studio.Contracts.Services
 
         public virtual void SaveProfile(Profile profile)
         {
+            Profile duplicate = FindDuplicateProfile(profile);
+            if (duplicate != null)
+            {
+                Profiles.Remove(duplicate);
+            }
+
             Profiles.Add(profile);
+
         }
 
         public virtual void DeleteProfile(Profile profile)
         {
             Profiles.Remove(profile);
+        }
+
+        public virtual bool ContainsProfile(Profile profile)
+        {
+            return FindDuplicateProfile(profile) != null;
+        }
+
+        private Profile FindDuplicateProfile(Profile profile)
+        {
+            foreach (var item in Profiles)
+            {
+                if (item.Battletag.ToString() == profile.Battletag.ToString()) return item;
+            }
+
+            return null;
         }
 
         public abstract Profile ReadProfile(BattleTag battletag);

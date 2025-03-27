@@ -7,7 +7,7 @@ namespace Studio.Models
 
     #region Profile
 
-    public class UserData
+    public class Profile
     {
         public BattleTag Battletag { get; set; }
         public string BattletagString => Battletag?.ToString();

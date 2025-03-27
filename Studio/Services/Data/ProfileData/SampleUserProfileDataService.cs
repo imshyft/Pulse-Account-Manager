@@ -46,33 +46,32 @@ namespace Studio.Services.Data
                     Battletag = new BattleTag("Username", _rnd.Next(1000, 9999).ToString()),
                     //Username = "Username",
                     //Tag = _rnd.Next(1000, 9999).ToString(),
-                    Avatar = missingDetails ? 
+                    Avatar = missingDetails ?
                         null : $"https://d15f34w2p8l1cc.cloudfront.net/overwatch/daeddd96e58a2150afa6ffc3c5503ae7f96afc2e22899210d444f45dee508c6c.png",
                     CustomId = $"Name{_rnd.Next(1000)}",
-                    Email = missingDetails ? null : "email@123.com",
+                    Email = "email@123",
                     LastUpdate = _rnd.Next(1, 1000000),
                     RankedCareer = new RankedCareer()
                     {
-                        Damage = new Damage()
+                        Damage = _rnd.NextDouble() > 0.4 ? new Damage()
                         {
-                            CurrentRank = _rnd.NextDouble() > 0.4 ? Rank.RankFromSr(_rnd.Next(500, 5000)) : null,
+                            CurrentRank = Rank.RankFromSr(_rnd.Next(500, 5000)),
                             PeakRank = RandomRankMoments(1)[0],
                             RankMoments = RandomRankMoments(rankMoments)
-                        },
+                        } : null,
+                        Support = _rnd.NextDouble() > 0.4 ? new Support()
+                        {
+                            CurrentRank = Rank.RankFromSr(_rnd.Next(500, 5000)),
+                            PeakRank = RandomRankMoments(1)[0],
+                            RankMoments = RandomRankMoments(rankMoments)
+                        } : null,
 
-                        Support = new Support()
+                        Tank = _rnd.NextDouble() > 0.4 ? new Tank()
                         {
-                            CurrentRank = _rnd.NextDouble() > 0.4 ? Rank.RankFromSr(_rnd.Next(500, 5000)) : null,
+                            CurrentRank = Rank.RankFromSr(_rnd.Next(500, 5000)),
                             PeakRank = RandomRankMoments(1)[0],
                             RankMoments = RandomRankMoments(rankMoments)
-                        },
-
-                        Tank = new Tank()
-                        {
-                            CurrentRank = _rnd.NextDouble() > 0.4 ? Rank.RankFromSr(_rnd.Next(500, 5000)) : null,
-                            PeakRank = RandomRankMoments(1)[0],
-                            RankMoments = RandomRankMoments(rankMoments)
-                        },
+                        } : null,
                     },
                     TimesLaunched = _rnd.Next(3, 80),
                     TimesSwitched = _rnd.Next(10, 300)

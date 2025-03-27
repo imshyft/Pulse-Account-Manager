@@ -37,4 +37,50 @@
         <PathGeometry Figures="M32.8869 0.05448C32.7026 -0.01816 32.4978 -0.01816 32.3135 0.05448C28.2355 1.83795 28.1416 7.75154 28.1416 7.75154V31.6771H36.9964V7.75154C36.9964 7.75154 36.9649 1.85881 32.8869 0.05448Z"/>
 
     </GeometryGroup>
+
+    <DrawingImage x:Key="WideGroupDrawingImage">
+        <DrawingImage.Drawing>
+            <DrawingGroup ClipGeometry="M0,0 V30.72 H30.72 V0 H0 Z">
+                <DrawingGroup.Transform>
+                    <TranslateTransform X="1.332388510633109E-08" Y="0" />
+                </DrawingGroup.Transform>
+                <DrawingGroup Transform="1,0,0,1,17.2049999442191,6.79499998202103">
+                    <GeometryDrawing Brush="#FFA37F00">
+                        <GeometryDrawing.Geometry>
+                            <EllipseGeometry RadiusX="2.8725" RadiusY="2.8725" Center="2.8725,2.8725" />
+                        </GeometryDrawing.Geometry>
+                    </GeometryDrawing>
+                </DrawingGroup>
+                <DrawingGroup Transform="1,0,0,1,14.1777997149914,13.653749083736">
+                    <GeometryDrawing Brush="#FFA37F00" Geometry="F0 M30.72,30.72z M0,0z M7.92742,8.72251L7.87005,6.16028 11.4075,2.92876 11.4235,0 0,0.00374007 0.0159345,2.9325 3.5534,6.16402 3.49603,8.72625z" />
+                </DrawingGroup>
+                <DrawingGroup Transform="1,0,0,1,25.6504271578808,9.84373587485275">
+                    <GeometryDrawing Brush="#FFA37F00" Geometry="F0 M30.72,30.72z M0,0z M0.022071,0.337513C0.040821,0.116263 0.194571,0.00376344 0.483321,1.34376E-05 0.916446,-0.00561156 3.95957,1.75501 3.92582,4.77001 3.89207,7.78501 1.13395,9.83251 0.505822,9.83626 0.0870718,9.83876 -0.0716782,9.71251 0.0295718,9.45751 0.0445718,9.33501 0.254572,9.16501 0.659572,8.94751 1.26707,8.62126 2.22707,6.14251 2.22707,4.86001 2.22707,3.57751 1.4452,1.16439 0.637072,0.870014 0.528322,0.870014 -0.0379282,0.712514 0.022071,0.337513z" />
+                </DrawingGroup>
+                <DrawingGroup Transform="-1,0,0,1,13.0350010113154,6.79499998202103">
+                    <GeometryDrawing Brush="#FFA37F00">
+                        <GeometryDrawing.Geometry>
+                            <EllipseGeometry RadiusX="2.8725" RadiusY="2.8725" Center="2.8725,2.8725" />
+                        </GeometryDrawing.Geometry>
+                    </GeometryDrawing>
+                </DrawingGroup>
+                <DrawingGroup Transform="-1,0,0,1,16.0622012405431,13.653749083736">
+                    <GeometryDrawing Brush="#FFA37F00" Geometry="F0 M30.72,30.72z M0,0z M7.92742,8.72251L7.87005,6.16028 11.4075,2.92876 11.4235,0 0,0.00374007 0.0159345,2.9325 3.5534,6.16402 3.49603,8.72625z" />
+                </DrawingGroup>
+                <DrawingGroup Transform="-1,0,0,1,4.58957379765361,9.84373587485275">
+                    <GeometryDrawing Brush="#FFA37F00" Geometry="F0 M30.72,30.72z M0,0z M0.022071,0.337513C0.040821,0.116263 0.194571,0.00376344 0.483321,1.34376E-05 0.916446,-0.00561156 3.95957,1.75501 3.92582,4.77001 3.89207,7.78501 1.13395,9.83251 0.505822,9.83626 0.0870718,9.83876 -0.0716782,9.71251 0.0295718,9.45751 0.197072,9.33501 0.387072,9.18626 0.599572,9.01126 0.918322,8.74876 2.22707,6.14251 2.22707,4.86001 2.22707,3.57751 1.09457,1.42126 0.697072,0.885014 0.217072,0.585014 -0.0379282,0.712514 0.022071,0.337513z" />
+                </DrawingGroup>
+                <DrawingGroup Transform="1,0,0,1,11.76,5.04">
+                    <GeometryDrawing Brush="#FFFDC802">
+                        <GeometryDrawing.Geometry>
+                            <EllipseGeometry RadiusX="3.36" RadiusY="3.36" Center="3.36,3.36" />
+                        </GeometryDrawing.Geometry>
+                    </GeometryDrawing>
+                </DrawingGroup>
+                <DrawingGroup Transform="1,0,0,1,8.46937528473243,13.113749089268">
+                    <GeometryDrawing Brush="#FFFDC802" Geometry="F0 M30.72,30.72z M0,0z M9.32812,10.2637L9.26062,7.24875 13.4231,3.44625 13.4419,0 0,0.00440091 0.01875,3.45065 4.18125,7.25315 4.11375,10.2681z" />
+                </DrawingGroup>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
 </ResourceDictionary>

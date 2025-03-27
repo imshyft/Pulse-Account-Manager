@@ -20,6 +20,7 @@ using Studio.Services.Data;
 using Studio.Services.Files;
 using Studio.Services.Storage;
 using Wpf.Ui.Controls;
+using static SkiaSharp.HarfBuzz.SKShaper;
 using Button = Wpf.Ui.Controls.Button;
 using TextBox = Wpf.Ui.Controls.TextBox;
 
@@ -28,19 +29,23 @@ namespace Studio.Views;
 
 public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
 {
-    // TODO : Find somewhere for button to add favourite (maybe move expand/collapse btn?)
-    // TODO : Add Escape for back navigation
+
+
     // TODO : Add flyouts to introduce main actions (adding profiles, favourites) on first time launch
     public ObservableCollection<Profile> FilteredProfiles { get; set; } = new();
     public GroupSelectionService GroupSelectionService { get; set; }
     public bool IsPanelShowingFavourites { get; set; } = true;
 
     private readonly FavouriteProfileDataService _favouriteProfiles;
+    private readonly BattleNetService _battleNetService;
     private readonly UserProfileDataService _userProfiles;
     private IProfileFetchingService _profileDataFetchingService;
 
     private readonly PersistAndRestoreService _persistAndRestoreService;
     private bool IsFavouritesPanelCollapsed { get; set; } = false;
+
+    private int _flyoutOpenId = 0;
+    private Flyout[] _flyouts;
 
     public MainPage()
     {
@@ -51,6 +56,7 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
         _userProfiles = ((App)Application.Current).GetService<UserProfileDataService>();
         GroupSelectionService = ((App)Application.Current).GetService<GroupSelectionService>();
         _profileDataFetchingService = ((App)Application.Current).GetService<IProfileFetchingService>();
+        _battleNetService = ((App)Application.Current).GetService<BattleNetService>();
 
 
 
@@ -65,8 +71,8 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
         
         PreviewMouseDown += OnPreviewMouseDown;
 
-
         CheckIfFirstLaunch();
+        _battleNetService.Initialize();
     }
 
     private async void CheckIfFirstLaunch()
@@ -87,6 +93,8 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
 
             _persistAndRestoreService.SetValue("IsFirstLaunch", false);
             _persistAndRestoreService.PersistData();
+
+            AddProfileDropDownButton.IsDropDownOpen = true;
         }
     }
     
@@ -165,10 +173,10 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
 
     private void OnFavouritesSearchTextChanged(object sender, TextChangedEventArgs e)
     {
-        FilterSearchPanel();
+        RefreshPanel();
     }
 
-    private void FilterSearchPanel()
+    private void RefreshPanel()
     {
         //https://learn.microsoft.com/en-us/windows/apps/design/controls/listview-filtering
         string text = FilterTextBox.Text;
@@ -248,8 +256,11 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
         if (result == ContentDialogResult.Primary)
         {
             Profile profile = dialog.Profile;
+            string email = _battleNetService.GetBattleNetAccount();
+            profile.Email = email;
             _userProfiles.SaveProfile(profile);
         }
+        RefreshPanel();
     }
     private async void OnAddFavouriteProfileButtonClick(object sender, RoutedEventArgs e)
     {
@@ -269,8 +280,20 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
         if (result == ContentDialogResult.Primary)
         {
             Profile profile = dialog.Profile;
+
+            if (_favouriteProfiles.ContainsProfile(profile))
+            {
+                _ = SnackbarPresenter.ImmediatelyDisplay(new Snackbar(SnackbarPresenter)
+                {
+                    Appearance = ControlAppearance.Danger,
+                    Title = "Profile already exists!",
+                    Content = "You have already added this profile before, so we'll just update it",
+                    Icon = new SymbolIcon(SymbolRegular.Info16),
+                });
+            }
+
             _favouriteProfiles.SaveProfile(profile);
-            FilterSearchPanel();
+            RefreshPanel();
         }
     }
 
@@ -303,7 +326,7 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
 
         IsPanelShowingFavourites = !IsPanelShowingFavourites;
 
-        FilterSearchPanel();
+        RefreshPanel();
     }
 
     private void OnToggleGroupSelectionButtonClick(object sender, RoutedEventArgs e)
@@ -315,12 +338,24 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
 
         if (isToggled)
         {
+            TogglePanelExpandButton.Opacity = 0.2;
             if (!IsPanelShowingFavourites)
                 TogglePanelProfileSource();
+            _ = SnackbarPresenter.ImmediatelyDisplay(new Snackbar(SnackbarPresenter)
+            {
+                Appearance = ControlAppearance.Transparent,
+                Title = "Group Selection Mode",
+                Content = "Click on the ranks of the roles your friends will play on on the side panel to see which accounts are in range",
+                Timeout = TimeSpan.FromSeconds(10),
+                
+                Icon = new SymbolIcon(SymbolRegular.ArrowClockwise16),
+            });
 
         }
         else
         {
+            SnackbarPresenter.HideCurrent();
+            TogglePanelExpandButton.Opacity = 1;
             GroupSelectionService.RemoveAllMembers();
         }
     }
@@ -351,10 +386,10 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
         if (FavouritesList.SelectedItem is not Profile profile)
             return;
 
-        var result = await _profileDataFetchingService.GetUserProfile(profile.Battletag);
+        var result = await _profileDataFetchingService.FetchProfileAsync(profile.Battletag);
 
 
-        if (string.IsNullOrEmpty(result.Error))
+        if (result.Outcome == ProfileFetchOutcome.Success)
         {
             _ = SnackbarPresenter.ImmediatelyDisplay(new Snackbar(SnackbarPresenter)
             {
@@ -363,8 +398,19 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
                 Content = "Favourited profile successfully synced",
                 Icon = new SymbolIcon(SymbolRegular.ArrowClockwise16),
             });
-            _favouriteProfiles.DeleteProfile(profile);
-            _favouriteProfiles.SaveProfile(result.Profile);
+
+            if (IsPanelShowingFavourites)
+            {
+                _favouriteProfiles.DeleteProfile(profile);
+                _favouriteProfiles.SaveProfile(result.Profile);
+            }
+            else
+            {
+                _userProfiles.DeleteProfile(profile);
+                _userProfiles.SaveProfile(result.Profile);
+            }
+
+
         }
         else
         {
@@ -376,6 +422,28 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
                 Icon = new SymbolIcon(SymbolRegular.ErrorCircle24),
             });
         }
-   
+
+        RefreshPanel();
+
+
     }
+
+    private void OnSidePanelItemDeleteClick(object sender, RoutedEventArgs e)
+    {
+        if (FavouritesList.SelectedItem is not Profile profile)
+            return;
+
+        if (IsPanelShowingFavourites)
+        {
+            _favouriteProfiles.DeleteProfile(profile);
+        }
+        else
+        {
+            _userProfiles.DeleteProfile(profile);
+        }
+
+        RefreshPanel();
+    }
+
+
 }

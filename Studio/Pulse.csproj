@@ -9,7 +9,11 @@
     <ApplicationIcon>AccountLauncherLogo.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <FileVersion>0.1.0.0</FileVersion>
+    <Configurations>Debug;Release;Sample</Configurations>
   </PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)' == 'Sample'">
+		<DefineConstants>SAMPLE</DefineConstants>
+	</PropertyGroup>
   
   <ItemGroup>
     <None Remove="Resources\AccountLauncherLogo.ico" />
@@ -91,15 +95,15 @@
   </ItemGroup>
   
   <ItemGroup>
+    <PackageReference Include="AngleSharp" Version="1.3.0-beta.470" />
     <PackageReference Include="LiveChartsCore.SkiaSharpView.WPF" Version="2.0.0-rc5.4" />
     <PackageReference Include="MahApps.Metro" Version="2.4.9" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.0" />
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3171-prerelease" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
+    <PackageReference Include="System.Text.Json" Version="9.0.3" />
     <PackageReference Include="WPF-UI" Version="4.0.2" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <ProjectReference Include="..\Studio.Core\Studio.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -125,5 +129,11 @@
 
   <ItemGroup>
     <Folder Include="Windows\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="BlizzardMemoryReader">
+      <HintPath>..\BattleNetMemoryReader\x64\Release\BlizzardMemoryReader.dll</HintPath>
+    </Reference>
   </ItemGroup>
 </Project>

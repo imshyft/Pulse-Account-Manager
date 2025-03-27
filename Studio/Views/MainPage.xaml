@@ -13,6 +13,26 @@
     d:DataContext="{d:DesignInstance Type=data:DesignTimeSampleData, IsDesignTimeCreatable=True}"
     d:DesignHeight="450" d:DesignWidth="800">
     <Page.Resources>
+        <Style
+            TargetType="controls:RankDisplay">
+            <Style.Triggers>
+                <DataTrigger Value="False">
+                    <DataTrigger.Binding>
+                        <MultiBinding Converter="{StaticResource RangeToBooleanConverter}">
+                            <Binding Path="DataContext.GroupSelectionService.Range" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Page}"/>
+                            <Binding Path ="RankValue.SkillRating" RelativeSource="{RelativeSource Self}"/>
+                        </MultiBinding>
+                    </DataTrigger.Binding>
+
+                    <Setter Property="ShowWideGroupDecorator" Value="True"/>
+                    <Setter Property="Opacity" Value="0.4"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=RankValue}" Value="{x:Null}">
+                    <Setter Property="Opacity" Value="0.4"/>
+                </DataTrigger>
+
+            </Style.Triggers>
+        </Style>
         <DataTemplate x:Key="DefaultPanelContentTemplate">
             <Grid 
                 Height="60"
@@ -119,29 +139,18 @@
                                 <Setter Property="Appearance" Value="Transparent"/>
                                 <Setter Property="Padding" Value="0"/>
                                 <Setter Property="Opacity" Value="0.6"/>
+                                <Setter Property="Height" Value="80"/>
+                                <Setter Property="BorderThickness" Value="0"/>
                                 <Setter Property="Visibility" Value="Visible"/>
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=Tag}" Value="{x:Null}">
-                                        <Setter Property="Visibility" Value="Hidden"/>
+                                        <Setter Property="IsEnabled" Value="False"/>
                                     </DataTrigger>
                                     <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=Tag.IsSelectedForComparison}" Value="True">
                                         <Setter Property="Opacity" Value="1"/>
                                         <Setter Property="Appearance" Value="Success"/>
                                     </DataTrigger>
-                                    <DataTrigger Value="False">
-                                        <DataTrigger.Binding>
-                                            <MultiBinding Converter="{StaticResource RangeToBooleanConverter}">
-                                                <Binding Path="DataContext.GroupSelectionService.Range" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Page}"/>
-                                                <Binding Path ="Tag.CurrentRank.SkillRating" RelativeSource="{RelativeSource Self}"/>
-                                            </MultiBinding>
-                                        </DataTrigger.Binding>
-                                        <Setter Property="Opacity" Value="0.2"/>
-                                        <Setter Property="Background">
-                                            <Setter.Value>
-                                                <SolidColorBrush Color="{StaticResource PaletteRedColor}" Opacity="0.3"/>
-                                            </Setter.Value>
-                                        </Setter>
-                                    </DataTrigger>
+
 
                                 </Style.Triggers>
                         
@@ -151,7 +160,10 @@
                             Click="OnSidePanelRoleButtonClick"
                             Tag="{Binding RankedCareer.Tank}">
                             <Viewbox>
-                                <controls:RankDisplay RankValue="{Binding Tag.CurrentRank, RelativeSource={RelativeSource AncestorType=ui:Button}}"/>
+                                <controls:RankDisplay 
+                                    RankValue="{Binding Tag.CurrentRank, RelativeSource={RelativeSource AncestorType=ui:Button}}"
+                                    VerticalAlignment="Stretch"         
+                                    Role="Tank"/>
                             </Viewbox>
                         </ui:Button>
                         <ui:Button
@@ -159,7 +171,8 @@
                             Click="OnSidePanelRoleButtonClick"
                             Tag="{Binding RankedCareer.Damage}">
                             <Viewbox>
-                                <controls:RankDisplay RankValue="{Binding Tag.CurrentRank, RelativeSource={RelativeSource AncestorType=ui:Button}}"/>
+                                <controls:RankDisplay RankValue="{Binding Tag.CurrentRank, RelativeSource={RelativeSource AncestorType=ui:Button}}"
+                                                      Role="Damage"/>
                             </Viewbox>
                         </ui:Button>
                         <ui:Button
@@ -167,7 +180,8 @@
                             Click="OnSidePanelRoleButtonClick"
                             Tag="{Binding RankedCareer.Support}">
                             <Viewbox>
-                                <controls:RankDisplay RankValue="{Binding Tag.CurrentRank, RelativeSource={RelativeSource AncestorType=ui:Button}}"/>
+                                <controls:RankDisplay RankValue="{Binding Tag.CurrentRank, RelativeSource={RelativeSource AncestorType=ui:Button}}"
+                                                      Role="Support"/>
                             </Viewbox>
                         </ui:Button>
                     </Grid>
@@ -220,16 +234,23 @@
             </Grid.ColumnDefinitions>
 
             <ui:DropDownButton
+                x:Name="AddProfileDropDownButton"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch"
+                ToolTip="Add a account to switch to or monitor"
+                ToolTipService.InitialShowDelay="500"
                 Style="{DynamicResource AccentButton}">
-                <ui:SymbolIcon Symbol="Add48"/>
+                <Grid>
+                    <ui:SymbolIcon Symbol="Add48"/>
+                </Grid>
+                
                 <ui:DropDownButton.Flyout>
                     <ContextMenu>
                         <MenuItem Header="User" Click="OnAddUserProfileButtonClick"/>
                         <MenuItem Header="Favourite" Click="OnAddFavouriteProfileButtonClick"/>
                     </ContextMenu>
                 </ui:DropDownButton.Flyout>
+                
             </ui:DropDownButton>
 
         </Grid>
@@ -245,6 +266,7 @@
             </Grid.ColumnDefinitions>
 
             <ui:Button
+                ToolTipService.InitialShowDelay="500"
                 IsEnabled="{Binding GroupSelectionService.IsEnabled, Converter={StaticResource InverseBooleanConverter}}"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch"
@@ -254,7 +276,10 @@
                 Style="{DynamicResource AccentButton}"
                 Margin="{StaticResource XSmallLeftRightMargin}"
                 ToolTip="Toggle between favourites and user profiles">
-                <ui:SymbolIcon x:Name="PanelToggleSymbol"  Symbol="Star48"/>
+                <Grid>
+                    <ui:SymbolIcon x:Name="PanelToggleSymbol"  Symbol="Star48"/>
+                </Grid>
+                
             </ui:Button>
             <ui:TextBox
                 x:Name="FilterTextBox"
@@ -294,6 +319,9 @@
                     <ui:MenuItem
                         Header="Sync"
                         Click="OnSidePanelItemSyncClick"/>
+                    <ui:MenuItem
+                        Header="Delete"
+                        Click="OnSidePanelItemDeleteClick"/>
                 </ContextMenu>
             </ListView.ContextMenu>
         </ui:ListView>
@@ -325,23 +353,32 @@
                 CornerRadius="4,4,0,0"/>
 
             <ui:Button
+                x:Name="TogglePanelExpandButton"
                 IsEnabled="{Binding GroupSelectionService.IsEnabled, Converter={StaticResource InverseBooleanConverter}}"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch"
                 Click="OnToggleOpenFavouritesPanelButtonClick"
                 CornerRadius="4,4, 0, 0"
                 Style="{DynamicResource AccentButton}"
+                ToolTipService.InitialShowDelay="500"
                 ToolTip="Expand/Collapse the sidebar">
-                <ui:SymbolIcon x:Name="PanelCollapseButtonSymbol" Symbol="ChevronDoubleRight20" FontSize="25"/>
+                <Grid>
+                    <ui:SymbolIcon x:Name="PanelCollapseButtonSymbol" Symbol="ChevronDoubleRight20" FontSize="25"/>
+                </Grid>
+                
             </ui:Button>
 
             <ToggleButton
+
                 Grid.Column="2"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch"
                 Click="OnToggleGroupSelectionButtonClick"
+                ToolTipService.InitialShowDelay="500"
                 ToolTip="Toggle group selection mode">
-                <ui:SymbolIcon Symbol="PeopleCommunity16" FontSize="20"/>
+                <Grid>
+                    <ui:SymbolIcon Symbol="PeopleCommunity16" FontSize="20"/>
+                </Grid>
             </ToggleButton>
         </Grid>
 
