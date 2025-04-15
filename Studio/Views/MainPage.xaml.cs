@@ -209,7 +209,7 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
 
             Storyboard storyboard = new Storyboard();
 
-            Duration duration = new Duration(TimeSpan.FromMilliseconds(500));
+            Duration duration = new Duration(TimeSpan.FromMilliseconds(200));
             CubicEase ease = new CubicEase { EasingMode = EasingMode.EaseOut };
 
             DoubleAnimation animation = new DoubleAnimation();
@@ -343,7 +343,9 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
                 TogglePanelProfileSource();
             _ = SnackbarPresenter.ImmediatelyDisplay(new Snackbar(SnackbarPresenter)
             {
-                Appearance = ControlAppearance.Transparent,
+                Appearance = ControlAppearance.Info,
+                Opacity = 0.7,
+                IsCloseButtonEnabled = false,
                 Title = "Group Selection Mode",
                 Content = "Click on the ranks of the roles your friends will play on on the side panel to see which accounts are in range",
                 Timeout = TimeSpan.FromSeconds(10),

@@ -10,33 +10,67 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml">
+    
+    <!--Fonts-->
+    <FontFamily x:Key="BigNoodleTooOblique">pack://application:,,,/Resources/Fonts/BigNoodleTooOblique.ttf#BigNoodleTooOblique</FontFamily>
+    <!--<FontFamily x:Key="Roboto">pack://application:,,,/Resources/Fonts/Roboto_SemiCondensed-SemiBold.ttf#Roboto SemiCondensed SemiBold</FontFamily>-->
+    <FontFamily x:Key="Roboto">pack://application:,,,/Resources/Fonts/Roboto/#Roboto</FontFamily>
+    <FontFamily x:Key="RobotoCondensed">pack://application:,,,/Resources/Fonts/Roboto/Roboto_Condensed-Bold.ttf#Roboto Condensed</FontFamily>
+    <FontFamily x:Key="Hakuna">pack://application:,,,/Resources/Fonts/Hakuna-Sans.otf#Hakuna Sans</FontFamily>
+    
+    
+    
     <BitmapImage 
         x:Key="PlaceholderAvatar" 
         UriSource="/Resources/PlaceholderPlayerIcon.png"/>
     
     <!--Accent Button-->
-    <Style
-        TargetType="ui:Button"
-        x:Key="AccentButton"
-        BasedOn="{StaticResource {x:Type Button}}">
-        <Setter Property="Foreground" Value="{StaticResource AccentBrush}"/>
+    <Style x:Key="AccentButton" TargetType="ui:Button">
         <Setter Property="Background">
             <Setter.Value>
-                <SolidColorBrush Color="{StaticResource AccentColor}" Opacity="0.2"/>
+                <SolidColorBrush Color="{StaticResource AccentColor}" Opacity="0.1"/>
             </Setter.Value>
         </Setter>
-        <Setter Property="MouseOverBackground">
+        <Setter Property="Foreground" Value="{StaticResource AccentBrush}"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
             <Setter.Value>
-                <SolidColorBrush Color="{StaticResource AccentColor}" Opacity="1"/>
-            </Setter.Value>
-        </Setter>
-        <Setter Property="PressedBackground">
-            <Setter.Value>
-                <SolidColorBrush Color="{StaticResource AccentColor}" Opacity="0.7"/>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="border"
+                        Background="{TemplateBinding Background}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="4">
+                        <ContentPresenter HorizontalAlignment="Center"
+                                      VerticalAlignment="Center" />
+                    </Border>
+                    
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="Background">
+                                <Setter.Value>
+                                    <SolidColorBrush Color="{DynamicResource AccentColor}" Opacity="0.4"/>
+                                </Setter.Value>
+                            </Setter>
+                            <Setter Property="Foreground">
+                                <Setter.Value>
+                                    <SolidColorBrush Color="White"/>
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="border" Property="Background">
+                                <Setter.Value>
+                                    <SolidColorBrush Color="{DynamicResource AccentColor}" Opacity="0.8"/>
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>
-
+    
     <Style TargetType="ScrollBar"
            BasedOn="{StaticResource {x:Type ScrollBar}}">
         <Setter Property="MaxWidth" Value="12"/>
@@ -72,5 +106,26 @@
             </Trigger>
         </Style.Triggers>
     </Style>
+
+    <Style TargetType="ToolTip"
+           BasedOn="{StaticResource {x:Type ToolTip}}">
+        <Setter Property="FontFamily" Value="{StaticResource Roboto}" />
+        
+    </Style>
+
+    <Style TargetType="TextBlock"
+           BasedOn="{StaticResource {x:Type TextBlock}}">
+        <!--<Setter Property="FontWeight" Value="SemiBold"/>-->
+        <Setter Property="FontFamily" Value="{StaticResource Roboto}" />
+    </Style>
+
+    <Style TargetType="ui:TextBox"
+           BasedOn="{StaticResource {x:Type ui:TextBox}}">
+        <Setter Property="FontWeight" Value="Regular"/>
+        <Setter Property="FontStretch" Value="SemiCondensed"/>
+        <Setter Property="FontFamily" Value="{StaticResource Roboto}" />
+
+    </Style>
+
 
 </ResourceDictionary>

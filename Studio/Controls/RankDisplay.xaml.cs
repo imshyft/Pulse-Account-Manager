@@ -103,7 +103,7 @@ namespace Studio.Controls
                 var opacityAnimation = new DoubleAnimation
                 {
                     To = showWide ? 1 : 0, // Target Opacity
-                    Duration = TimeSpan.FromSeconds(0.3),
+                    Duration = TimeSpan.FromSeconds(0.1),
                     EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
                 };
 

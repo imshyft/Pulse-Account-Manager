@@ -6,7 +6,7 @@
     <RootNamespace>Studio</RootNamespace>
     <UseWPF>true</UseWPF>
     <ImplicitUsings>enable</ImplicitUsings>
-    <ApplicationIcon>AccountLauncherLogo.ico</ApplicationIcon>
+    <ApplicationIcon>Resources\Logo\Logo.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <FileVersion>0.1.0.0</FileVersion>
     <Configurations>Debug;Release;Sample</Configurations>
@@ -16,7 +16,19 @@
 	</PropertyGroup>
   
   <ItemGroup>
-    <None Remove="Resources\AccountLauncherLogo.ico" />
+    <None Remove="Resources\Fonts\bignoodletoooblique.ttf" />
+    <None Remove="Resources\Fonts\Hakuna-Sans.otf" />
+    <None Remove="Resources\Fonts\Roboto-Regular.ttf" />
+    <None Remove="Resources\Fonts\Roboto\Roboto_Condensed-Bold.ttf" />
+    <None Remove="Resources\Fonts\Roboto\Roboto_SemiCondensed-Bold.ttf" />
+    <None Remove="Resources\Fonts\Roboto_Condensed-SemiBold.ttf" />
+    <None Remove="Resources\Fonts\Roboto_SemiCondensed-Regular.ttf" />
+    <None Remove="Resources\Fonts\Roboto_SemiCondensed-SemiBold.ttf" />
+    <None Remove="Resources\Logo.ico" />
+    <None Remove="Resources\Logo\Logo.ico" />
+    <None Remove="Resources\Logo\Logo.png" />
+    <None Remove="Resources\Logo\Mono.svg" />
+    <None Remove="Resources\Logo\Vector.svg" />
     <None Remove="Resources\PatchNotesWebView\index.html" />
     <None Remove="Resources\PatchNotesWebView\script.js" />
     <None Remove="Resources\PatchNotesWebView\styles.css" />
@@ -37,7 +49,6 @@
   </ItemGroup>
   
   <ItemGroup>
-    <Content Include="AccountLauncherLogo.ico" />
     <Content Include="Resources\PatchNotesWebView\index.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -47,7 +58,40 @@
     <Content Include="Resources\PatchNotesWebView\styles.css">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Resource Include="Resources\AccountLauncherLogo.ico">
+    <Resource Include="Resources\Fonts\Roboto\Roboto-Regular.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Fonts\Roboto\Roboto_Condensed-Bold.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Fonts\Roboto\Roboto_SemiCondensed-Bold.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Fonts\Roboto\Roboto_SemiCondensed-Regular.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Fonts\Roboto\Roboto_SemiCondensed-SemiBold.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Logo.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Fonts\BigNoodleTooOblique.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Fonts\Hakuna-Sans.otf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Logo\Logo.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Logo\Logo.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Logo\Mono.svg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Logo\Vector.svg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resources\PlaceholderPlayerIcon.png">

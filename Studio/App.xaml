@@ -37,6 +37,7 @@
                     <converters:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
                     <converters:RangeToBooleanConverter x:Key="RangeToBooleanConverter"/>
                 </ResourceDictionary>
+
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>
