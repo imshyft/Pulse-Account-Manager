@@ -20,20 +20,17 @@
 
 
     <!--
-    We've defined the most basic colors and brushes.
-    Please add other colors and brushes you use in your application. You should have a look at
-    https://github.com/MahApps/MahApps.Metro/blob/develop/src/MahApps.Metro/Styles/Themes/Theme.Template.xaml
-    for a complete reference of all available theme resources.
+        Based on WPF-UI Dark theme source, adapted to follow rose pine
     -->
 
     <!--Surface-->
     <Color x:Key="ApplicationFrameColor">#1f1d2e</Color>
     <SolidColorBrush x:Key="ApplicationFrameBrush" Color="{StaticResource ApplicationFrameColor}" />
 
-    <Color x:Key="AccentColor">#ebbcba</Color>
+    <Color x:Key="AccentColor">#eb6f92</Color>
     <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource AccentColor}" />
 
-    <Color x:Key="HighlightHighColor">#524f67</Color>
+    <Color x:Key="HighlightHighColor">#2f2c3d</Color>
     <SolidColorBrush x:Key="HighlightHighBrush" Color="{StaticResource HighlightHighColor}" />
     <!--Base-->
     <Color x:Key="ApplicationBackgroundColor">#FF202020</Color>
@@ -46,8 +43,16 @@
     <Color x:Key="PaletteRedColor">#b4637a</Color>
     <SolidColorBrush x:Key="PaletteRedBrush" Color="{StaticResource PaletteRedColor}" />
 
+   
     <!--  Colors  -->
-
+    <SolidColorBrush x:Key="TextControlBackground" Color="{StaticResource ApplicationFrameColor}" />
+    <SolidColorBrush x:Key="TextControlBackgroundPointerOver" Color="{StaticResource ApplicationFrameColor}" />
+    <SolidColorBrush x:Key="TextControlBackgroundFocused" Color="{StaticResource ApplicationFrameColor}" />
+    <SolidColorBrush x:Key="TextControlBackgroundDisabled" Color="{StaticResource ControlFillColorDisabled}" />
+    
+    <!--Flyout BG-->
+    <Color x:Key="AcrylicBackgroundFillColorDefault">#2f2c3d</Color>
+    
     <Color x:Key="TextFillColorPrimary">#FFFFFF</Color>
     <Color x:Key="TextFillColorSecondary">#C5FFFFFF</Color>
     <Color x:Key="TextFillColorTertiary">#87FFFFFF</Color>
@@ -135,7 +140,7 @@
     <Color x:Key="SnowflakeGradientBottom">#00000000</Color>
 
     <!--  Fallback color for missing Acrylic used for e.g. Flyouts  -->
-    <Color x:Key="AcrylicBackgroundFillColorDefault">#2C2C2C</Color>
+    <!--<Color x:Key="AcrylicBackgroundFillColorDefault">#2C2C2C</Color>-->
 
     <Color x:Key="LayerOnMicaBaseAltFillColorDefault">#733A3A3A</Color>
     <Color x:Key="LayerOnMicaBaseAltFillColorSecondary">#0FFFFFFF</Color>
@@ -620,10 +625,11 @@
     <SolidColorBrush x:Key="TabViewSelectedItemBorderBrush" Color="{StaticResource CardStrokeColorDefault}" />
 
     <!--  TextBox (same brushes are used for AutoSuggestBox / NumberBox / PasswordBox / RichSuggestBox)  -->
-    <SolidColorBrush x:Key="TextControlBackground" Color="{StaticResource ControlFillColorDefault}" />
+    <!--<SolidColorBrush x:Key="TextControlBackground" Color="{StaticResource ControlFillColorDefault}" />
     <SolidColorBrush x:Key="TextControlBackgroundPointerOver" Color="{StaticResource ControlFillColorSecondary}" />
     <SolidColorBrush x:Key="TextControlBackgroundFocused" Color="{StaticResource ControlFillColorInputActive}" />
-    <SolidColorBrush x:Key="TextControlBackgroundDisabled" Color="{StaticResource ControlFillColorDisabled}" />
+    <SolidColorBrush x:Key="TextControlBackgroundDisabled" Color="{StaticResource ControlFillColorDisabled}" />-->
+    
     <!--<SolidColorBrush x:Key="TextControlBorderBrush" Color="{StaticResource TextControlElevationBorderBrush}" />-->
     <SolidColorBrush x:Key="TextControlForeground" Color="{StaticResource TextFillColorPrimary}" />
     <SolidColorBrush x:Key="TextControlForegroundDisabled" Color="{StaticResource TextFillColorDisabled}" />

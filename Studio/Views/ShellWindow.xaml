@@ -70,18 +70,22 @@
             Grid.Row="0"
             Height="40">
             <ui:TitleBar.Icon>
-                <ui:ImageIcon Source="pack://application:,,,/Resources/AccountLauncherLogo.ico" Height="auto" Margin="2,-8,0,-8"/>
+                <ui:ImageIcon Source="pack://application:,,,/Resources/Logo/Logo.ico" Height="auto" Margin="2,-6,0,-6">
+                    <ui:ImageIcon.Effect>
+                        <DropShadowEffect Color="Black" ShadowDepth="0"/>
+                    </ui:ImageIcon.Effect>
+                </ui:ImageIcon>
             </ui:TitleBar.Icon>
         </ui:TitleBar>
 
-        <ui:NavigationView
+        <!--<ui:NavigationView
             Grid.Row="1"
             PaneDisplayMode="LeftFluent"
             CompactPaneLength="200"
             MenuItemsSource="{Binding MenuItems, Mode=OneWay}"
             FooterMenuItemsSource="{Binding FooterItems, Mode=OneWay}"
             Navigating="OnNavigating">
-
+            
             <ui:NavigationView.ContentOverlay>
                 <Frame
                     Background="{DynamicResource ApplicationFrameBrush}"
@@ -90,7 +94,34 @@
                     NavigationUIVisibility="Hidden"
                     Focusable="False" />
             </ui:NavigationView.ContentOverlay>
-        </ui:NavigationView>
+        </ui:NavigationView>-->
+
+        <!--Background="{DynamicResource ApplicationFrameBrush}"-->
+        <Grid
+            Grid.Row="1"
+            Background="{DynamicResource ApplicationFrameBrush}">
+            <ui:Image
+                Grid.Row="1"
+                Source="pack://application:,,,/Resources/Logo/Logo.png"
+                Opacity="0.05"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Top"
+                Height="600"
+                Margin="0,0,-100,0"
+            >
+                <ui:Image.Effect>
+                    <BlurEffect Radius="20"/>
+                </ui:Image.Effect>
+            </ui:Image>
+            <Frame
+           
+            Grid.Row="1"
+            x:Name="shellFrame"
+            NavigationUIVisibility="Hidden"
+            Focusable="False"/>
+        </Grid>
+
+
         <ContentPresenter 
             Grid.Row="0"
             x:Name="RootContentDialogPresenter"

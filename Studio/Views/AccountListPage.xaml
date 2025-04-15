@@ -15,33 +15,7 @@
       KeepAlive="True"
       SizeChanged="OnPageSizeChanged">
     <Page.Resources>
-        <!--<Style
-            TargetType="{x:Type Border}"
-            x:Key="RankBorderStyle">
-            <Setter Property="CornerRadius" Value="4"/>
-            <Setter Property="BorderThickness" Value="2"/>
 
-            <Setter Property="VerticalAlignment" Value="Stretch"/>
-            <Style.Triggers>
-                <DataTrigger Value="False">
-                    <DataTrigger.Binding>
-                        <MultiBinding Converter="{StaticResource RangeToBooleanConverter}">
-                            <Binding Path="DataContext.GroupSelectionService.Range" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Page}"/>
-                            <Binding Path ="Tag.CurrentRank.SkillRating" RelativeSource="{RelativeSource Self}"/>
-                        </MultiBinding>
-                    </DataTrigger.Binding>
-                    <Setter Property="Opacity" Value="0.2"/>
-                    <Setter Property="BorderBrush">
-                        <Setter.Value>
-                            <SolidColorBrush Color="{StaticResource WideGroupColor}" Opacity="1"/>
-                        </Setter.Value>
-                    </Setter>
-                </DataTrigger>
-                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=Tag}" Value="{x:Null}">
-                    <Setter Property="Visibility" Value="Hidden"/>
-                </DataTrigger>
-            </Style.Triggers>
-        </Style>-->
         <Style
             TargetType="controls:RankDisplay">
             <Style.Triggers>
@@ -77,21 +51,24 @@
             MouseLeftButtonDown="UIElement_OnPreviewMouseLeftButtonDown"
             HorizontalAlignment="Stretch"
             Sorting="AccountDataGrid_Sorting"
+            ScrollViewer.HorizontalScrollBarVisibility="Disabled"
             IsReadOnly="True">
             
             <ui:DataGrid.Columns>
 
                 <!--Avatar-->
                 <DataGridTemplateColumn
-                    Header=""
+                    Header="Sort"
                     MinWidth="60"
                     CanUserSort="False"
                     CanUserResize="False"
                     CanUserReorder="False"
+
                     >
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <ui:Image
+                                Margin="4"
                                 CornerRadius="4">
                                 <ui:Image.Source>
                                     <Binding Path="Avatar" >
@@ -109,7 +86,7 @@
 
                 <!--Name-->
                 <DataGridTemplateColumn
-                    MinWidth="150"
+                    MinWidth="180"
                     Width="*"
                     Header="Name"
                     CanUserSort="True"
@@ -127,15 +104,22 @@
                                         <RowDefinition Height="20"/>
                                     </Grid.RowDefinitions>
                                     <ui:TextBlock
+                                        Grid.Row="0"
                                         Text="{Binding CustomId}"
-                                        FontTypography="Title"
+                                        FontFamily="{StaticResource BigNoodleTooOblique}"
+                                        FontWeight="Light"
                                         FontSize="17"
-                                        VerticalAlignment="Top"/>
+                                        VerticalAlignment="Bottom"/>
                                     <TextBlock
+                                        Style="{StaticResource ListSubTitleStyle}"
+                                        FontFamily="{StaticResource Roboto}"
+                                        Opacity="0.6"
                                         Grid.Row="1"
                                         FontSize="8"
-                                        Text="{Binding BattletagString}"
-                                        Style="{StaticResource ListSubTitleStyle}"/>
+                                        Margin="0,-2,0,0"
+                                        
+                                        Text="{Binding BattletagString}"/>
+
                                 </Grid>
                             </Viewbox>
 
@@ -209,7 +193,7 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-
+<!--Support-->
                 <DataGridTemplateColumn
                     x:Name="DataGridSupportColumn"
                     Header="Sort"
@@ -240,6 +224,7 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
+<!--Play-->                
                 <DataGridTemplateColumn
                     Header=""
                     CanUserSort="False"
@@ -253,7 +238,7 @@
                             <ui:Button 
                                 Margin="{StaticResource SmallLeftMargin}"
                                 Click="OnPlayButtonClick" 
-                                MouseEnter="UIElement_OnMouseEnter"
+                                MouseEnter="ListButton_MouseOver"
                                 MouseLeave="UIElement_OnMouseLeave" 
                                 HorizontalAlignment="Center" 
                                 VerticalAlignment="Center"
@@ -262,6 +247,9 @@
                                 ToolTipService.InitialShowDelay="500"
                                 Height="40"
                                 Style="{DynamicResource AccentButton}">
+                                <ui:Button.Effect>
+                                    <DropShadowEffect ShadowDepth="0" Color="{StaticResource AccentColor}"/>
+                                </ui:Button.Effect>
                                 <ui:SymbolIcon Symbol="Play16" FontSize="20"/>
 
                             </ui:Button>
@@ -294,12 +282,14 @@
                                                 Appearance="Success"
                                                 HorizontalAlignment="Stretch"
                                                 Margin="4, 0, 4, 0"
+                                                ToolTip="Re-sync account details"
                                                 Click="OnOptionsSyncButtonClick">
                                                 <ui:SymbolIcon Symbol="ArrowCounterclockwise16"/>
                                             </ui:Button>
                                             <ui:Button
                                                 Appearance="Danger"
                                                 HorizontalAlignment="Stretch"
+                                                ToolTip="Remove Account"
                                                 Margin="4, 0, 4, 0"
                                                 Click="OnOptionsRemoveButtonClick">
                                                 <ui:SymbolIcon Symbol="Delete16"/>
@@ -310,7 +300,7 @@
                                 <ui:Button 
                                     Padding="0"
                                     Click="OnAccountOptionsClicked" 
-                                    MouseEnter="UIElement_OnMouseEnter"
+                                    MouseEnter="ListButton_MouseOver"
                                     MouseLeave="UIElement_OnMouseLeave" 
                                     HorizontalAlignment="Center" 
                                     VerticalAlignment="Center"
@@ -318,6 +308,9 @@
                                     Height="40"
                                     Style="{DynamicResource AccentButton}"
                                     Tag="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow}}">
+                                    <ui:Button.Effect>
+                                        <DropShadowEffect ShadowDepth="0" Color="{StaticResource AccentColor}"/>
+                                    </ui:Button.Effect>
                                     <ui:SymbolIcon Symbol="Options16" FontSize="15"/>
                                 </ui:Button>
                             </Grid>

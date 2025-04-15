@@ -227,7 +227,7 @@
 
 
         <Grid
-            Margin="4">
+            Margin="6">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="40"/>
                 <ColumnDefinition Width="*"/>
@@ -240,6 +240,9 @@
                 ToolTip="Add a account to switch to or monitor"
                 ToolTipService.InitialShowDelay="500"
                 Style="{DynamicResource AccentButton}">
+                <ui:DropDownButton.Effect>
+                    <DropShadowEffect ShadowDepth="0" Color="{StaticResource AccentColor}"/>
+                </ui:DropDownButton.Effect>
                 <Grid>
                     <ui:SymbolIcon Symbol="Add48"/>
                 </Grid>
@@ -252,6 +255,16 @@
                 </ui:DropDownButton.Flyout>
                 
             </ui:DropDownButton>
+
+            <TextBlock
+                Style="{StaticResource ListTitleStyle}"
+                Foreground="{StaticResource AccentBrush}"
+                Opacity="0.8"
+                Margin="15,0,0,0"
+                Grid.Column="1"
+                Text="Add Account"
+                VerticalAlignment="Center">
+            </TextBlock>
 
         </Grid>
 
@@ -276,6 +289,9 @@
                 Style="{DynamicResource AccentButton}"
                 Margin="{StaticResource XSmallLeftRightMargin}"
                 ToolTip="Toggle between favourites and user profiles">
+                <ui:Button.Effect>
+                    <DropShadowEffect ShadowDepth="0" Color="{StaticResource AccentColor}"/>
+                </ui:Button.Effect>
                 <Grid>
                     <ui:SymbolIcon x:Name="PanelToggleSymbol"  Symbol="Star48"/>
                 </Grid>
@@ -287,7 +303,10 @@
                 TextChanged="OnFavouritesSearchTextChanged"
                 FontSize="12"
                 PlaceholderText="Search Profiles..."
-                Padding="6"/>
+                PlaceholderEnabled="True"
+                
+                Padding="6">
+            </ui:TextBox>
         </Grid>
 
 
@@ -362,6 +381,9 @@
                 Style="{DynamicResource AccentButton}"
                 ToolTipService.InitialShowDelay="500"
                 ToolTip="Expand/Collapse the sidebar">
+                <ui:Button.Effect>
+                    <DropShadowEffect ShadowDepth="0" Color="{StaticResource AccentColor}"/>
+                </ui:Button.Effect>
                 <Grid>
                     <ui:SymbolIcon x:Name="PanelCollapseButtonSymbol" Symbol="ChevronDoubleRight20" FontSize="25"/>
                 </Grid>
@@ -376,6 +398,9 @@
                 Click="OnToggleGroupSelectionButtonClick"
                 ToolTipService.InitialShowDelay="500"
                 ToolTip="Toggle group selection mode">
+                <ToggleButton.Effect>
+                    <DropShadowEffect ShadowDepth="0" Color="{StaticResource AccentColor}"/>
+                </ToggleButton.Effect>
                 <Grid>
                     <ui:SymbolIcon Symbol="PeopleCommunity16" FontSize="20"/>
                 </Grid>

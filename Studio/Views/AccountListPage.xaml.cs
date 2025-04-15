@@ -19,6 +19,7 @@ using System.Windows.Shapes;
 using MahApps.Metro.Controls;
 using Studio.Contracts.Services;
 using Studio.Contracts.Views;
+using Studio.Helpers;
 using Studio.Models;
 using Studio.Services;
 using Studio.Services.Data;
@@ -58,6 +59,7 @@ namespace Studio.Views
             GroupSelectionService = ((App)Application.Current).GetService<GroupSelectionService>();
             
             AccountDataGrid.SelectedItem = null;
+
             
         }
 
@@ -116,11 +118,10 @@ namespace Studio.Views
             _battleNetService.OpenBattleNetWithAccount(profile.Email);
 
             e.Handled = true;
-
         }
 
 
-        private void UIElement_OnMouseEnter(object sender, MouseEventArgs e) => _mouseOverButton = true;
+        private void ListButton_MouseOver(object sender, MouseEventArgs e) => _mouseOverButton = true;
         private void UIElement_OnMouseLeave(object sender, MouseEventArgs e) => _mouseOverButton = false;
 
         private void OnAccountOptionsClicked(object sender, RoutedEventArgs e)
@@ -191,6 +192,7 @@ namespace Studio.Views
                 Title = "Account deleted",
                 Icon = new SymbolIcon(SymbolRegular.Checkmark16),
             });
+            
         }
 
         private void OnPageSizeChanged(object sender, SizeChangedEventArgs e)
@@ -217,6 +219,18 @@ namespace Studio.Views
         {
             SetDataGridNoSortingHeader(e.Column.DisplayIndex);
 
+            // reimplement base sorting
+            e.Handled = true;
+
+            var column = e.Column;
+            var direction = column.SortDirection != ListSortDirection.Ascending
+                ? ListSortDirection.Ascending
+                : ListSortDirection.Descending;
+
+            column.SortDirection = direction;
+
+            ListCollectionView view = (ListCollectionView)CollectionViewSource.GetDefaultView(AccountDataGrid.ItemsSource);
+            view.CustomSort = new AccountListItemComparer(column.SortMemberPath, direction);
         }
 
         private void SetDataGridNoSortingHeader(int index)
