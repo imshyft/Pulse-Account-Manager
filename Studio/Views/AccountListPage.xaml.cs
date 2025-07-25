@@ -165,6 +165,7 @@ namespace Studio.Views
                     Content = "Account profile successfully synced",
                     Icon = new SymbolIcon(SymbolRegular.ArrowClockwise16),
                 });
+                result.Profile.Email = profile.Email;
                 UserProfiles.DeleteProfile(profile);
                 UserProfiles.SaveProfile(result.Profile);
             }
