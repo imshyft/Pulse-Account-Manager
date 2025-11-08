@@ -13,6 +13,7 @@ using System.Windows.Media.Animation;
 using AngleSharp.Text;
 using System.Collections.Specialized;
 using System.Windows.Controls.Ribbon;
+using Studio.Contracts.Services;
 
 namespace Studio.Services
 {
@@ -21,16 +22,17 @@ namespace Studio.Services
         private readonly PersistAndRestoreService _persistAndRestoreService;
         private string _battleNetConfigPath;
         private string _overwatchLauncherPath;
-        private readonly BattleNetMemoryReaderService _memoryReaderService;
+        private readonly IMemoryReaderService _memoryReaderService;
+        //private readonly BattleNetMemoryReaderService _memoryReaderService;
 
 
-        public BattleNetService()
+        public BattleNetService(IMemoryReaderService memoryReaderService)
         {
             _persistAndRestoreService = ((App)Application.Current).GetService<PersistAndRestoreService>();
-            
-            _memoryReaderService = new BattleNetMemoryReaderService();
+            _memoryReaderService = memoryReaderService;
+            //_memoryReaderService = new BattleNetMemoryReaderService();
 
-           
+
         }
 
         public bool Initialize()
@@ -58,9 +60,9 @@ namespace Studio.Services
             }
         }
 
-        public void OpenBattleNet()
+        public void OpenBattleNet(bool launchGame = false)
         {
-            Process.Start(_overwatchLauncherPath);
+            Process.Start(_overwatchLauncherPath, launchGame ? "--exec=\"launch Pro\"" : "");
         }
 
         public void OpenBattleNetWithAccount(string email)
@@ -75,6 +77,34 @@ namespace Studio.Services
             CloseBattleNet();
             ResetBattleNetAccount();
             OpenBattleNet();
+        }
+
+        public async Task<bool> WaitForMainWindow()
+        {
+            var cancel = new CancellationTokenSource(80000);
+            try
+            {
+                await Task.Run(async () =>
+                {
+                    while (true)
+                    {
+                        cancel.Token.ThrowIfCancellationRequested();
+
+                        var procs = Process.GetProcessesByName("Battle.net");
+                        Debug.WriteLine(procs.Select(x => x.MainWindowTitle));
+                        if (procs.Length > 0 && procs.Any(x => x.MainWindowTitle == "Battle.net"))
+                            return;
+
+                        await Task.Delay(500, cancel.Token);
+                    }
+                }); ;
+                await Task.Delay(2000);
+                return true;
+            }
+            catch (OperationCanceledException)
+            {
+                return false;
+            }
         }
 
         public void SetBattleNetAccount(string email)
@@ -124,8 +154,10 @@ namespace Studio.Services
             //var friends = _memoryReaderService.FindBlizzardFriends(process.Id);
 
 
-            var tag = BattleNetMemoryReaderService.GetUserBattleTag(process.Handle);
-            if (tag == null)
+            //var tag = BattleNetMemoryReaderService_OLD.GetUserBattleTagString(process.Handle);
+            var tag = _memoryReaderService.GetUserBattleTagString(process.Handle);
+
+            if (tag == "")
                 return null;
 
             BattleTag battleTag = new BattleTag(tag);
@@ -149,7 +181,8 @@ namespace Studio.Services
             //var friends = _memoryReaderService.FindBlizzardFriends(process.Id);
 
 
-            var tags = BattleNetMemoryReaderService.GetFriendBattleTags(process.Handle);
+            //var tags = BattleNetMemoryReaderService_OLD.GetFriendBattleTagStrings(process.Handle);
+            var tags = _memoryReaderService.GetFriendBattleTagStrings(process.Handle);
             BattleTag[] battleTags = tags.Select(x => new BattleTag(x)).ToArray();
 
             return battleTags;

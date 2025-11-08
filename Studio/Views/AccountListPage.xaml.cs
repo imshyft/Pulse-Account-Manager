@@ -37,7 +37,7 @@ namespace Studio.Views
     public partial class AccountListPage : Page
     {
 
-        public UserProfileDataService UserProfiles {get; set; }
+        public UserProfileDataService UserProfiles { get; set; }
         public GroupSelectionService GroupSelectionService { get; set; }
 
         private BattleNetService _battleNetService;
@@ -50,17 +50,17 @@ namespace Studio.Views
         public AccountListPage()
         {
             InitializeComponent();
-            
+
             DataContext = this;
 
             UserProfiles = ((App)Application.Current).GetService<UserProfileDataService>();
             _battleNetService = ((App)Application.Current).GetService<BattleNetService>();
             _profileDataFetchingService = ((App)Application.Current).GetService<IProfileFetchingService>();
             GroupSelectionService = ((App)Application.Current).GetService<GroupSelectionService>();
-            
+
             AccountDataGrid.SelectedItem = null;
 
-            
+
         }
 
 
@@ -86,15 +86,13 @@ namespace Studio.Views
             }
         }
 
-
-        private void OnPlayButtonClick(object sender, RoutedEventArgs e)
+        private async Task TryLaunchAccount(Profile profile, bool tryLaunchGame = false)
         {
-            Profile profile = ((FrameworkElement)sender).DataContext as Profile;
             if (profile == null)
                 return;
             if (profile.Email == null)
             {
-                SnackbarPresenter.ImmediatelyDisplay(new Snackbar(SnackbarPresenter)
+                _ = SnackbarPresenter.ImmediatelyDisplay(new Snackbar(SnackbarPresenter)
                 {
                     AllowDrop = false,
                     Appearance = ControlAppearance.Danger,
@@ -106,20 +104,54 @@ namespace Studio.Views
                 return;
             }
 
-            SnackbarPresenter.ImmediatelyDisplay(new Snackbar(SnackbarPresenter)
+            _ = SnackbarPresenter.ImmediatelyDisplay(new Snackbar(SnackbarPresenter)
             {
                 AllowDrop = false,
                 Appearance = ControlAppearance.Success,
-                Title = "Launching Account!",
+                Title = "Switching Account!",
                 Icon = new SymbolIcon(SymbolRegular.Checkmark12, 35),
                 Opacity = 0.9
             });
 
             _battleNetService.OpenBattleNetWithAccount(profile.Email);
+            if (!tryLaunchGame)
+                return;
 
-            e.Handled = true;
+            bool result = await _battleNetService.WaitForMainWindow();
+            if (result)
+            {
+                _ = SnackbarPresenter.ImmediatelyDisplay(new Snackbar(SnackbarPresenter)
+                {
+                    AllowDrop = false,
+                    Appearance = ControlAppearance.Success,
+                    Title = "Launching Game!",
+                    Icon = new SymbolIcon(SymbolRegular.Checkmark12, 35),
+                    Opacity = 0.9
+                });
+
+                _battleNetService.OpenBattleNet(true);
+            }
+            else
+            {
+                _ = SnackbarPresenter.ImmediatelyDisplay(new Snackbar(SnackbarPresenter)
+                {
+                    AllowDrop = false,
+                    Appearance = ControlAppearance.Danger,
+                    Title = "Couldn't Launch Overwatch",
+                    Content = "Timed out waiting for Battle.net to load",
+                    Icon = new SymbolIcon(SymbolRegular.ErrorCircle12),
+                    Opacity = 0.9
+                });
+            }
         }
 
+        private async void OnPlayButtonClick(object sender, RoutedEventArgs e)
+        {
+            Profile profile = ((FrameworkElement)sender).DataContext as Profile;
+
+            await TryLaunchAccount(profile, true);
+            e.Handled = true;
+        }
 
         private void ListButton_MouseOver(object sender, MouseEventArgs e) => _mouseOverButton = true;
         private void UIElement_OnMouseLeave(object sender, MouseEventArgs e) => _mouseOverButton = false;
@@ -165,6 +197,7 @@ namespace Studio.Views
                     Content = "Account profile successfully synced",
                     Icon = new SymbolIcon(SymbolRegular.ArrowClockwise16),
                 });
+                result.Profile.Email = profile.Email;
                 UserProfiles.DeleteProfile(profile);
                 UserProfiles.SaveProfile(result.Profile);
             }
@@ -192,7 +225,7 @@ namespace Studio.Views
                 Title = "Account deleted",
                 Icon = new SymbolIcon(SymbolRegular.Checkmark16),
             });
-            
+
         }
 
         private void OnPageSizeChanged(object sender, SizeChangedEventArgs e)
@@ -251,9 +284,31 @@ namespace Studio.Views
                 {
                     icon.Symbol = SymbolRegular.ArrowUp24;
                 }
-                
+
             }
 
+        }
+
+        private async void AccountDataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            DependencyObject source = (DependencyObject)e.OriginalSource;
+
+            while (source != null && !(source is DataGridRow))
+                source = VisualTreeHelper.GetParent(source);
+
+            if (source is DataGridRow row && row.DataContext is Profile profile)
+            {
+                await TryLaunchAccount(profile);
+
+            }
+        }
+
+        private async void OnSwitchBnetButtonClick(object sender, RoutedEventArgs e)
+        {
+            Profile profile = ((FrameworkElement)sender).DataContext as Profile;
+
+            await TryLaunchAccount(profile, false);
+            e.Handled = true;
         }
     }
 }

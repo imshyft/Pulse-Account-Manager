@@ -19,6 +19,7 @@ using Studio.Services.Files;
 using Studio.Services.Storage;
 using Studio.Views;
 using Studio.Services.Data.ProfileFetching;
+using Studio.Services.BattleNet;
 
 namespace Studio;
 
@@ -87,9 +88,11 @@ public partial class App : Application
         services.AddSingleton<IProfileFetchingService, BlizzardProfileFetchingService>();
 #endif
         services.AddSingleton<PathResolverService>();
-        
+
         services.AddSingleton<BattleNetService>();
         services.AddSingleton<GroupSelectionService>();
+
+        services.AddSingleton<IMemoryReaderService, RegexMatchingMemoryReader>();
 
 
         // Views
