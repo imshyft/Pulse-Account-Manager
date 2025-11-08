@@ -26,7 +26,7 @@
                             <Binding Path ="RankValue.SkillRating" RelativeSource="{RelativeSource Self}"/>
                         </MultiBinding>
                     </DataTrigger.Binding>
-                    
+
                     <Setter Property="ShowWideGroupDecorator" Value="True"/>
                     <Setter Property="Opacity" Value="0.4"/>
                 </DataTrigger>
@@ -52,8 +52,9 @@
             HorizontalAlignment="Stretch"
             Sorting="AccountDataGrid_Sorting"
             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+            MouseDoubleClick="AccountDataGrid_MouseDoubleClick"
             IsReadOnly="True">
-            
+
             <ui:DataGrid.Columns>
 
                 <!--Avatar-->
@@ -155,7 +156,7 @@
                                 <controls:RankDisplay
                                     RankValue="{Binding RankedCareer.Tank.CurrentRank, Mode=OneWay}"
                                     Role="Tank">
-                                    
+
                                 </controls:RankDisplay>
 
                             </Grid>
@@ -193,7 +194,7 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-<!--Support-->
+                <!--Support-->
                 <DataGridTemplateColumn
                     x:Name="DataGridSupportColumn"
                     Header="Sort"
@@ -224,7 +225,7 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-<!--Play-->                
+                <!--Play-->
                 <DataGridTemplateColumn
                     Header=""
                     CanUserSort="False"
@@ -232,27 +233,112 @@
                     CanUserReorder="False"
                     Width="200"
                     MinWidth="70">
-                    
+
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <ui:Button 
-                                Margin="{StaticResource SmallLeftMargin}"
-                                Click="OnPlayButtonClick" 
-                                MouseEnter="ListButton_MouseOver"
-                                MouseLeave="UIElement_OnMouseLeave" 
-                                HorizontalAlignment="Center" 
-                                VerticalAlignment="Center"
-                                Width="50"
-                                ToolTip="Switch to the account"
-                                ToolTipService.InitialShowDelay="500"
-                                Height="40"
-                                Style="{DynamicResource AccentButton}">
-                                <ui:Button.Effect>
-                                    <DropShadowEffect ShadowDepth="0" Color="{StaticResource AccentColor}"/>
-                                </ui:Button.Effect>
-                                <ui:SymbolIcon Symbol="Play16" FontSize="20"/>
+                            <Grid x:Name="ButtonContainer">
+                                <ui:Button 
+                                    x:Name="PlayBtn"
+                                    Margin="{StaticResource SmallLeftRightMargin}"
+                                    Click="OnPlayButtonClick" 
+                                    MouseEnter="ListButton_MouseOver"
+                                    MouseLeave="UIElement_OnMouseLeave" 
+                                    HorizontalAlignment="Center" 
+                                    VerticalAlignment="Center"
+                                    Width="50"
+                                    ToolTip="Switches Battle.Net to the account and Launches the Game"
+                                    ToolTipService.InitialShowDelay="500"
+                                    Height="40"
+                                    Style="{DynamicResource AccentButton}">
+                                    <ui:Button.Effect>
+                                        <DropShadowEffect ShadowDepth="0" Color="{StaticResource AccentColor}"/>
+                                    </ui:Button.Effect>
+                                    <ui:SymbolIcon Symbol="Play16" FontSize="20"/>
+                                </ui:Button>
+                                <!-- Bnet Button shows on hover -->
+                                <ui:Button
+                                    x:Name="LaunchBnetBtn"
+                                    Width="0"
+                                    d:Width="25"
+                                    Height="32"
+                                    Click="OnSwitchBnetButtonClick"
+                                    Cursor="Hand"
+                                    Background="LightBlue"
+                                    Panel.ZIndex="-1" Margin="125,0,0,0"
+                                    ToolTip="Switch Account Without Launching Game"
+                                    >
+                                    <Button.Template>
+                                        <ControlTemplate TargetType="Button">
+                                            <Grid>
+                                                <Border
+                                                Opacity="0.5"
+                                                Padding="2"
+                                                CornerRadius="0, 4, 4, 0">
+                                                    <Border.Background>
+                                                        <LinearGradientBrush EndPoint="1,0.5" StartPoint="0,0.5">
+                                                            <GradientStop Color="#00226196"/>
+                                                            <GradientStop Color="#FF226196" Offset="1"/>
+                                                        </LinearGradientBrush>
+                                                    </Border.Background>
+                                                </Border>
+                                                <Image
+                                                    Margin="2"
+                                                    Opacity="0.2"
+                                                   Source="/Resources/Icons/BattleNetIcon.png"
+                                                   >
+                                                    <Image.Effect>
+                                                        <BlurEffect Radius="5"/>
+                                                    </Image.Effect>
+                                                </Image>
+                                            </Grid>
 
-                            </ui:Button>
+                                        </ControlTemplate>
+                                    </Button.Template>
+                                </ui:Button>
+                                <!--TODO: Condense launch bnet btn trigger logic; currently duplicated-->
+                                <Grid.Triggers>
+                                    <EventTrigger SourceName="PlayBtn" RoutedEvent="MouseEnter">
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimation Storyboard.TargetName="LaunchBnetBtn"
+                                                                 Storyboard.TargetProperty="Width"
+                                                                 To="25"
+                                                                 Duration="0:0:0.05"/>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </EventTrigger>
+                                    <EventTrigger SourceName="LaunchBnetBtn" RoutedEvent="MouseEnter">
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimation Storyboard.TargetName="LaunchBnetBtn"
+                                                                 Storyboard.TargetProperty="Width"
+                                                                 To="25"
+                                                                 Duration="0:0:0.05"/>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </EventTrigger>
+                                    <EventTrigger SourceName="PlayBtn" RoutedEvent="MouseLeave">
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimation Storyboard.TargetName="LaunchBnetBtn"
+                                                 Storyboard.TargetProperty="Width"
+                                                 To="0"
+                                                 Duration="0:0:0.2"/>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </EventTrigger>
+                                    <EventTrigger SourceName="LaunchBnetBtn" RoutedEvent="MouseLeave">
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimation Storyboard.TargetName="LaunchBnetBtn"
+                                                 Storyboard.TargetProperty="Width"
+                                                 To="0"
+                                                 Duration="0:0:0.2"/>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </EventTrigger>
+                                </Grid.Triggers>
+                            </Grid>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
@@ -314,7 +400,7 @@
                                     <ui:SymbolIcon Symbol="Options16" FontSize="15"/>
                                 </ui:Button>
                             </Grid>
- 
+
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>

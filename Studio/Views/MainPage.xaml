@@ -76,7 +76,7 @@
             Style="{StaticResource ListSubTitleStyle}"/>
                 </StackPanel>
             </Grid>
-            
+
         </DataTemplate>
         <DataTemplate x:Key="GroupSelectionContentTemplate">
             <Grid 
@@ -153,7 +153,7 @@
 
 
                                 </Style.Triggers>
-                        
+
                             </Style>
                         </Grid.Resources>
                         <ui:Button
@@ -189,10 +189,10 @@
                 </Grid>
 
             </Grid>
-            
+
         </DataTemplate>
         <DataTemplate x:Key="FavouritesDataTemplate">
-            
+
             <ContentControl 
                     Grid.Column="1"
                     Content="{Binding }">
@@ -246,14 +246,14 @@
                 <Grid>
                     <ui:SymbolIcon Symbol="Add48"/>
                 </Grid>
-                
+
                 <ui:DropDownButton.Flyout>
                     <ContextMenu>
                         <MenuItem Header="User" Click="OnAddUserProfileButtonClick"/>
                         <MenuItem Header="Favourite" Click="OnAddFavouriteProfileButtonClick"/>
                     </ContextMenu>
                 </ui:DropDownButton.Flyout>
-                
+
             </ui:DropDownButton>
 
             <TextBlock
@@ -289,13 +289,13 @@
                 Style="{DynamicResource AccentButton}"
                 Margin="{StaticResource XSmallLeftRightMargin}"
                 ToolTip="Toggle between favourites and user profiles">
-                <ui:Button.Effect>
+                <!--<ui:Button.Effect>
                     <DropShadowEffect ShadowDepth="0" Color="{StaticResource AccentColor}"/>
-                </ui:Button.Effect>
+                </ui:Button.Effect>-->
                 <Grid>
                     <ui:SymbolIcon x:Name="PanelToggleSymbol"  Symbol="Star48"/>
                 </Grid>
-                
+
             </ui:Button>
             <ui:TextBox
                 x:Name="FilterTextBox"
@@ -381,13 +381,13 @@
                 Style="{DynamicResource AccentButton}"
                 ToolTipService.InitialShowDelay="500"
                 ToolTip="Expand/Collapse the sidebar">
-                <ui:Button.Effect>
+                <!--<ui:Button.Effect>
                     <DropShadowEffect ShadowDepth="0" Color="{StaticResource AccentColor}"/>
-                </ui:Button.Effect>
+                </ui:Button.Effect>-->
                 <Grid>
                     <ui:SymbolIcon x:Name="PanelCollapseButtonSymbol" Symbol="ChevronDoubleRight20" FontSize="25"/>
                 </Grid>
-                
+
             </ui:Button>
 
             <ToggleButton
@@ -397,10 +397,11 @@
                 VerticalAlignment="Stretch"
                 Click="OnToggleGroupSelectionButtonClick"
                 ToolTipService.InitialShowDelay="500"
+                Cursor="Hand"
                 ToolTip="Toggle group selection mode">
-                <ToggleButton.Effect>
+                <!--<ToggleButton.Effect>
                     <DropShadowEffect ShadowDepth="0" Color="{StaticResource AccentColor}"/>
-                </ToggleButton.Effect>
+                </ToggleButton.Effect>-->
                 <Grid>
                     <ui:SymbolIcon Symbol="PeopleCommunity16" FontSize="20"/>
                 </Grid>
