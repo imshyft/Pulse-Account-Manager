@@ -13,8 +13,7 @@
     d:DataContext="{d:DesignInstance Type=data:DesignTimeSampleData, IsDesignTimeCreatable=True}"
     d:DesignHeight="450" d:DesignWidth="800">
     <Page.Resources>
-        <Style
-            TargetType="controls:RankDisplay">
+        <Style TargetType="controls:RankDisplay">
             <Style.Triggers>
                 <DataTrigger Value="False">
                     <DataTrigger.Binding>
@@ -33,10 +32,13 @@
 
             </Style.Triggers>
         </Style>
+        
         <DataTemplate x:Key="DefaultPanelContentTemplate">
             <Grid 
                 Height="60"
-                ToolTipService.InitialShowDelay="50">
+                ToolTipService.InitialShowDelay="50"
+                ToolTipService.IsEnabled="{Binding RelativeSource={RelativeSource AncestorType=Page}, 
+                Path=DataContext.IsFavouritesPanelCollapsed}">
                 <Grid.ToolTip>
                     <StackPanel>
                         <TextBlock
@@ -78,6 +80,7 @@
             </Grid>
 
         </DataTemplate>
+        
         <DataTemplate x:Key="GroupSelectionContentTemplate">
             <Grid 
                 Height="110"
@@ -191,6 +194,7 @@
             </Grid>
 
         </DataTemplate>
+        
         <DataTemplate x:Key="FavouritesDataTemplate">
 
             <ContentControl 
@@ -304,8 +308,10 @@
                 FontSize="12"
                 PlaceholderText="Search Profiles..."
                 PlaceholderEnabled="True"
+                TextAlignment="Left"
+                VerticalContentAlignment="Center"
                 
-                Padding="6">
+                Padding="5">
             </ui:TextBox>
         </Grid>
 
@@ -391,7 +397,7 @@
             </ui:Button>
 
             <ToggleButton
-
+                Style="{DynamicResource AccentToggle}"
                 Grid.Column="2"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch"

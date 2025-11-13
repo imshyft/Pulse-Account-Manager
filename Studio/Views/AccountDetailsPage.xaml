@@ -25,6 +25,7 @@
             <ColumnDefinition Width="2*" MinWidth="400"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
+        <!--Player Title-->
         <Viewbox HorizontalAlignment="Left">
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -52,6 +53,7 @@
                     <ui:TextBlock
                         Text="{Binding Profile.CustomId}"
                         Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                        FontFamily="{StaticResource BigNoodleTooOblique}"
                         VerticalAlignment="Bottom"
                         FontTypography="Title"
                         FontSize="70"></ui:TextBlock>
@@ -78,15 +80,35 @@
             Grid.Row="1"
             Grid.Column="0"
             Career="{Binding Profile.RankedCareer}"
+            Padding="{StaticResource XSmallTopMargin}"
             x:Name="RankDisplay"/>
         
         <lvc:CartesianChart
             x:Name="Chart"
             Grid.Row="2"
             Grid.Column="0"
+            Background="Transparent"
             Series="{Binding Series}"
             XAxes="{Binding XAxes}"
+            YAxes="{Binding YAxes}"
+
+            
+            
             FindingStrategy="Automatic"/>
 
+        <lvc:PolarChart 
+            SnapsToDevicePixels="True"
+            x:Name="polar" Grid.Row="2" Grid.Column="1"
+            InitialRotation="-45"
+            Background="Transparent"
+            Series="{Binding S}"
+            RadiusAxes="{Binding RadiusAxes}"
+            AngleAxes="{Binding AngleAxes}"
+            Margin="-50"
+            MouseWheel="polar_MouseWheel"
+                        >
+            
+
+        </lvc:PolarChart>
     </Grid>
 </Page>

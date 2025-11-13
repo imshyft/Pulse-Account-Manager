@@ -42,10 +42,16 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
     private IProfileFetchingService _profileDataFetchingService;
 
     private readonly PersistAndRestoreService _persistAndRestoreService;
-    private bool IsFavouritesPanelCollapsed { get; set; } = false;
 
-    private int _flyoutOpenId = 0;
-    private Flyout[] _flyouts;
+    public bool IsFavouritesPanelCollapsed
+    {
+        get => _isFavouritesPanelCollapsed;
+        set => Set(ref _isFavouritesPanelCollapsed, value);
+    }
+    private bool _isFavouritesPanelCollapsed = false;
+
+    //private int _flyoutOpenId = 0;
+    //private Flyout[] _flyouts;
 
     public MainPage()
     {

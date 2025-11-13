@@ -20,11 +20,14 @@
                     <ColumnDefinition Width="30"/>
                     <ColumnDefinition Width="60"/>
                 </Grid.ColumnDefinitions>
-                <Image Source="{StaticResource TankDrawingImage}"
-                       Margin="5, 0, -3, 0"/>
+                <!--<Grid Margin="5, 0, -3, 0">
+                    <Image Source="{StaticResource TankDrawingImage}"></Image>
+                </Grid>-->
+
                 <local:RankDisplay
                     Grid.Column="1"
-                    x:Name="TankDisplay"/>
+                    x:Name="TankDisplay"
+                    Role="Tank"/>
             </Grid>
             <Grid
                 Grid.Column="1" Grid.ColumnSpan="2">
@@ -32,11 +35,12 @@
                     <ColumnDefinition Width="30"/>
                     <ColumnDefinition Width="60"/>
                 </Grid.ColumnDefinitions>
-                <Image Source="{StaticResource DamageDrawingImage}"
-                       Margin="5, 0, -3, 0"/>
+                <!--<Image Source="{StaticResource DamageDrawingImage}"
+                       Margin="5, 0, -3, 0"/>-->
                 <local:RankDisplay
                     Grid.Column="1"
-                    x:Name="DamageDisplay"/>
+                    x:Name="DamageDisplay"
+                    Role="Damage"/>
             </Grid>
             <Grid
                 Grid.Column="3">
@@ -44,11 +48,12 @@
                     <ColumnDefinition Width="30"/>
                     <ColumnDefinition Width="60"/>
                 </Grid.ColumnDefinitions>
-                <Image Source="{StaticResource SupportDrawingImage}"
-                       Margin="5, 0, -3, 0"/>
+                <!--<Image Source="{StaticResource SupportDrawingImage}"
+                       Margin="5, 0, -3, 0"/>-->
                 <local:RankDisplay
                     Grid.Column="1"
-                    x:Name="SupportDisplay"/>
+                    x:Name="SupportDisplay"
+                    Role="Support"/>
             </Grid>
 
         </Grid>

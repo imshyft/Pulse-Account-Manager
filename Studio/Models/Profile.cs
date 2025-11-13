@@ -12,7 +12,6 @@ namespace Studio.Models
     public class Profile
     {
         public BattleTag Battletag { get; set; }
-        public string BattletagString => Battletag?.ToString();
         public string CustomId { get; set; }
         public string Email { get; set; }
         public string Avatar { get; set; }
@@ -86,6 +85,12 @@ namespace Studio.Models
         public Tank Tank { get; set; }
         public Support Support { get; set; }
         public Damage Damage { get; set; }
+
+        // TODO: Create Getters for career
+        // TODO: Rework career system so that one moment holds all ranks captured at a given time
+        public DateTime LastRecorded { get; set; }
+        public DateTime FirstRecorded { get; set; }
+        public int Count { get; set; }
     }
 
     public abstract class Role : INotifyPropertyChanged
@@ -208,7 +213,8 @@ namespace Studio.Models
 
             Division division = Division.Bronze;
             int remainder = 0;
-
+            if (sr < 400)
+                remainder = 1;
             foreach (Division div in Enum.GetValues(typeof(Division)))
             {
                 if (sr < (int)div)
@@ -217,7 +223,7 @@ namespace Studio.Models
             }
 
             int baseDivRank = (int)division;
-            remainder = sr - baseDivRank;
+            remainder = Math.Min(sr - (division == Division.Bronze ? 1000 : baseDivRank), 499);
 
             int tier = Math.Min(5,  5 - remainder / 100 );
 
@@ -261,7 +267,7 @@ namespace Studio.Models
 
     public enum Division
     {
-        Bronze = 1000,
+        Bronze = 0,
         Silver = 1500,
         Gold = 2000,
         Platinum = 2500,

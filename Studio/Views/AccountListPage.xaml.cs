@@ -81,7 +81,7 @@ namespace Studio.Views
                 var row = VisualTreeHelper.GetParent(source) as DataGridRow;
                 if (row != null && !_isFlyoutOpen)
                 {
-                    //NavigationService?.Navigate(new AccountDetailsPage((row.DataContext as Profile)));
+                    NavigationService?.Navigate(new AccountDetailsPage((row.DataContext as Profile)));
                 }
             }
         }

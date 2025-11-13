@@ -15,14 +15,16 @@ namespace Studio.Services.Data
 
         private List<RankMoment> RandomRankMoments(int count)
         {
-            return Enumerable.Range(0, count)
-                .Select(j =>
-                    new RankMoment()
-                    {
-                        Date = _randomDates[j],
-                        Rank = Rank.RankFromSr(_rnd.Next(500, 5000))
-                    })
-                .ToList();
+            List<int> start = [_rnd.Next(500, 4500)];
+            for (int i = 1; i < count; ++i)
+            {
+                start.Add(start[i - 1] + _rnd.Next(-300, 300));
+            }
+            return start.Select((r, i) => new RankMoment()
+            {
+                Date = _randomDates[i],
+                Rank = Rank.RankFromSr(r)
+            }).ToList();
         }
 
         private List<Profile> CreateProfiles(int count)
@@ -41,6 +43,10 @@ namespace Studio.Services.Data
 
                 bool missingDetails = _rnd.NextDouble() < 0.3;
 
+                var tankMoments = RandomRankMoments(rankMoments);
+                var dmgMoments = RandomRankMoments(rankMoments);
+                var suppMoments = RandomRankMoments(rankMoments);
+
                 data.Add(new Profile()
                 {
                     Battletag = new BattleTag("Username", _rnd.Next(1000, 9999).ToString()),
@@ -51,26 +57,30 @@ namespace Studio.Services.Data
                     CustomId = $"Name{_rnd.Next(1000)}",
                     Email = "email@123",
                     LastUpdate = _rnd.Next(1, 1000000),
+
+                    
+
                     RankedCareer = new RankedCareer()
                     {
                         Damage = _rnd.NextDouble() > 0.4 ? new Damage()
                         {
-                            CurrentRank = Rank.RankFromSr(_rnd.Next(500, 5000)),
+                            RankMoments = dmgMoments,
+
+                            CurrentRank = dmgMoments.Last().Rank,
                             PeakRank = RandomRankMoments(1)[0],
-                            RankMoments = RandomRankMoments(rankMoments)
                         } : null,
                         Support = _rnd.NextDouble() > 0.4 ? new Support()
                         {
-                            CurrentRank = Rank.RankFromSr(_rnd.Next(500, 5000)),
+                            CurrentRank = suppMoments.Last().Rank,
                             PeakRank = RandomRankMoments(1)[0],
-                            RankMoments = RandomRankMoments(rankMoments)
+                            RankMoments = suppMoments
                         } : null,
 
                         Tank = _rnd.NextDouble() > 0.4 ? new Tank()
                         {
-                            CurrentRank = Rank.RankFromSr(_rnd.Next(500, 5000)),
+                            CurrentRank = tankMoments.Last().Rank,
                             PeakRank = RandomRankMoments(1)[0],
-                            RankMoments = RandomRankMoments(rankMoments)
+                            RankMoments = tankMoments
                         } : null,
                     },
                     TimesLaunched = _rnd.Next(3, 80),
