@@ -22,8 +22,8 @@ namespace Studio.Helpers
 
         public int Compare(object x, object y)
         {
-            var item1 = (Profile)x;
-            var item2 = (Profile)y;
+            var item1 = (ProfileV2)x;
+            var item2 = (ProfileV2)y;
 
             var val1 = GetNestedPropertyValue(item1, _property) as IComparable;
             var val2 = GetNestedPropertyValue(item2, _property) as IComparable;
@@ -33,7 +33,7 @@ namespace Studio.Helpers
             if (val2 == null) return -1; // val2 null, put after val1
 
             int result = val1.CompareTo(val2);
-            return _direction == ListSortDirection.Ascending ? result : -result;
+            return _direction == ListSortDirection.Ascending ? -result : result;
         }
 
         public static object GetNestedPropertyValue(object obj, string propertyPath)

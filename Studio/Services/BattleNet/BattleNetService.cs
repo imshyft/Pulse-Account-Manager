@@ -138,7 +138,7 @@ namespace Studio.Services
 
         }
 
-        public BattleTag ReadBattleTagFromMemory()
+        public BattleTagV2 ReadBattleTagFromMemory()
         {
             Process[] processes = Process.GetProcessesByName("Battle.net");
             Process process;
@@ -160,12 +160,12 @@ namespace Studio.Services
             if (tag == "")
                 return null;
 
-            BattleTag battleTag = new BattleTag(tag);
+            BattleTagV2 battleTag = new BattleTagV2(tag);
 
             return battleTag;
         }
 
-        public BattleTag[] ReadFriendsListFromMemory()
+        public BattleTagV2[] ReadFriendsListFromMemory()
         {
             Process[] processes = Process.GetProcessesByName("Battle.net");
             Process process;
@@ -183,7 +183,7 @@ namespace Studio.Services
 
             //var tags = BattleNetMemoryReaderService_OLD.GetFriendBattleTagStrings(process.Handle);
             var tags = _memoryReaderService.GetFriendBattleTagStrings(process.Handle);
-            BattleTag[] battleTags = tags.Select(x => new BattleTag(x)).ToArray();
+            BattleTagV2[] battleTags = tags.Select(x => new BattleTagV2(x)).ToArray();
 
             return battleTags;
 

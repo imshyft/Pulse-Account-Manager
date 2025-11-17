@@ -1,36 +1,18 @@
 ﻿using LiveChartsCore;
 using LiveChartsCore.Defaults;
 using LiveChartsCore.Drawing;
-using LiveChartsCore.Kernel;
 using LiveChartsCore.Kernel.Sketches;
-using LiveChartsCore.Painting;
 using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Painting;
 using LiveChartsCore.SkiaSharpView.Painting.Effects;
-using LiveChartsCore.SkiaSharpView.SKCharts;
-using OpenTK.Audio.OpenAL.Extensions.Creative.EFX;
 using SkiaSharp;
-using Studio.Contracts.Views;
 using Studio.Helpers;
 using Studio.Models;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Effects;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using Visual = LiveChartsCore.VisualElements.Visual;
 
 
 namespace Studio.Views
@@ -40,103 +22,91 @@ namespace Studio.Views
     /// </summary>
     public partial class AccountDetailsPage : Page
     {
-        public Profile Profile { get; set; }
-        public ISeries[] Series { get; set; }
-        public ICartesianAxis[] XAxes { get; set; }
-        public ICartesianAxis[] YAxes { get; set; }
+        public ProfileV2 Profile { get; set; }
+        private float _snapshotIndex;
 
 
-        // TODO: Web graph showing stats, scrolling zooms through time
-        public static ObservableCollection<double> Vals { get; set; } = new ObservableCollection<double> { 5, 2, 1, 4, 3 };
-        public ISeries[] S { get; set; }
-            = new ISeries[]
-            {
-                new PolarLineSeries<double>
-                {
-                    Values = Vals,
-                    GeometryFill = null,
-                    GeometryStroke = null,
-                    LineSmoothness = 0.2,
-                    Stroke = null,
-                    IsClosed = true,
-                },
-            };
-        public double TangentAngle { get; set; } =
-            LiveCharts.TangentAngle;
+        public ISeries[] RankSeries { get; set; }
+        public ICartesianAxis[] RankXAxes { get; set; }
+        public ICartesianAxis[] RankYAxes { get; set; }
+
+
+        // TODO: Web graph showing stats
+        public static ObservableCollection<double> Vals { get; set; } = new ObservableCollection<double> { 0, 0, 0, 0 };
+        public PolarLineSeries<double>[] StatGraphSeries { get; set; }
+
 
         public PolarAxis[] RadiusAxes { get; set; }
-            = new PolarAxis[]
-            {
-                        new PolarAxis
-                        {
-                            TextSize = 10,
-                            LabelsPaint = new SolidColorPaint(SKColors.Transparent),
-                            LabelsBackground = new LvcColor(0, 0, 0, 0),
-                            SeparatorsPaint = new SolidColorPaint(SKColors.LightSlateGray) { StrokeThickness = 2 },
-                            CustomSeparators = [1, 3, 5],
-                            MaxLimit = 5,
-                            MinLimit = 0
-                            
-                        }
-            };
-
         public PolarAxis[] AngleAxes { get; set; }
-            = new PolarAxis[]
-            {
-                new PolarAxis
-                {
-                    LabelsPaint = new SolidColorPaint(SKColors.WhiteSmoke)
-                    {
-                        SKTypeface = SKTypeface.FromStream(Application.GetResourceStream(new Uri("pack://application:,,,/Resources/Fonts/Hakuna-Sans.otf")).Stream)
-                    },
-                    TextSize = 20,
-                    LabelsBackground = new LvcColor(0, 0, 0, 0),
-                    Labels = ["Damage", "Healing", "Solo Kills", "Deaths", "Elims"],
-                    SeparatorsPaint = new SolidColorPaint(SKColors.LightSlateGray)
-                    {
-                        StrokeThickness = 1,
-                        PathEffect = new DashEffect([3, 3])
-                    },
-                    LabelsRotation = LiveCharts.TangentAngle,
-                }
-            };
 
-        public AccountDetailsPage(Profile profile)
+        public double CurrentRegionLow => double.NaN;
+        public double CurrentRegion { get; set; } = 1748864068 + TimeSpan.FromDays(10).TotalSeconds;
+
+        private readonly Dictionary<Roles, SKColor> _roleColors = new()
+        {
+            {Roles.Tank, new SKColor(52, 152, 219) },
+            {Roles.Damage, new SKColor(192, 57, 43) },
+            {Roles.Support, new SKColor(46, 204, 113) },
+        };
+
+        public AccountDetailsPage(ProfileV2 profile)
         {
             InitializeComponent();
-            LiveCharts.Configure(c => c.AddLiveChartsRenderSettings());
+            //LiveCharts.Configure(c => c.AddLiveChartsRenderSettings());
             DataContext = this;
             Loaded += OnLoaded;
 
             Profile = profile;
+            _snapshotIndex = Profile.Snapshots.Count - 1;
+
+            RankChart.Background = Brushes.Transparent;
+            StatPolarGraph.Background = Brushes.Transparent;
+
+            if (Profile.Snapshots.Count == 0)
+                return;
+
+            InitRankGraph();
+            InitStatGraph();
+        }
+
+        private void InitRankGraph()
+        {
+            var points = GetDateTimePoints(Profile.Snapshots);
 
             var series = new List<ISeries>();
 
-            if (Profile.RankedCareer.Tank != null)
-                series.Add(new RankLineSeries(GetDateTimePoints(Profile.RankedCareer.Tank), SKColors.LightSkyBlue));
+            if (Profile.LatestSnapshot.Tank != null)
+                series.Add(new RankLineSeries(points[Roles.Tank], _roleColors[Roles.Tank]));
 
-            if (Profile.RankedCareer.Damage != null)
-                series.Add(new RankLineSeries(GetDateTimePoints(Profile.RankedCareer.Damage), SKColors.IndianRed));
+            if (Profile.LatestSnapshot.Damage != null)
+                series.Add(new RankLineSeries(points[Roles.Damage], _roleColors[Roles.Damage]));
 
-            if (Profile.RankedCareer.Support != null)
-                series.Add(new RankLineSeries(GetDateTimePoints(Profile.RankedCareer.Support), SKColors.LightGreen));
-            
+            if (Profile.LatestSnapshot.Support != null)
+                series.Add(new RankLineSeries(points[Roles.Support], _roleColors[Roles.Support]));
+
             //Chart.TooltipBackgroundPaint = new SolidColorPaint(SKColor.Parse("#DD2f2c3d"));
             //Chart.TooltipTextPaint = new SolidColorPaint(SKColors.White);
-            Series = series.ToArray();
-            XAxes = new ICartesianAxis[] { new DateTimeAxis(TimeSpan.FromDays(20), date => date.ToString("M/d")) };
+            RankSeries = series.ToArray();
+            var oldestSnapshot = Profile.Snapshots.OrderByDescending(s => s.Timestamp).Last();
+            var timespan = TimeSpan.FromSeconds(Profile.LatestSnapshot.Timestamp - oldestSnapshot.Timestamp);
+
+            CurrentRegion = Profile.LatestSnapshot.Timestamp;
+
+            RankXAxes = [new DateTimeAxis(timespan / 7.0, date => date.ToString("M/d"))
+            {
+                //MinStep = timespan.TotalSeconds / 7.0,
+                LabelsPaint = new SolidColorPaint(SKColors.WhiteSmoke)
+            }];
 
             var uri = new Uri("pack://application:,,,/Resources/Fonts/Roboto-Regular-Ranks.ttf");
-            YAxes = new Axis[]
+            RankYAxes = new Axis[]
             {
-                new Axis
-                {
+                new() {
                     MinStep = 500,
                     LabelsPaint = new SolidColorPaint(SKColors.White)
                     {
-                        SKTypeface = SKTypeface.FromStream(Application.GetResourceStream(uri).Stream)
+                        SKTypeface = SKTypeface.FromStream(Application.GetResourceStream(uri).Stream),
                     },
-
                     // Unicode 1 - 8 are rank symbols, map rank values to them
                     // TODO: Make graph tooltips not replace values with rank symbols
                     Labeler = (value) =>
@@ -149,19 +119,110 @@ namespace Studio.Views
                         else
                             return Convert.ToString(value);
                     },
-                    TextSize = 20,
-                    CustomSeparators = new double[] { 0, 1500, 2000, 2500, 3000, 3500, 3500, 4000, 4500, 5000},
+                    TextSize = 23,
+                    CustomSeparators = [0, 1500, 2000, 2500, 3000, 3500, 3500, 4000, 4500, 5000],
                     SeparatorsPaint = new SolidColorPaint(SKColors.LightSlateGray)
                     {
                         StrokeThickness = 2,
-                        PathEffect = new DashEffect(new float[] { 3, 3 })
+                        PathEffect = new DashEffect([3, 3])
                     },
-                    
+
                 }
             };
-            //RankDisplay.Career = Profile.RankedCareer;
-            
-            //polar.Tooltip = 
+        }
+        
+        private void DisplayStats(ProfileSnapshotV2 snapshot)
+        {
+
+            foreach (Roles role in Enum.GetValues(typeof(Roles)))
+            {
+                if (snapshot[role].Stats == null)
+                {
+                    StatGraphSeries[(int)role].Values = [0, 0, 0, 0];
+                    continue;
+                }
+                var stats = StatisticScaler.ScaleStatistics(snapshot[role].Stats);
+                StatGraphSeries[(int)role].Values = [
+                        stats.GetValueOrDefault(StatisticType.Damage, 0),
+                        stats.GetValueOrDefault(StatisticType.Healing, 0),
+                        stats.GetValueOrDefault(StatisticType.Deaths, 0),
+                        stats.GetValueOrDefault(StatisticType.Elims, 0),
+                    ];
+
+            }
+        }
+
+        private void InitStatGraph()
+        {
+            StatGraphSeries = [
+                new PolarLineSeries<double>
+                {
+                    Values = [],
+                    Fill = new SolidColorPaint(new SKColor(52, 152, 219, 50)),
+                    GeometryStroke = null,
+                    GeometryFill = null,
+                    LineSmoothness = 0.2,
+                    Stroke = null,
+                    IsClosed = true,
+                },
+                new PolarLineSeries<double>
+                {
+                    Values = [],
+                    Fill = new SolidColorPaint(new SKColor(192, 57, 43, 50)),
+                    GeometryStroke = null,
+                    GeometryFill = null,
+                    LineSmoothness = 0.2,
+                    Stroke = null,
+                    IsClosed = true,
+                },
+                new PolarLineSeries<double>
+                {
+                    Values = [],
+                    Fill = new SolidColorPaint(new SKColor(46, 204, 113, 50)),
+                    GeometryFill = null,
+                    GeometryStroke = null,
+                    LineSmoothness = 0.2,
+                    Stroke = null,
+                    IsClosed = true,
+                },
+            ];
+
+            var snapshot = Profile.LatestSnapshot;
+            DisplayStats(snapshot);
+
+
+            AngleAxes = [
+                new PolarAxis
+                {
+                    LabelsPaint = new SolidColorPaint(SKColors.WhiteSmoke)
+                    {
+                        SKTypeface = SKTypeface.FromStream(Application.GetResourceStream(new Uri("pack://application:,,,/Resources/Fonts/Hakuna-Sans.otf")).Stream)
+                    },
+                    TextSize = 20,
+                    LabelsBackground = new LvcColor(0, 0, 0, 0),
+                    Labels = ["Damage", "Healing", "Deaths", "Elims"],
+                    SeparatorsPaint = new SolidColorPaint(SKColors.LightSlateGray)
+                    {
+                        StrokeThickness = 1,
+                        PathEffect = new DashEffect([3, 3])
+                    },
+                    LabelsRotation = LiveCharts.TangentAngle,
+                }
+            ];
+
+            RadiusAxes = [
+                new PolarAxis
+                {
+                    TextSize = 10,
+                    LabelsPaint = new SolidColorPaint(SKColors.Transparent),
+                    LabelsBackground = new LvcColor(0, 0, 0, 0),
+                    SeparatorsPaint = new SolidColorPaint(SKColors.LightSlateGray) { StrokeThickness = 2 },
+                    CustomSeparators = [1, 3, 5],
+                    MaxLimit = 1,
+                    MinLimit = 0
+
+                }
+            ];
 
         }
 
@@ -170,15 +231,47 @@ namespace Studio.Views
             return;
         }
 
-        private List<DateTimePoint> GetDateTimePoints(Role role)
+        private Dictionary<Roles, List<DateTimePoint>> GetDateTimePoints(List<ProfileSnapshotV2> snapshots)
         {
-            return role.RankMoments
-                .Select(m => new DateTimePoint()
-                {
-                    DateTime = DateTimeOffset.FromUnixTimeSeconds(m.Date).DateTime,
-                    Value = m.Rank.SkillRating
-                })
-                .ToList();
+            var result = new Dictionary<Roles, List<DateTimePoint>>()
+            {
+                {Roles.Tank, [] },
+                {Roles.Damage, [] },
+                {Roles.Support, [] },
+            };
+
+            foreach (var snapshot in snapshots)
+            {
+                int time = snapshot.Timestamp;
+                if (snapshot.Tank.Rank != null)
+                    result[Roles.Tank].Add(new DateTimePoint()
+                    {
+                        DateTime = DateTimeOffset.FromUnixTimeSeconds(time).DateTime,
+                        Value = snapshot.Tank.Rank.SkillRating
+                    });
+                if (snapshot.Damage.Rank != null)
+                    result[Roles.Damage].Add(new DateTimePoint()
+                    {
+                        DateTime = DateTimeOffset.FromUnixTimeSeconds(time).DateTime,
+                        Value = snapshot.Damage.Rank.SkillRating
+                    });
+
+                if (snapshot.Support.Rank != null)
+                    result[Roles.Support].Add(new DateTimePoint()
+                    {
+                        DateTime = DateTimeOffset.FromUnixTimeSeconds(time).DateTime,
+                        Value = snapshot.Support.Rank.SkillRating
+                    });
+            }
+            //return role.RankMoments
+            //    .Select(m => new DateTimePoint()
+            //    {
+            //        DateTime = DateTimeOffset.FromUnixTimeSeconds(m.Date).DateTime,
+            //        Value = m.Rank.SkillRating
+            //    })
+            //    .ToList();
+            return result;
+
         }
 
         private class RankLineSeries : LineSeries<DateTimePoint>
@@ -206,29 +299,19 @@ namespace Studio.Views
         }
 
 
+
+
         private void OnBackButtonClick(object sender, RoutedEventArgs e)
         {
-
             NavigationService?.Navigate(new AccountListPage());
-
         }
 
         private void polar_MouseWheel(object sender, MouseWheelEventArgs e)
         {
-            for (int i = 0; i < Vals.Count; i++)
-            {
-                Vals[i] += e.Delta / 1000.0;
-            }
+            //_snapshotIndex = (float)Math.Clamp(_snapshotIndex + e.Delta / 100.0, 0, Profile.Snapshots.Count - 1);
+
+            //DisplayStats(snapshot);
         }
     }
 
-    //public class CustomTooltip : SKDefaultTooltip
-    //{
-    //    public override void Show(IEnumerable<ChartPoint> foundPoints, Chart chart)
-    //    {
-            
-    //        chart.GetPointsAt(chart. )
-    //        base.Show(foundPoints, chart);
-    //    }
-    //}
 }

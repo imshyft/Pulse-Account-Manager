@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Studio.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,7 +13,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Studio.Models;
 
 namespace Studio.Controls
 {
@@ -27,12 +27,12 @@ namespace Studio.Controls
         }
 
         public static readonly DependencyProperty CareerProperty =
-            DependencyProperty.Register(nameof(Career), typeof(RankedCareer), typeof(MultiRankDisplay),
-                new PropertyMetadata(new RankedCareer(), OnRankPropertyChanged));
+            DependencyProperty.Register(nameof(Career), typeof(ProfileSnapshotV2), typeof(MultiRankDisplay),
+                new PropertyMetadata(new ProfileSnapshotV2(), OnRankPropertyChanged));
 
-        public RankedCareer Career
+        public ProfileSnapshotV2 Career
         {
-            get => (RankedCareer)GetValue(CareerProperty);
+            get => (ProfileSnapshotV2)GetValue(CareerProperty);
             set => SetValue(CareerProperty, value);
         }
 
@@ -62,11 +62,11 @@ namespace Studio.Controls
         {
             if (d is MultiRankDisplay control)
             {
-                if (e.NewValue is RankedCareer career)
+                if (e.NewValue is ProfileSnapshotV2 career)
                 {
-                    control.TankDisplay.RankValue = career.Tank?.CurrentRank;
-                    control.SupportDisplay.RankValue = career.Support?.CurrentRank;
-                    control.DamageDisplay.RankValue = career.Damage?.CurrentRank;
+                    control.TankDisplay.RankValue = career.Tank?.Rank;
+                    control.SupportDisplay.RankValue = career.Support?.Rank;
+                    control.DamageDisplay.RankValue = career.Damage?.Rank;
                 }
             }
         }

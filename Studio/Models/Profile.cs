@@ -1,7 +1,10 @@
 ﻿
 
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Studio.Models.Legacy;
 using System.ComponentModel;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 
 namespace Studio.Models
@@ -9,39 +12,87 @@ namespace Studio.Models
 
     #region Profile
 
-    public class Profile
+    public class ProfileV2
     {
-        public BattleTag Battletag { get; set; }
-        public string CustomId { get; set; }
+        public BattleTagV2 Battletag { get; set; }
+        public string CustomName { get; set; }
         public string Email { get; set; }
-        public string Avatar { get; set; }
-        public int LastUpdate { get; set; }
-        public int TimesSwitched { get; set; }
-        public int TimesLaunched { get; set; }
+        public string AvatarURL { get; set; }
+        [JsonIgnore]
+        public ProfileSnapshotV2 LatestSnapshot => Snapshots.OrderByDescending(s => s.Timestamp).FirstOrDefault(defaultValue: null);
+        public List<ProfileSnapshotV2> Snapshots { get; set; } = [];
 
-        public RankedCareer RankedCareer { get; set; }
-
+        // allows casting from old profile type
+        public static implicit operator ProfileV2(ProfileV1 v)
+        {
+            var profile =  new ProfileV2()
+            {
+                AvatarURL = v.Avatar,
+                Battletag = new BattleTagV2(v.Battletag.ToString()),
+                Email = v.Email,
+                CustomName = v.CustomId,
+                Snapshots = []
+            };
+            if (v.RankedCareer != null)
+            {
+                profile.Snapshots.Add(new ProfileSnapshotV2()
+                {
+                    Timestamp = v.LastUpdate,
+                    Tank = new Tank() { Rank = v.RankedCareer.Tank == null ? null : RankV2.RankFromSr(v.RankedCareer.Tank.CurrentRank.SkillRating) },
+                    Damage = new Damage() { Rank = v.RankedCareer.Damage == null ? null : RankV2.RankFromSr(v.RankedCareer.Damage.CurrentRank.SkillRating) },
+                    Support = new Support() { Rank = v.RankedCareer.Support == null ? null : RankV2.RankFromSr(v.RankedCareer.Support.CurrentRank.SkillRating) },
+                });
+            }
+            return profile;
+        }
     }
 
-    public class BattleTag
+    public class ProfileSnapshotV2
     {
+        public int Timestamp { get; set; }
+        public Tank Tank { get; set; } = new Tank();
+        public Support Support { get; set; } = new Support();
+        public Damage Damage { get; set; } = new Damage();
+
+        // allows indexing for role type
+        public RoleV2 this[Roles role]
+        {
+            get
+            {
+                switch (role)
+                {
+                    case Roles.Tank:
+                        return Tank;
+                    case Roles.Damage:
+                        return Damage;
+                    case Roles.Support:
+                        return Support;
+                    default: return null;
+                }
+            }
+        }
+    }
+
+    public class BattleTagV2
+    {
+        [JsonIgnore]
         public string FullTag => ToString();
+
         public string Username { get; set; }
         public string Tag { get; set; }
 
         [JsonConstructor]
-        public BattleTag(string username, string tag)
+        public BattleTagV2(string username, string tag)
         {
             Username = username;
             Tag = tag;
         }
-        public BattleTag(string battletag)
+        public BattleTagV2(string battletag)
         {
             string[] parts = battletag.Split('#');
             Username = parts[0];
             Tag = parts[1];
         }
-
 
         public override string ToString()
         {
@@ -51,51 +102,13 @@ namespace Studio.Models
 
     #endregion
 
-    #region Statistics
-
-    public class Statistic
-    {
-        public StatisticType Name { get; set; }
-        public double Value { get; set; }
-        public double ValuePer10 { get; set; }
-        public double ScaledValuePer10 { get; set; }
-
-        public void ScaleToRole(Role role) =>
-            ScaledValuePer10 = role.Scalars[StatisticType.Assists] * ValuePer10;
-
-    }
-    public class StatCollection
-    {
-
-        public Dictionary<StatisticType, Statistic> Stats;
-        public void ScaleToRole(Role role)
-        {
-            foreach (var stat in Stats)
-            {
-                stat.Value.ScaleToRole(role);
-            }
-        }
-
-    }
-    #endregion
 
     #region Roles
-    public class RankedCareer
-    {
-        public Tank Tank { get; set; }
-        public Support Support { get; set; }
-        public Damage Damage { get; set; }
 
-        // TODO: Create Getters for career
-        // TODO: Rework career system so that one moment holds all ranks captured at a given time
-        public DateTime LastRecorded { get; set; }
-        public DateTime FirstRecorded { get; set; }
-        public int Count { get; set; }
-    }
-
-    public abstract class Role : INotifyPropertyChanged
+    public abstract class RoleV2 : INotifyPropertyChanged
     {
         private bool _isSelectedForComparison;
+        [JsonIgnore]
         public bool IsSelectedForComparison
         {
             get => _isSelectedForComparison;
@@ -106,54 +119,12 @@ namespace Studio.Models
             }
 
         }
+        [JsonIgnore]
         public abstract Roles Type { get; }
-        public abstract List<RankMoment> RankMoments { get; set; }
-        public abstract RankMoment PeakRank { get; set; }
-        public abstract Rank CurrentRank { get; set; }
 
-        [JsonIgnore]
-        public abstract StatCollection StatCollection { get; set; }
 
-        [JsonIgnore]
-        public static Dictionary<StatisticType, float> StatScalars { get; set; }
-
-        [JsonIgnore]
-        public Dictionary<StatisticType, float> Scalars => ScalarCollection[Type];
-
-        [JsonIgnore]
-        public static Dictionary<Roles, Dictionary<StatisticType, float>> ScalarCollection = new()
-        {
-            { Roles.Tank, new Dictionary<StatisticType, float>
-                {
-                    { StatisticType.Damage, 0.002f },
-                    { StatisticType.Assists, 0.004f },
-                    { StatisticType.FinalBlows, 1.0f },
-                    { StatisticType.TimePlayed, 1.0f },
-                    { StatisticType.Healing, 1.0f },
-                    { StatisticType.Deaths, 1.0f }
-                }
-            },
-            { Roles.Damage, new Dictionary<StatisticType, float>
-                {
-                    { StatisticType.Damage, 0.004f },
-                    { StatisticType.Assists, 0.004f },
-                    { StatisticType.FinalBlows, 1.0f },
-                    { StatisticType.TimePlayed, 1.0f },
-                    { StatisticType.Healing, 0.00167f },
-                    { StatisticType.Deaths, 1.0f }
-                }
-            },
-            { Roles.Support, new Dictionary<StatisticType, float>
-                {
-                    { StatisticType.Damage, 0.002f },
-                    { StatisticType.Assists, 0.004f },
-                    { StatisticType.FinalBlows, 1.0f },
-                    { StatisticType.TimePlayed, 1.0f },
-                    { StatisticType.Healing, 0.00333f },
-                    { StatisticType.Deaths, 1.0f }
-                }
-            },
-        };
+        public RankV2 Rank { get; set; }
+        public Dictionary<StatisticType, float> Stats { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName] string propertyName = null) =>
@@ -161,52 +132,83 @@ namespace Studio.Models
 
     }
 
-    public class Tank : Role
+    public static class StatisticScaler
+    {
+        public static Dictionary<StatisticType, MappingRange> StatRanges = new()
+        {
+            {StatisticType.Damage, new MappingRange(3000, 12000) },
+            {StatisticType.Healing, new MappingRange(3000, 12000) },
+            {StatisticType.Elims, new MappingRange(5, 40) },
+            {StatisticType.Deaths, new MappingRange(12, 2) },
+        };
+
+        // scales stat to 0-1 range
+        public static Dictionary<StatisticType, float> ScaleStatistics(Dictionary<StatisticType, float> originalStats)
+        {
+            Dictionary<StatisticType, float> statCollection = new();
+            foreach (var stat in originalStats.Keys)
+            {
+                if (StatRanges.ContainsKey(stat))
+                    statCollection[stat] = StatRanges[stat].MapFloatToScalar(originalStats[stat]);
+                else
+                    statCollection[stat] = originalStats[stat];
+            }
+            return statCollection;
+        }
+    }
+
+    public class MappingRange(double min, double max)
+    {
+        public double Min { get; set; } = min;
+        public double Max { get; set; } = max;
+
+        public float MapFloatToScalar(float value)
+        {
+            if (Max == Min)
+                return 0f; // avoid div by 0
+            float low = (float)Math.Min(Min, Max);
+            float high = (float)Math.Max(Min, Max);
+
+            var clamped = Math.Clamp(value, low, high);
+            float scalar = (clamped - low) / (high - low);
+
+            // flip if inverted
+            if (Min > Max)
+                scalar = 1f - scalar;
+
+            return scalar;
+        }
+    }
+
+    public class Tank : RoleV2
     {
         public override Roles Type => Roles.Tank;
-        public override List<RankMoment> RankMoments { get; set; }
-        public override RankMoment PeakRank { get; set; }
-        public override Rank CurrentRank { get; set; }
-        public override StatCollection StatCollection { get; set; }
-
-
     }
 
-    public class Support : Role
+    public class Support : RoleV2
     {
         public override Roles Type => Roles.Support;
-        public override List<RankMoment> RankMoments { get; set; }
-        public override RankMoment PeakRank { get; set; }
-        public override Rank CurrentRank { get; set; }
-        public override StatCollection StatCollection { get; set; }
     }
 
-    public class Damage : Role
+    public class Damage : RoleV2
     {
         public override Roles Type => Roles.Damage;
-        public override List<RankMoment> RankMoments { get; set; }
-        public override RankMoment PeakRank { get; set; }
-        public override Rank CurrentRank { get; set; }
-        public override StatCollection StatCollection { get; set; }
     }
 
     #endregion
 
     #region Ranks
-    public class RankMoment
-    {
-        public Rank Rank { get; set; }
-        public int Date { get; set; }
-    }
 
-    public class Rank
+    public class RankV2
     {
-        public int SkillRating { get; set; }
         public int Tier { get; set; }
+        [JsonConverter(typeof(StringEnumConverter))]
         public Division Division { get; set; }
 
+        [JsonIgnore]
+        public int SkillRating { get; set; }
 
-        public static Rank RankFromSr(int sr)
+        public static RankV2 RankFromSr(int sr)
         {
             if (sr < 0) sr = 0;
             if (sr >= 5000) sr = 4999;
@@ -227,7 +229,7 @@ namespace Studio.Models
 
             int tier = Math.Min(5,  5 - remainder / 100 );
 
-            return new Rank()
+            return new RankV2()
             {
                 Division = division,
                 SkillRating = sr,
@@ -235,7 +237,7 @@ namespace Studio.Models
             };
         }
 
-        public static Rank RankFromDivision(string divisionString, int tier)
+        public static RankV2 RankFromDivision(string divisionString, int tier)
         {
             if (!Enum.TryParse(divisionString, true, out Division division))
                 throw new ArgumentException("Division was not an accepted string");
@@ -248,7 +250,7 @@ namespace Studio.Models
 
             int sr = baseSr + remainder;
 
-            return new Rank()
+            return new RankV2()
             {
                 SkillRating = sr,
                 Division = division,
@@ -280,10 +282,11 @@ namespace Studio.Models
     public enum StatisticType
     {
         Damage,
-        Assists,
         Deaths,
+        Elims,
+        Healing,
         TimePlayed,
-        FinalBlows,
-        Healing
+        Winrate,
     }
+
 }

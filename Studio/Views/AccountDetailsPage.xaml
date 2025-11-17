@@ -36,7 +36,7 @@
                     CornerRadius="15"
                     Width="160">
                     <ui:Image.Source>
-                        <Binding Path="Profile.Avatar" >
+                        <Binding Path="Profile.AvatarURL" >
                             <Binding.TargetNullValue>
                                 <ImageSource>/Resources/PlaceholderPlayerIcon.png</ImageSource>
                             </Binding.TargetNullValue>
@@ -51,7 +51,7 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
                     <ui:TextBlock
-                        Text="{Binding Profile.CustomId}"
+                        Text="{Binding Profile.CustomName}"
                         Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                         FontFamily="{StaticResource BigNoodleTooOblique}"
                         VerticalAlignment="Bottom"
@@ -60,7 +60,7 @@
                     <ui:TextBlock
                         Grid.Row="1"
                         Foreground="{StaticResource TextFillColorSecondaryBrush}"
-                        Text="{Binding Profile.BattletagString}"
+                        Text="{Binding Profile.Battletag}"
                         VerticalAlignment="Top"
                         FontTypography="Subtitle"
                         FontSize="30"></ui:TextBlock>
@@ -79,32 +79,41 @@
         <controls:MultiRankDisplay
             Grid.Row="1"
             Grid.Column="0"
-            Career="{Binding Profile.RankedCareer}"
+            Career="{Binding Profile.LatestSnapshot}"
             Padding="{StaticResource XSmallTopMargin}"
             x:Name="RankDisplay"/>
-        
+
         <lvc:CartesianChart
-            x:Name="Chart"
+            x:Name="RankChart"
             Grid.Row="2"
             Grid.Column="0"
-            Background="Transparent"
-            Series="{Binding Series}"
-            XAxes="{Binding XAxes}"
-            YAxes="{Binding YAxes}"
+            Series="{Binding RankSeries}"
+            XAxes="{Binding RankXAxes}"
+            YAxes="{Binding RankYAxes}"
 
             
             
-            FindingStrategy="Automatic"/>
+            FindingStrategy="Automatic">
+            <lvc:CartesianChart.Sections>
+                <lvc:SectionsCollection>
+                    <lvc:XamlRectangularSection
+                        Xi="{Binding CurrentRegionLow}"
+                        Xj="{Binding CurrentRegion}"
+                        Fill="{lvc:SolidColorPaint Color='#FFFFFF'}"/>
+                </lvc:SectionsCollection>
+            </lvc:CartesianChart.Sections>
+               
+                    
+        </lvc:CartesianChart>
 
         <lvc:PolarChart 
             SnapsToDevicePixels="True"
-            x:Name="polar" Grid.Row="2" Grid.Column="1"
+            x:Name="StatPolarGraph" Grid.Row="2" Grid.Column="1"
             InitialRotation="-45"
-            Background="Transparent"
-            Series="{Binding S}"
+            Series="{Binding StatGraphSeries}"
             RadiusAxes="{Binding RadiusAxes}"
             AngleAxes="{Binding AngleAxes}"
-            Margin="-50"
+            Margin="-30"
             MouseWheel="polar_MouseWheel"
                         >
             

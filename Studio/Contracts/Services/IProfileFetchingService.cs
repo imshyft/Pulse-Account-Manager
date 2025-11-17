@@ -11,12 +11,12 @@ namespace Studio.Contracts.Services
 {
     public interface IProfileFetchingService
     {
-        public Task<ProfileFetchResult> FetchProfileAsync(BattleTag battletag);
+        public Task<ProfileFetchResult> FetchProfileAsync(BattleTagV2 battletag);
     }
 
     public class ProfileFetchResult
     {
-        public Profile Profile { get; set; }
+        public ProfileV2 Profile { get; set; }
         public ProfileFetchOutcome Outcome { get; set; }
         public string? ErrorMessage { get; set; }
 

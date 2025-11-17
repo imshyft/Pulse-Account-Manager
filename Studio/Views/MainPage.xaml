@@ -42,10 +42,10 @@
                 <Grid.ToolTip>
                     <StackPanel>
                         <TextBlock
-                            Text="{Binding CustomId}"
+                            Text="{Binding CustomName, Mode=OneWay}"
                             Style="{StaticResource ListTitleStyle}"/>
                         <TextBlock
-                            Text="{Binding BattletagString}"
+                            Text="{Binding Battletag}"
                             Style="{StaticResource ListSubTitleStyle}"/>
                     </StackPanel>
                 </Grid.ToolTip>
@@ -59,7 +59,7 @@
                     Margin="10, 0, -4 ,0"
                     CornerRadius="4">
                     <ui:Image.Source>
-                        <Binding Path="Avatar" >
+                        <Binding Path="AvatarURL" >
                             <Binding.TargetNullValue>
                                 <StaticResource ResourceKey="PlaceholderAvatar"/>
                             </Binding.TargetNullValue>
@@ -71,10 +71,10 @@
                 <StackPanel Grid.Column="1"
                 Margin="20, 8, 0, 0">
                     <TextBlock
-            Text="{Binding CustomId}"
+            Text="{Binding CustomName, Mode=OneWay}"
             Style="{StaticResource ListTitleStyle}"/>
                     <TextBlock
-            Text="{Binding BattletagString}"
+            Text="{Binding Battletag}"
             Style="{StaticResource ListSubTitleStyle}"/>
                 </StackPanel>
             </Grid>
@@ -88,10 +88,10 @@
                 <Grid.ToolTip>
                     <StackPanel>
                         <TextBlock
-                            Text="{Binding CustomId}"
+                            Text="{Binding CustomName, Mode=OneWay}"
                             Style="{StaticResource ListTitleStyle}"/>
                         <TextBlock
-                            Text="{Binding BattletagString}"
+                            Text="{Binding Battletag}"
                             Style="{StaticResource ListSubTitleStyle}"/>
                     </StackPanel>
                 </Grid.ToolTip>
@@ -105,7 +105,7 @@
                     Margin="10, 0, -4 ,0"
                     CornerRadius="4">
                     <ui:Image.Source>
-                        <Binding Path="Avatar" >
+                        <Binding Path="AvatarURL" >
                             <Binding.TargetNullValue>
                                 <StaticResource ResourceKey="PlaceholderAvatar"/>
                             </Binding.TargetNullValue>
@@ -121,7 +121,7 @@
                     </Grid.RowDefinitions>
 
                     <TextBlock
-                        Text="{Binding BattletagString}"
+                        Text="{Binding Battletag}"
                         Style="{StaticResource ListTitleStyle}"
                         FontSize="14"/>
 
@@ -161,10 +161,10 @@
                         </Grid.Resources>
                         <ui:Button
                             Click="OnSidePanelRoleButtonClick"
-                            Tag="{Binding RankedCareer.Tank}">
+                            Tag="{Binding LatestSnapshot.Tank}">
                             <Viewbox>
                                 <controls:RankDisplay 
-                                    RankValue="{Binding Tag.CurrentRank, RelativeSource={RelativeSource AncestorType=ui:Button}}"
+                                    RankValue="{Binding Tag.Rank, RelativeSource={RelativeSource AncestorType=ui:Button}}"
                                     VerticalAlignment="Stretch"         
                                     Role="Tank"/>
                             </Viewbox>
@@ -172,18 +172,18 @@
                         <ui:Button
                             Grid.Column="1"
                             Click="OnSidePanelRoleButtonClick"
-                            Tag="{Binding RankedCareer.Damage}">
+                            Tag="{Binding LatestSnapshot.Damage}">
                             <Viewbox>
-                                <controls:RankDisplay RankValue="{Binding Tag.CurrentRank, RelativeSource={RelativeSource AncestorType=ui:Button}}"
+                                <controls:RankDisplay RankValue="{Binding Tag.Rank, RelativeSource={RelativeSource AncestorType=ui:Button}}"
                                                       Role="Damage"/>
                             </Viewbox>
                         </ui:Button>
                         <ui:Button
                             Grid.Column="2"
                             Click="OnSidePanelRoleButtonClick"
-                            Tag="{Binding RankedCareer.Support}">
+                            Tag="{Binding LatestSnapshot.Support}">
                             <Viewbox>
-                                <controls:RankDisplay RankValue="{Binding Tag.CurrentRank, RelativeSource={RelativeSource AncestorType=ui:Button}}"
+                                <controls:RankDisplay RankValue="{Binding Tag.Rank, RelativeSource={RelativeSource AncestorType=ui:Button}}"
                                                       Role="Support"/>
                             </Viewbox>
                         </ui:Button>

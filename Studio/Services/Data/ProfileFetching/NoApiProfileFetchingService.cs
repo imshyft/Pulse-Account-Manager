@@ -14,26 +14,19 @@ namespace Studio.Services.Data.ProfileFetching
     class NoApiProfileFetchingService : IProfileFetchingService
     {
 
-        public Task<ProfileFetchResult> FetchProfileAsync(BattleTag battletag)
+        public Task<ProfileFetchResult> FetchProfileAsync(BattleTagV2 battletag)
         {
             Debug.WriteLine("Got Profile Details!");
             var profileFetchResult = new ProfileFetchResult()
             {
                 Outcome = ProfileFetchOutcome.Success,
-                Profile = new Profile()
+                Profile = new ProfileV2()
                 {
-                    Avatar = null,
+                    AvatarURL = null,
                     Battletag = battletag,
-                    CustomId = "Added Account",
+                    CustomName = "Added Account",
                     Email = null,
-                    LastUpdate = (int)DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
-                    RankedCareer = new RankedCareer()
-                    {
-                        Damage = null,
-                        Tank = null,
-                        Support = null,
-                    },
-                    TimesSwitched = 0,
+                    Snapshots = null,
                     
                 }
             };

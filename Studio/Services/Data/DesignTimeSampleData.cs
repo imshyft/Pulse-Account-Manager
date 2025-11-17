@@ -12,9 +12,9 @@ namespace Studio.Services.Data
 {
     public class DesignTimeSampleData
     {
-        public ObservableCollection<Profile> FilteredProfiles { get; set; } = new ObservableCollection<Profile>();
+        public ObservableCollection<ProfileV2> FilteredProfiles { get; set; } = [];
         public UserProfileDataService UserProfiles { get; set; }
-        public Profile Profile { get; set; }
+        public ProfileV2 Profile { get; set; }
         public DesignTimeSampleData()
         {
             UserProfiles = new SampleUserProfileDataService();

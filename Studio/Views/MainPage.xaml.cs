@@ -32,7 +32,7 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
 
 
     // TODO : Add flyouts to introduce main actions (adding profiles, favourites) on first time launch
-    public ObservableCollection<Profile> FilteredProfiles { get; set; } = new();
+    public ObservableCollection<ProfileV2> FilteredProfiles { get; set; } = new();
     public GroupSelectionService GroupSelectionService { get; set; }
     public bool IsPanelShowingFavourites { get; set; } = true;
 
@@ -134,7 +134,7 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
     }
 
 
-    public void OpenDetailsPage(Profile profile)
+    public void OpenDetailsPage(ProfileV2 profile)
     {
         //mainContentFrame.NavigationService.Navigate(new AccountDetailsPage(profile));
 
@@ -167,7 +167,7 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
     {
         if (e.AddedItems.Count > 0)
         {
-            OpenDetailsPage(e.AddedItems[0] as Profile);
+            OpenDetailsPage(e.AddedItems[0] as ProfileV2);
         }
 
     }
@@ -188,7 +188,7 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
         string text = FilterTextBox.Text;
 
         ProfileDataService profileSource = IsPanelShowingFavourites ? _favouriteProfiles : _userProfiles;
-        var filtered = profileSource.Profiles.Where(p => p.CustomId.Contains(text, StringComparison.CurrentCultureIgnoreCase));
+        var filtered = profileSource.Profiles.Where(p => p.CustomName.Contains(text, StringComparison.CurrentCultureIgnoreCase));
 
         for (int i = FilteredProfiles.Count - 1; i >= 0; i--)
         {
@@ -261,7 +261,7 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
         var result = await dialog.ShowAsync();
         if (result == ContentDialogResult.Primary)
         {
-            Profile profile = dialog.Profile;
+            ProfileV2 profile = dialog.Profile;
             string email = _battleNetService.GetBattleNetAccount();
             profile.Email = email;
             _userProfiles.SaveProfile(profile);
@@ -285,7 +285,7 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
         var result = await dialog.ShowAsync();
         if (result == ContentDialogResult.Primary)
         {
-            Profile profile = dialog.Profile;
+            ProfileV2 profile = dialog.Profile;
 
             if (_favouriteProfiles.ContainsProfile(profile))
             {
@@ -350,7 +350,7 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
             _ = SnackbarPresenter.ImmediatelyDisplay(new Snackbar(SnackbarPresenter)
             {
                 Appearance = ControlAppearance.Info,
-                Opacity = 0.7,
+                Opacity = 0.9,
                 IsCloseButtonEnabled = false,
                 Title = "Group Selection Mode",
                 Content = "Click on the ranks of the roles your friends will play on on the side panel to see which accounts are in range",
@@ -370,9 +370,9 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
 
     private void OnSidePanelRoleButtonClick(object sender, RoutedEventArgs e)
     {
-        if (((FrameworkElement)sender).DataContext is not Profile profile)
+        if (((FrameworkElement)sender).DataContext is not ProfileV2 profile)
             return;
-        if (((FrameworkElement)sender).Tag is not Role role)
+        if (((FrameworkElement)sender).Tag is not RoleV2 role)
             return;
 
         if (GroupSelectionService.Contains(role))
@@ -391,12 +391,15 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
 
     private async void OnSidePanelItemSyncClick(object sender, RoutedEventArgs e)
     {
-        if (FavouritesList.SelectedItem is not Profile profile)
+        if (FavouritesList.SelectedItem is not ProfileV2 profile)
             return;
 
-        var result = await _profileDataFetchingService.FetchProfileAsync(profile.Battletag);
-
-
+        //var result = await _profileDataFetchingService.FetchProfileAsync(profile.Battletag);
+        var result = new ProfileFetchResult()
+        {
+            Outcome = ProfileFetchOutcome.NotFound,
+            Profile = null
+        };
         if (result.Outcome == ProfileFetchOutcome.Success)
         {
             _ = SnackbarPresenter.ImmediatelyDisplay(new Snackbar(SnackbarPresenter)
@@ -438,7 +441,7 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
 
     private void OnSidePanelItemDeleteClick(object sender, RoutedEventArgs e)
     {
-        if (FavouritesList.SelectedItem is not Profile profile)
+        if (FavouritesList.SelectedItem is not ProfileV2 profile)
             return;
 
         if (IsPanelShowingFavourites)

@@ -8,6 +8,7 @@ using Newtonsoft.Json.Linq;
 using Studio.Contracts.Services;
 using System.Collections.ObjectModel;
 using Studio.Services.Files;
+using Studio.Models.Legacy;
 
 namespace Studio.Services.Data;
 
@@ -25,7 +26,7 @@ public class StoredUserProfileDataService : UserProfileDataService
             Directory.CreateDirectory(ProfileDirectory);
     }
 
-    public override void SaveProfile(Profile profile)
+    public override void SaveProfile(ProfileV2 profile)
     {
         string fileName = $"{profile.Battletag}.json";
         _fileService.Save(ProfileDirectory, fileName, profile);
@@ -33,14 +34,14 @@ public class StoredUserProfileDataService : UserProfileDataService
         base.SaveProfile(profile);
     }
 
-    public override Profile ReadProfile(BattleTag battletag)
+    public override ProfileV2 ReadProfile(BattleTagV2 battletag)
     {
         string fileName = $"{battletag}.json";
-        var data = _fileService.Read<Profile>(ProfileDirectory, fileName);
+        var data = _fileService.Read<ProfileV2>(ProfileDirectory, fileName);
         return data;
     }
 
-    public override void DeleteProfile(Profile profile)
+    public override void DeleteProfile(ProfileV2 profile)
     {
         string fileName = $"{profile.Battletag}.json";
 
@@ -53,7 +54,24 @@ public class StoredUserProfileDataService : UserProfileDataService
     {
         foreach (string file in Directory.GetFiles(ProfileDirectory))
         {
-            Profiles.Add(_fileService.Read<Profile>(file));
+            try
+            {
+                var profile = _fileService.Read<ProfileV2>(file);
+                if (profile.CustomName == null) // TODO: Better detection for profile file schema
+                {
+                    var profileV1 = (ProfileV2)_fileService.Read<ProfileV1>(file);
+                    SaveProfile(profileV1);
+                    Profiles.Add(profileV1);
+                }
+                else
+                {
+                    Profiles.Add(profile);
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
         }
     }
 

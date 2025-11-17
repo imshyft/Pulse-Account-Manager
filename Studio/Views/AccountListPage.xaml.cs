@@ -31,6 +31,7 @@ using TextBox = Wpf.Ui.Controls.TextBox;
 
 namespace Studio.Views
 {
+    // TODO: sorting broken 
     /// <summary>
     /// Interaction logic for AccountListPage.xaml
     /// </summary>
@@ -81,12 +82,12 @@ namespace Studio.Views
                 var row = VisualTreeHelper.GetParent(source) as DataGridRow;
                 if (row != null && !_isFlyoutOpen)
                 {
-                    NavigationService?.Navigate(new AccountDetailsPage((row.DataContext as Profile)));
+                    NavigationService?.Navigate(new AccountDetailsPage((row.DataContext as ProfileV2)));
                 }
             }
         }
 
-        private async Task TryLaunchAccount(Profile profile, bool tryLaunchGame = false)
+        private async Task TryLaunchAccount(ProfileV2 profile, bool tryLaunchGame = false)
         {
             if (profile == null)
                 return;
@@ -147,7 +148,7 @@ namespace Studio.Views
 
         private async void OnPlayButtonClick(object sender, RoutedEventArgs e)
         {
-            Profile profile = ((FrameworkElement)sender).DataContext as Profile;
+            ProfileV2 profile = ((FrameworkElement)sender).DataContext as ProfileV2;
 
             await TryLaunchAccount(profile, true);
             e.Handled = true;
@@ -158,7 +159,7 @@ namespace Studio.Views
 
         private void OnAccountOptionsClicked(object sender, RoutedEventArgs e)
         {
-            if (((FrameworkElement)sender).DataContext is not Profile profile)
+            if (((FrameworkElement)sender).DataContext is not ProfileV2 profile)
                 return;
 
             var row = VisualTreeHelper.GetParent((DependencyObject)sender) as Grid;
@@ -176,10 +177,10 @@ namespace Studio.Views
         // TODO : make a better sync system that preserves history
         private async void OnOptionsSyncButtonClick(object sender, RoutedEventArgs e)
         {
-            if (((FrameworkElement)sender).DataContext is not Profile profile)
+            if (((FrameworkElement)sender).DataContext is not ProfileV2 profile)
                 return;
 
-            var result = await _profileDataFetchingService.FetchProfileAsync(profile.Battletag);
+            var result = await _profileDataFetchingService.FetchProfileAsync(null); // TODO: FIX
             SnackbarPresenter.AddToQue(new Snackbar(SnackbarPresenter)
             {
                 Appearance = ControlAppearance.Info,
@@ -215,7 +216,7 @@ namespace Studio.Views
 
         private void OnOptionsRemoveButtonClick(object sender, RoutedEventArgs e)
         {
-            if (((FrameworkElement)sender).DataContext is not Profile profile)
+            if (((FrameworkElement)sender).DataContext is not ProfileV2 profile)
                 return;
 
             UserProfiles.DeleteProfile(profile);
@@ -296,7 +297,7 @@ namespace Studio.Views
             while (source != null && !(source is DataGridRow))
                 source = VisualTreeHelper.GetParent(source);
 
-            if (source is DataGridRow row && row.DataContext is Profile profile)
+            if (source is DataGridRow row && row.DataContext is ProfileV2 profile)
             {
                 await TryLaunchAccount(profile);
 
@@ -305,7 +306,7 @@ namespace Studio.Views
 
         private async void OnSwitchBnetButtonClick(object sender, RoutedEventArgs e)
         {
-            Profile profile = ((FrameworkElement)sender).DataContext as Profile;
+            ProfileV2 profile = ((FrameworkElement)sender).DataContext as ProfileV2;
 
             await TryLaunchAccount(profile, false);
             e.Handled = true;

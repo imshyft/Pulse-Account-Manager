@@ -72,7 +72,7 @@
                                 Margin="4"
                                 CornerRadius="4">
                                 <ui:Image.Source>
-                                    <Binding Path="Avatar" >
+                                    <Binding Path="AvatarURL" >
                                         <Binding.TargetNullValue>
                                             <StaticResource ResourceKey="PlaceholderAvatar"/>
                                         </Binding.TargetNullValue>
@@ -93,7 +93,7 @@
                     CanUserSort="True"
                     CanUserResize="False"
                     CanUserReorder="False"
-                    SortMemberPath="CustomId">
+                    SortMemberPath="CustomName">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Viewbox
@@ -106,7 +106,7 @@
                                     </Grid.RowDefinitions>
                                     <ui:TextBlock
                                         Grid.Row="0"
-                                        Text="{Binding CustomId}"
+                                        Text="{Binding CustomName, Mode=OneWay}"
                                         FontFamily="{StaticResource BigNoodleTooOblique}"
                                         FontWeight="Light"
                                         FontSize="17"
@@ -119,7 +119,7 @@
                                         FontSize="8"
                                         Margin="0,-2,0,0"
                                         
-                                        Text="{Binding BattletagString}"/>
+                                        Text="{Binding Battletag}"/>
 
                                 </Grid>
                             </Viewbox>
@@ -139,7 +139,7 @@
                     CanUserReorder="False"
                     CanUserSort="True"
                     
-                    SortMemberPath="RankedCareer.Tank.CurrentRank.SkillRating">
+                    SortMemberPath="LatestSnapshot.Tank.Rank.SkillRating">
                     <DataGridTemplateColumn.HeaderTemplate>
                         <DataTemplate>
                             <ui:Image 
@@ -154,7 +154,7 @@
                             <Grid
                                 Margin="2,10,2,10">
                                 <controls:RankDisplay
-                                    RankValue="{Binding RankedCareer.Tank.CurrentRank, Mode=OneWay}"
+                                    RankValue="{Binding LatestSnapshot.Tank.Rank, Mode=OneWay}"
                                     Role="Tank">
 
                                 </controls:RankDisplay>
@@ -172,7 +172,7 @@
                     CanUserResize="False"
                     CanUserReorder="False"
                     CanUserSort="True"
-                    SortMemberPath="RankedCareer.Damage.CurrentRank.SkillRating">
+                    SortMemberPath="LatestSnapshot.Damage.Rank.SkillRating">
                     <DataGridTemplateColumn.HeaderTemplate>
                         <DataTemplate>
                             <ui:Image 
@@ -188,7 +188,7 @@
                                 Margin="2,10,2,10">
                                 <controls:RankDisplay
                                     
-                                    RankValue="{Binding RankedCareer.Damage.CurrentRank, Mode=OneWay}"
+                                    RankValue="{Binding LatestSnapshot.Damage.Rank, Mode=OneWay}"
                                     Role="Damage"/>
                             </Grid>
                         </DataTemplate>
@@ -203,7 +203,7 @@
                     CanUserResize="False"
                     CanUserReorder="False"
                     CanUserSort="True"
-                    SortMemberPath="RankedCareer.Support.CurrentRank.SkillRating">
+                    SortMemberPath="LatestSnapshot.Support.Rank.SkillRating">
                     <DataGridTemplateColumn.HeaderTemplate>
                         <DataTemplate>
                             <ui:Image 
@@ -218,7 +218,7 @@
                             <Grid
                                 Margin="2,10,2,10">
                                 <controls:RankDisplay
-                                    RankValue="{Binding RankedCareer.Support.CurrentRank, Mode=OneWay}"
+                                    RankValue="{Binding LatestSnapshot.Support.Rank, Mode=OneWay}"
                                     Role="Support"/>
                             </Grid>
                         </DataTemplate>

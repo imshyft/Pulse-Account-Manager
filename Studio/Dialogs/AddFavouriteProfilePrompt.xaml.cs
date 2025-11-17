@@ -35,7 +35,7 @@ namespace Studio.Dialogs
         private readonly BattleNetService _battleNetService;
 
 
-        public Profile Profile { get; set; }
+        public ProfileV2 Profile { get; set; }
         public AddFavouriteProfilePrompt(ContentPresenter contentPresenter)
         {
             InitializeComponent();
@@ -71,7 +71,7 @@ namespace Studio.Dialogs
         private string _infoBarMessage;
         private bool _isInfoBarOpen;
 
-        public ObservableCollection<BattleTag> MemoryBattleTags { get; private set; } = new();
+        public ObservableCollection<BattleTagV2> MemoryBattleTags { get; private set; } = new();
 
         public string InfoText
         {
@@ -204,7 +204,7 @@ namespace Studio.Dialogs
 
 
 
-            BattleTag[] battleTags = _battleNetService.ReadFriendsListFromMemory();
+            BattleTagV2[] battleTags = _battleNetService.ReadFriendsListFromMemory();
             if (battleTags.Length == 0)
             {
                 ShowError("Could not find any friends", "if Battle.net wasn't opened, we just launched it so wait for it to load and try again");
@@ -261,7 +261,7 @@ namespace Studio.Dialogs
         private async Task FetchProfile(string tag)
         {
 
-            BattleTag battleTag = new BattleTag(tag);
+            BattleTagV2 battleTag = new BattleTagV2(tag);
             var result = await _profileFetchingService.FetchProfileAsync(battleTag);
 
             switch (result.Outcome)

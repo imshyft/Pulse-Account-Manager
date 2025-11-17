@@ -16,7 +16,6 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Shell;
 using Studio.Helpers;
-using Studio.Models;
 using Wpf.Ui.Controls;
 using Studio.Services.Data;
 using System.ComponentModel;
@@ -24,6 +23,7 @@ using System.Runtime.CompilerServices;
 using Wpf.Ui.Input;
 using Studio.Contracts.Services;
 using System.Windows.Media.Animation;
+using Studio.Models;
 
 namespace Studio.Controls
 {
@@ -36,7 +36,7 @@ namespace Studio.Controls
         private readonly BattleNetService _battleNetService;
 
 
-        public Profile Profile { get; set; }
+        public ProfileV2 Profile { get; set; }
         public AddAccountPrompt(ContentPresenter contentPresenter)
         {
             InitializeComponent();
@@ -199,7 +199,7 @@ namespace Studio.Controls
 
 
 
-            BattleTag battleTag = _battleNetService.ReadBattleTagFromMemory();
+            BattleTagV2 battleTag = _battleNetService.ReadBattleTagFromMemory();
 
             if (battleTag != null)
             {
@@ -240,7 +240,7 @@ namespace Studio.Controls
         {
             _battleNetService.OpenBattleNetWithEmptyAccount();
             InfoText = "Great! Now while we fetch the account details, log in to the same account through Battle.net, and once its fully loaded press Add Account";
-            BattleTag battleTag = new BattleTag(BattleTagInput);
+            BattleTagV2 battleTag = new BattleTagV2(BattleTagInput);
             var result = await _profileFetchingService.FetchProfileAsync(battleTag);
 
             switch (result.Outcome)

@@ -30,7 +30,7 @@ namespace Studio.Controls
         }
 
         public static readonly DependencyProperty RankValueProperty =
-            DependencyProperty.Register(nameof(RankValue), typeof(Rank), typeof(RankDisplay),
+            DependencyProperty.Register(nameof(RankValue), typeof(RankV2), typeof(RankDisplay),
                 new PropertyMetadata(null, OnRankValueChanged));
 
         public static readonly DependencyProperty ShowWideGroupDecoratorProperty =
@@ -45,9 +45,9 @@ namespace Studio.Controls
                 DependencyProperty.Register(nameof(Role), typeof(Roles?), typeof(RankDisplay),
                     new PropertyMetadata(null, OnRoleChanged));
 
-        public Rank RankValue
+        public RankV2 RankValue
         {
-            get => (Rank)GetValue(RankValueProperty);
+            get => (RankV2)GetValue(RankValueProperty);
             set => SetValue(RankValueProperty, value);
         }
 
@@ -72,7 +72,7 @@ namespace Studio.Controls
         {
             if (d is RankDisplay control)
             {
-                Rank rank = control.RankValue;
+                RankV2 rank = control.RankValue;
 
                 if (rank == null)
                 {

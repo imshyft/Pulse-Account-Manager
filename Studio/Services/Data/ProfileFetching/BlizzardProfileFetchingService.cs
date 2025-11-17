@@ -9,7 +9,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.System;
 using HarfBuzzSharp;
-using Studio.Models;
 using LiveChartsCore.Kernel;
 using Newtonsoft.Json;
 using Studio.Contracts.Services;
@@ -17,6 +16,7 @@ using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using AngleSharp;
 using System.Text.RegularExpressions;
+using Studio.Models;
 
 
 namespace Studio.Services.Data
@@ -28,14 +28,14 @@ namespace Studio.Services.Data
 
         }
 
-        private static string BattletagToWebFormat(BattleTag battletag) =>
+        private static string BattletagToWebFormat(BattleTagV2 battletag) =>
             $"{battletag.Username}-{battletag.Tag}";
 
-        public async Task<ProfileFetchResult> FetchProfileAsync(BattleTag battleTag)
+        public async Task<ProfileFetchResult> FetchProfileAsync(BattleTagV2 battleTag)
         {
-            Profile profile = new Profile();
+            ProfileV2 profile = new();
             profile.Battletag = battleTag;
-            profile.CustomId = battleTag.Username;
+            profile.CustomName = battleTag.Username;
 
 
             string errorMessage = "";
@@ -96,14 +96,16 @@ namespace Studio.Services.Data
 
             int unixNow = (int)DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
-            profile.Avatar = document.QuerySelector<IHtmlImageElement>(".Profile-player--portrait")?.Source ??
+            profile.AvatarURL = document.QuerySelector<IHtmlImageElement>(".Profile-player--portrait")?.Source ??
                 "https://d15f34w2p8l1cc.cloudfront.net/overwatch/daeddd96e58a2150afa6ffc3c5503ae7f96afc2e22899210d444f45dee508c6c.png";
-            profile.TimesLaunched = 0;
-            profile.CustomId = battleTag.Username;
-            profile.LastUpdate = unixNow;
-            profile.RankedCareer = new RankedCareer();
+            profile.CustomName = battleTag.Username;
+            profile.Snapshots = [];
             profile.Battletag = battleTag;
 
+            var snapshot = new ProfileSnapshotV2()
+            {
+                Timestamp = unixNow,
+            };
             // getting roles for each rank
             foreach (IElement roleElement in document.QuerySelectorAll(".Profile-playerSummary--roleWrapper"))
             {
@@ -116,20 +118,22 @@ namespace Studio.Services.Data
                     continue;
 
 
-                Role role;
+                RoleV2 role;
                 switch (roleString)
                 {
                     case "offense":
-                        profile.RankedCareer.Damage = new Damage();
-                        role = profile.RankedCareer.Damage;
+                        //snapshot.Damage = new Damage();
+                        role = snapshot.Damage;
                         break;
                     case "tank":
-                        profile.RankedCareer.Tank = new Tank();
-                        role = profile.RankedCareer.Tank;
+                        role = snapshot.Tank;
+
+                        //role = profile.RankedCareer.Tank;
                         break;
                     case "support":
-                        profile.RankedCareer.Support = new Support();
-                        role = profile.RankedCareer.Support;
+                        role = snapshot.Support;
+
+                        //role = profile.RankedCareer.Support;
                         break;
                     default:
                         continue;
@@ -161,16 +165,10 @@ namespace Studio.Services.Data
 
                 divisionString = divisionString.Remove(divisionString.Length - 4);
                 // remove 'Tier' from ending of division string
-                Rank currentRank = Rank.RankFromDivision(divisionString, tier);
-                RankMoment rankMoment = new()
-                {
-                    Rank = currentRank,
-                    Date = unixNow
-                };
+                RankV2 currentRank = RankV2.RankFromDivision(divisionString, tier);
 
-                role.PeakRank = rankMoment;
-                role.CurrentRank = currentRank;
-                role.RankMoments = new List<RankMoment> { rankMoment };
+                role.Rank = currentRank;
+
 
 
             }

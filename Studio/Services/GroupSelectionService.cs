@@ -20,7 +20,7 @@ namespace Studio.Services
             set { _isEnabled = value; OnPropertyChanged(); }
         }
 
-        public ObservableCollection<Role> GroupRoles { get; set; } = new();
+        public ObservableCollection<RoleV2> GroupRoles { get; set; } = new();
 
         public Range Range => new Range(MinimumSr, MaximumSr);
 
@@ -59,15 +59,15 @@ namespace Studio.Services
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-        public bool Contains(Role role)
+        public bool Contains(RoleV2 role)
         {
             return GroupRoles.Contains(role);
         }
-        public void AddMember(Role member)
+        public void AddMember(RoleV2 member)
         {
             GroupRoles.Add(member);
             member.IsSelectedForComparison = true;
-            int sr = member.CurrentRank.SkillRating;
+            int sr = member.Rank.SkillRating;
 
             if (sr < lowestMemberSr || lowestMemberSr == -1)
                 lowestMemberSr = sr;
@@ -80,7 +80,7 @@ namespace Studio.Services
             OnPropertyChanged(nameof(Range));
         }
 
-        public void RemoveMember(Role member)
+        public void RemoveMember(RoleV2 member)
         {
             if (GroupRoles.Count == 1)
             {
@@ -91,9 +91,9 @@ namespace Studio.Services
             GroupRoles.Remove(member);
             int minSr = 5000;
             int maxSr = 0;
-            foreach (Role role in GroupRoles)
+            foreach (RoleV2 role in GroupRoles)
             {
-                int sr = role.CurrentRank.SkillRating;
+                int sr = role.Rank.SkillRating;
                 if (sr > maxSr) maxSr = sr;
                 if (sr <  minSr) minSr = sr;
                 if (sr >= (int)Division.Champion) isChampionPresent = true;
@@ -108,7 +108,7 @@ namespace Studio.Services
             int memberCount = GroupRoles.Count;
             for (int i = 0; i < memberCount; i++)
             {
-                Role role = GroupRoles[0];
+                RoleV2 role = GroupRoles[0];
                 role.IsSelectedForComparison = false;
                 GroupRoles.RemoveAt(0);
             }
