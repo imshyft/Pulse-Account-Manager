@@ -165,7 +165,13 @@ namespace Studio.Services.Data
 
                 divisionString = divisionString.Remove(divisionString.Length - 4);
                 // remove 'Tier' from ending of division string
-                RankV2 currentRank = RankV2.RankFromDivision(divisionString, tier);
+
+                if (!Enum.TryParse(divisionString, true, out Division division))
+                    throw new ArgumentException("Division was not an accepted string");
+
+                if (tier < 1 || tier > 5)
+                    throw new ArgumentException("Tier must be between 1 and 5");
+                RankV2 currentRank = new RankV2(tier, division);
 
                 role.Rank = currentRank;
 

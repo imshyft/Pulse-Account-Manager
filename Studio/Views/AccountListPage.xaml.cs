@@ -24,6 +24,7 @@ using Studio.Models;
 using Studio.Services;
 using Studio.Services.Data;
 using Studio.Services.Storage;
+using Wpf.Ui;
 using Wpf.Ui.Controls;
 using Button = System.Windows.Controls.Button;
 using Flyout = Wpf.Ui.Controls.Flyout;
@@ -43,6 +44,7 @@ namespace Studio.Views
 
         private BattleNetService _battleNetService;
         private IProfileFetchingService _profileDataFetchingService;
+        private SnackbarService _snackbarService;
 
         private bool _mouseOverButton = false;
         private bool _isFlyoutOpen;
@@ -58,6 +60,7 @@ namespace Studio.Views
             _battleNetService = ((App)Application.Current).GetService<BattleNetService>();
             _profileDataFetchingService = ((App)Application.Current).GetService<IProfileFetchingService>();
             GroupSelectionService = ((App)Application.Current).GetService<GroupSelectionService>();
+            _snackbarService = ((App)Application.Current).GetService<SnackbarService>();
 
             AccountDataGrid.SelectedItem = null;
 
@@ -93,7 +96,7 @@ namespace Studio.Views
                 return;
             if (profile.Email == null)
             {
-                _ = SnackbarPresenter.ImmediatelyDisplay(new Snackbar(SnackbarPresenter)
+                _ = _snackbarService.GetSnackbarPresenter().ImmediatelyDisplay(new Snackbar(_snackbarService.GetSnackbarPresenter())
                 {
                     AllowDrop = false,
                     Appearance = ControlAppearance.Danger,
@@ -105,7 +108,7 @@ namespace Studio.Views
                 return;
             }
 
-            _ = SnackbarPresenter.ImmediatelyDisplay(new Snackbar(SnackbarPresenter)
+            _ = _snackbarService.GetSnackbarPresenter().ImmediatelyDisplay(new Snackbar(_snackbarService.GetSnackbarPresenter())
             {
                 AllowDrop = false,
                 Appearance = ControlAppearance.Success,
@@ -121,7 +124,7 @@ namespace Studio.Views
             bool result = await _battleNetService.WaitForMainWindow();
             if (result)
             {
-                _ = SnackbarPresenter.ImmediatelyDisplay(new Snackbar(SnackbarPresenter)
+                _ = _snackbarService.GetSnackbarPresenter().ImmediatelyDisplay(new Snackbar(_snackbarService.GetSnackbarPresenter())
                 {
                     AllowDrop = false,
                     Appearance = ControlAppearance.Success,
@@ -134,7 +137,7 @@ namespace Studio.Views
             }
             else
             {
-                _ = SnackbarPresenter.ImmediatelyDisplay(new Snackbar(SnackbarPresenter)
+                _ = _snackbarService.GetSnackbarPresenter().ImmediatelyDisplay(new Snackbar(_snackbarService.GetSnackbarPresenter())
                 {
                     AllowDrop = false,
                     Appearance = ControlAppearance.Danger,
@@ -181,7 +184,7 @@ namespace Studio.Views
                 return;
 
             var result = await _profileDataFetchingService.FetchProfileAsync(null); // TODO: FIX
-            SnackbarPresenter.AddToQue(new Snackbar(SnackbarPresenter)
+            _snackbarService.GetSnackbarPresenter().AddToQue(new Snackbar(_snackbarService.GetSnackbarPresenter())
             {
                 Appearance = ControlAppearance.Info,
                 Title = "Syncing Account",
@@ -191,7 +194,7 @@ namespace Studio.Views
 
             if (result.Outcome == ProfileFetchOutcome.Success)
             {
-                _ = SnackbarPresenter.ImmediatelyDisplay(new Snackbar(SnackbarPresenter)
+                _ = _snackbarService.GetSnackbarPresenter().ImmediatelyDisplay(new Snackbar(_snackbarService.GetSnackbarPresenter())
                 {
                     Appearance = ControlAppearance.Success,
                     Title = "Synced Account",
@@ -204,7 +207,7 @@ namespace Studio.Views
             }
             else
             {
-                _ = SnackbarPresenter.ImmediatelyDisplay(new Snackbar(SnackbarPresenter)
+                _ = _snackbarService.GetSnackbarPresenter().ImmediatelyDisplay(new Snackbar(_snackbarService.GetSnackbarPresenter())
                 {
                     Appearance = ControlAppearance.Danger,
                     Title = "Could not fetch account",
@@ -220,7 +223,7 @@ namespace Studio.Views
                 return;
 
             UserProfiles.DeleteProfile(profile);
-            SnackbarPresenter.ImmediatelyDisplay(new Snackbar(SnackbarPresenter)
+            _snackbarService.GetSnackbarPresenter().ImmediatelyDisplay(new Snackbar(_snackbarService.GetSnackbarPresenter())
             {
                 Appearance = ControlAppearance.Success,
                 Title = "Account deleted",

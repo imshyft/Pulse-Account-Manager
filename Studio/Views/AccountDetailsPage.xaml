@@ -22,8 +22,8 @@
             <RowDefinition Height="6*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="2*" MinWidth="400"/>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="2*" MinWidth="300"/>
+            <ColumnDefinition Width="*" MinWidth="200"/>
         </Grid.ColumnDefinitions>
         <!--Player Title-->
         <Viewbox HorizontalAlignment="Left">
@@ -71,14 +71,34 @@
             Grid.Row="0"
             Grid.Column="1"
             VerticalAlignment="Top"
+            Style="{DynamicResource AccentButton}"
             HorizontalAlignment="Right"
             Click="OnBackButtonClick">
             <ui:SymbolIcon Symbol="ArrowPrevious12" FontSize="20"/>
         </ui:Button>
-        
+
+        <Grid Grid.Row="1" Grid.Column="1">
+            <ui:Button 
+                x:Name="PlayBtn"
+                Click="PlayBtn_Click"
+                
+                ToolTip="Switches Battle.Net to the account and Launches the Game"
+                ToolTipService.InitialShowDelay="500"
+                Margin="10"
+                VerticalAlignment="Stretch"
+                Style="{DynamicResource AccentButton}"
+                >
+                <ui:Button.Effect>
+                    <DropShadowEffect ShadowDepth="0" Color="{StaticResource AccentColor}"/>
+                </ui:Button.Effect>
+                <ui:SymbolIcon Symbol="Play16" FontSize="30"/>
+            </ui:Button>
+        </Grid>
+
         <controls:MultiRankDisplay
             Grid.Row="1"
             Grid.Column="0"
+            Margin="10, 0, 10, 0"
             Career="{Binding Profile.LatestSnapshot}"
             Padding="{StaticResource XSmallTopMargin}"
             x:Name="RankDisplay"/>
@@ -90,20 +110,11 @@
             Series="{Binding RankSeries}"
             XAxes="{Binding RankXAxes}"
             YAxes="{Binding RankYAxes}"
+            Background="Transparent"
+            FindingStrategy="Automatic"
+            Panel.ZIndex="1"
+            >
 
-            
-            
-            FindingStrategy="Automatic">
-            <lvc:CartesianChart.Sections>
-                <lvc:SectionsCollection>
-                    <lvc:XamlRectangularSection
-                        Xi="{Binding CurrentRegionLow}"
-                        Xj="{Binding CurrentRegion}"
-                        Fill="{lvc:SolidColorPaint Color='#FFFFFF'}"/>
-                </lvc:SectionsCollection>
-            </lvc:CartesianChart.Sections>
-               
-                    
         </lvc:CartesianChart>
 
         <lvc:PolarChart 
@@ -113,10 +124,13 @@
             Series="{Binding StatGraphSeries}"
             RadiusAxes="{Binding RadiusAxes}"
             AngleAxes="{Binding AngleAxes}"
-            Margin="-30"
+            Background="Transparent"
             MouseWheel="polar_MouseWheel"
-                        >
-            
+            MinHeight="200"
+            MinWidth="200"
+            Margin="-30"
+            Panel.ZIndex="-1">
+
 
         </lvc:PolarChart>
     </Grid>

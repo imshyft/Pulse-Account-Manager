@@ -408,7 +408,6 @@
             </ui:DataGrid.Columns>
         </ui:DataGrid>
 
-        <ui:SnackbarPresenter x:Name="SnackbarPresenter"/>
     </Grid>
 
 

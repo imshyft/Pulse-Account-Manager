@@ -55,7 +55,7 @@ namespace Studio.Dialogs
         }
 
         private string _infoText =
-            "Do you want to manually enter the BattleTag of the profile to favourite or choose from your friends of your currently logged in Battle.net account (experimental: reads from memory of Battle.net)";
+            "Do you want to manually enter the BattleTag of the profile to favourite or choose from your friends of your currently logged in Battle.net account (experimental: reads from memory of Battle.net, may take up to 30s on first scan)";
         private bool _isSelectingMode = true;
         private bool _isManualEntry;
         private bool _isMemoryRead;

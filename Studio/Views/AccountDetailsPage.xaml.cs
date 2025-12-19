@@ -1,18 +1,24 @@
 ﻿using LiveChartsCore;
 using LiveChartsCore.Defaults;
 using LiveChartsCore.Drawing;
+using LiveChartsCore.Kernel;
 using LiveChartsCore.Kernel.Sketches;
 using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Painting;
 using LiveChartsCore.SkiaSharpView.Painting.Effects;
+using Newtonsoft.Json.Linq;
 using SkiaSharp;
+using Studio.Contracts.Services;
 using Studio.Helpers;
 using Studio.Models;
+using Studio.Services;
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using Wpf.Ui;
+using Wpf.Ui.Controls;
 
 
 namespace Studio.Views
@@ -22,8 +28,10 @@ namespace Studio.Views
     /// </summary>
     public partial class AccountDetailsPage : Page
     {
+        private readonly SnackbarService _snackbarService;
+        private readonly BattleNetService _battleNetService;
+
         public ProfileV2 Profile { get; set; }
-        private float _snapshotIndex;
 
 
         public ISeries[] RankSeries { get; set; }
@@ -33,7 +41,7 @@ namespace Studio.Views
 
         // TODO: Web graph showing stats
         public static ObservableCollection<double> Vals { get; set; } = new ObservableCollection<double> { 0, 0, 0, 0 };
-        public PolarLineSeries<double>[] StatGraphSeries { get; set; }
+        public PolarLineSeries<float>[] StatGraphSeries { get; set; }
 
 
         public PolarAxis[] RadiusAxes { get; set; }
@@ -42,7 +50,7 @@ namespace Studio.Views
         public double CurrentRegionLow => double.NaN;
         public double CurrentRegion { get; set; } = 1748864068 + TimeSpan.FromDays(10).TotalSeconds;
 
-        private readonly Dictionary<Roles, SKColor> _roleColors = new()
+        static readonly Dictionary<Roles, SKColor> _roleColors = new()
         {
             {Roles.Tank, new SKColor(52, 152, 219) },
             {Roles.Damage, new SKColor(192, 57, 43) },
@@ -52,60 +60,45 @@ namespace Studio.Views
         public AccountDetailsPage(ProfileV2 profile)
         {
             InitializeComponent();
+            _battleNetService = ((App)Application.Current).GetService<BattleNetService>();
+            _snackbarService = ((App)Application.Current).GetService<SnackbarService>();
+
             //LiveCharts.Configure(c => c.AddLiveChartsRenderSettings());
             DataContext = this;
             Loaded += OnLoaded;
 
             Profile = profile;
-            _snapshotIndex = Profile.Snapshots.Count - 1;
 
-            RankChart.Background = Brushes.Transparent;
-            StatPolarGraph.Background = Brushes.Transparent;
-
-            if (Profile.Snapshots.Count == 0)
-                return;
-
+            SizeChanged += OnPageSizeChanged;
             InitRankGraph();
             InitStatGraph();
         }
 
+        private void OnPageSizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            //RankYAxes[0].TextSize
+            StatPolarGraph.Height = StatPolarGraph.ActualWidth;
+            //StatPolarGraph.Visibility = this.ActualWidth < 600 ? Visibility.Hidden : Visibility.Visible;
+                
+        }
+
         private void InitRankGraph()
         {
-            var points = GetDateTimePoints(Profile.Snapshots);
-
-            var series = new List<ISeries>();
-
-            if (Profile.LatestSnapshot.Tank != null)
-                series.Add(new RankLineSeries(points[Roles.Tank], _roleColors[Roles.Tank]));
-
-            if (Profile.LatestSnapshot.Damage != null)
-                series.Add(new RankLineSeries(points[Roles.Damage], _roleColors[Roles.Damage]));
-
-            if (Profile.LatestSnapshot.Support != null)
-                series.Add(new RankLineSeries(points[Roles.Support], _roleColors[Roles.Support]));
-
-            //Chart.TooltipBackgroundPaint = new SolidColorPaint(SKColor.Parse("#DD2f2c3d"));
-            //Chart.TooltipTextPaint = new SolidColorPaint(SKColors.White);
-            RankSeries = series.ToArray();
-            var oldestSnapshot = Profile.Snapshots.OrderByDescending(s => s.Timestamp).Last();
-            var timespan = TimeSpan.FromSeconds(Profile.LatestSnapshot.Timestamp - oldestSnapshot.Timestamp);
-
-            CurrentRegion = Profile.LatestSnapshot.Timestamp;
-
-            RankXAxes = [new DateTimeAxis(timespan / 7.0, date => date.ToString("M/d"))
-            {
-                //MinStep = timespan.TotalSeconds / 7.0,
-                LabelsPaint = new SolidColorPaint(SKColors.WhiteSmoke)
-            }];
-
             var uri = new Uri("pack://application:,,,/Resources/Fonts/Roboto-Regular-Ranks.ttf");
+            var font = SKTypeface.FromStream(Application.GetResourceStream(uri).Stream);
+            RankChart.TooltipTextPaint = new SolidColorPaint(SKColors.White)
+            {
+                SKTypeface = font,
+            };
+            RankChart.TooltipBackgroundPaint = new SolidColorPaint(new SKColor(30, 30, 50, 200));
             RankYAxes = new Axis[]
             {
                 new() {
                     MinStep = 500,
+                    LabelsDensity = 0.09f,
                     LabelsPaint = new SolidColorPaint(SKColors.White)
                     {
-                        SKTypeface = SKTypeface.FromStream(Application.GetResourceStream(uri).Stream),
+                        SKTypeface = font,
                     },
                     // Unicode 1 - 8 are rank symbols, map rank values to them
                     // TODO: Make graph tooltips not replace values with rank symbols
@@ -126,69 +119,52 @@ namespace Studio.Views
                         StrokeThickness = 2,
                         PathEffect = new DashEffect([3, 3])
                     },
-
+                    
+                    
                 }
             };
-        }
-        
-        private void DisplayStats(ProfileSnapshotV2 snapshot)
-        {
 
-            foreach (Roles role in Enum.GetValues(typeof(Roles)))
+            RankXAxes = [new DateTimeAxis(TimeSpan.FromDays(1), date => date.ToString("M/d"))
             {
-                if (snapshot[role].Stats == null)
-                {
-                    StatGraphSeries[(int)role].Values = [0, 0, 0, 0];
-                    continue;
-                }
-                var stats = StatisticScaler.ScaleStatistics(snapshot[role].Stats);
-                StatGraphSeries[(int)role].Values = [
-                        stats.GetValueOrDefault(StatisticType.Damage, 0),
-                        stats.GetValueOrDefault(StatisticType.Healing, 0),
-                        stats.GetValueOrDefault(StatisticType.Deaths, 0),
-                        stats.GetValueOrDefault(StatisticType.Elims, 0),
-                    ];
+                //MinStep = timespan.TotalSeconds / 7.0,
+                LabelsPaint = new SolidColorPaint(SKColors.WhiteSmoke),
+            }];
 
-            }
+            if (Profile.Snapshots.Count == 0)
+                return;
+
+            var points = GetDateTimePoints(Profile.Snapshots);
+
+            var series = new List<ISeries>();
+
+            if (Profile.LatestSnapshot.Tank != null)
+                series.Add(new RankLineSeries(points[Roles.Tank], _roleColors[Roles.Tank]));
+
+            if (Profile.LatestSnapshot.Damage != null)
+                series.Add(new RankLineSeries(points[Roles.Damage], _roleColors[Roles.Damage]));
+
+            if (Profile.LatestSnapshot.Support != null)
+                series.Add(new RankLineSeries(points[Roles.Support], _roleColors[Roles.Support]));
+
+
+            //Chart.TooltipBackgroundPaint = new SolidColorPaint(SKColor.Parse("#DD2f2c3d"));
+            //Chart.TooltipTextPaint = new SolidColorPaint(SKColors.White);
+            RankSeries = series.ToArray();
+            var oldestSnapshot = Profile.Snapshots.OrderByDescending(s => s.Timestamp).Last();
+            var timespan = TimeSpan.FromSeconds(Profile.LatestSnapshot.Timestamp - oldestSnapshot.Timestamp);
+
+            CurrentRegion = Profile.LatestSnapshot.Timestamp;
+
+            RankXAxes[0].UnitWidth = (timespan / 7.0).Ticks;
+            RankXAxes[0].MinLimit = null;
+
         }
+
 
         private void InitStatGraph()
         {
-            StatGraphSeries = [
-                new PolarLineSeries<double>
-                {
-                    Values = [],
-                    Fill = new SolidColorPaint(new SKColor(52, 152, 219, 50)),
-                    GeometryStroke = null,
-                    GeometryFill = null,
-                    LineSmoothness = 0.2,
-                    Stroke = null,
-                    IsClosed = true,
-                },
-                new PolarLineSeries<double>
-                {
-                    Values = [],
-                    Fill = new SolidColorPaint(new SKColor(192, 57, 43, 50)),
-                    GeometryStroke = null,
-                    GeometryFill = null,
-                    LineSmoothness = 0.2,
-                    Stroke = null,
-                    IsClosed = true,
-                },
-                new PolarLineSeries<double>
-                {
-                    Values = [],
-                    Fill = new SolidColorPaint(new SKColor(46, 204, 113, 50)),
-                    GeometryFill = null,
-                    GeometryStroke = null,
-                    LineSmoothness = 0.2,
-                    Stroke = null,
-                    IsClosed = true,
-                },
-            ];
-
-            var snapshot = Profile.LatestSnapshot;
-            DisplayStats(snapshot);
+            StatPolarGraph.TooltipTextPaint = new SolidColorPaint(SKColors.White);
+            StatPolarGraph.TooltipBackgroundPaint = new SolidColorPaint(new SKColor(30, 30, 50));
 
 
             AngleAxes = [
@@ -198,7 +174,7 @@ namespace Studio.Views
                     {
                         SKTypeface = SKTypeface.FromStream(Application.GetResourceStream(new Uri("pack://application:,,,/Resources/Fonts/Hakuna-Sans.otf")).Stream)
                     },
-                    TextSize = 20,
+                    TextSize = 15,
                     LabelsBackground = new LvcColor(0, 0, 0, 0),
                     Labels = ["Damage", "Healing", "Deaths", "Elims"],
                     SeparatorsPaint = new SolidColorPaint(SKColors.LightSlateGray)
@@ -217,12 +193,20 @@ namespace Studio.Views
                     LabelsPaint = new SolidColorPaint(SKColors.Transparent),
                     LabelsBackground = new LvcColor(0, 0, 0, 0),
                     SeparatorsPaint = new SolidColorPaint(SKColors.LightSlateGray) { StrokeThickness = 2 },
-                    CustomSeparators = [1, 3, 5],
+                    CustomSeparators = [1],
                     MaxLimit = 1,
                     MinLimit = 0
 
                 }
             ];
+
+
+            StatGraphSeries = [
+                new StatChartSeries(Profile.LatestSnapshot?.Tank),
+                new StatChartSeries(Profile.LatestSnapshot?.Damage),
+                new StatChartSeries(Profile.LatestSnapshot?.Support)
+            ];
+
 
         }
 
@@ -263,13 +247,7 @@ namespace Studio.Views
                         Value = snapshot.Support.Rank.SkillRating
                     });
             }
-            //return role.RankMoments
-            //    .Select(m => new DateTimePoint()
-            //    {
-            //        DateTime = DateTimeOffset.FromUnixTimeSeconds(m.Date).DateTime,
-            //        Value = m.Rank.SkillRating
-            //    })
-            //    .ToList();
+
             return result;
 
         }
@@ -294,16 +272,56 @@ namespace Studio.Views
                     
                 };
                 GeometryStroke = null;
-                YToolTipLabelFormatter = point => point.Model.Value.ToString();
+                YToolTipLabelFormatter = point =>
+                {
+                    int sr = (int)point.Model.Value;
+                    var (tier, division) = RankV2.CalculateDiv(sr);
+                    string icon = Char.ConvertFromUtf32(1 + Array.IndexOf(Enum.GetValues<Division>(), division));
+                    return $"{icon} {tier}";
+                };
+                
+            }
+        }
+
+        private class StatChartSeries : PolarLineSeries<float>
+        {
+            StatisticType[] statTypes = [
+                            StatisticType.Damage,
+                            StatisticType.Healing,
+                            StatisticType.Deaths,
+                            StatisticType.Elims,
+                        ];
+            public StatChartSeries(RoleV2 role)
+            {
+                if (role?.Stats == null)
+                {
+                    Values = [10, 10, 10, 10];
+                    Fill = null;
+                }
+                else
+                {
+                    var stats = StatisticScaler.ScaleStatistics(role.Stats);
+                    //Values = stats.Where(x => statTypes.Contains(x.Key)).Select(x => x.Value).ToList();
+                    Values = role.Stats.Where(x => statTypes.Contains(x.Key)).Select(x => x.Value).ToList();
+                    Mapping = (height, rad) => new Coordinate(rad, stats[statTypes[rad]]);
+                    Fill = new SolidColorPaint(_roleColors[role.Type].WithAlpha(50));
+
+                }
+                GeometryFill = null;
+                GeometryStroke = null;
+                LineSmoothness = 0.2;
+                Stroke = null;
+                GeometrySize = 20; // hover radius
+                IsClosed = true;
+                RadiusToolTipLabelFormatter = point => point.Model.ToString();
+
             }
         }
 
 
-
-
         private void OnBackButtonClick(object sender, RoutedEventArgs e)
         {
-            NavigationService?.Navigate(new AccountListPage());
+            NavigationService?.GoBack();
         }
 
         private void polar_MouseWheel(object sender, MouseWheelEventArgs e)
@@ -312,6 +330,72 @@ namespace Studio.Views
 
             //DisplayStats(snapshot);
         }
+
+        private async void PlayBtn_Click(object sender, RoutedEventArgs e)
+        {
+            await TryLaunchAccount(Profile, true);
+        }
+
+        // TODO: fix repeated code
+        private async Task TryLaunchAccount(ProfileV2 profile, bool tryLaunchGame = false)
+        {
+            if (profile == null)
+                return;
+            if (profile.Email == null)
+            {
+                _ = _snackbarService.GetSnackbarPresenter().ImmediatelyDisplay(new Snackbar(_snackbarService.GetSnackbarPresenter())
+                {
+                    AllowDrop = false,
+                    Appearance = ControlAppearance.Danger,
+                    Title = "Couldn't Launch Account",
+                    Content = "No email is associated with this account",
+                    Icon = new SymbolIcon(SymbolRegular.ErrorCircle12),
+                    Opacity = 0.9
+                });
+                return;
+            }
+
+            _ = _snackbarService.GetSnackbarPresenter().ImmediatelyDisplay(new Snackbar(_snackbarService.GetSnackbarPresenter())
+            {
+                AllowDrop = false,
+                Appearance = ControlAppearance.Success,
+                Title = "Switching Account!",
+                Icon = new SymbolIcon(SymbolRegular.Checkmark12, 35),
+                Opacity = 0.9
+            });
+
+            _battleNetService.OpenBattleNetWithAccount(profile.Email);
+            if (!tryLaunchGame)
+                return;
+
+            bool result = await _battleNetService.WaitForMainWindow();
+            if (result)
+            {
+                _ = _snackbarService.GetSnackbarPresenter().ImmediatelyDisplay(new Snackbar(_snackbarService.GetSnackbarPresenter())
+                {
+                    AllowDrop = false,
+                    Appearance = ControlAppearance.Success,
+                    Title = "Launching Game!",
+                    Icon = new SymbolIcon(SymbolRegular.Checkmark12, 35),
+                    Opacity = 0.9
+                });
+
+                _battleNetService.OpenBattleNet(true);
+            }
+            else
+            {
+                _ = _snackbarService.GetSnackbarPresenter().ImmediatelyDisplay(new Snackbar(_snackbarService.GetSnackbarPresenter())
+                {
+                    AllowDrop = false,
+                    Appearance = ControlAppearance.Danger,
+                    Title = "Couldn't Launch Overwatch",
+                    Content = "Timed out waiting for Battle.net to load",
+                    Icon = new SymbolIcon(SymbolRegular.ErrorCircle12),
+                    Opacity = 0.9
+                });
+            }
+        }
+
     }
 
 }

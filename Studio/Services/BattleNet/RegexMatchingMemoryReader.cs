@@ -36,7 +36,7 @@ namespace Studio.Services.BattleNet
 
         static readonly byte[] AccountMatchingPattern = { 0x0F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0F,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x64, 0x5B, 0xB9, 0x7A };
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x64, 0x5B};
 
         // Offset from pattern to name
         const long BACKWARD_OFFSET_TO_BASE = 0x4C;
@@ -68,7 +68,7 @@ namespace Studio.Services.BattleNet
 
         // Finds any battletag like string in memory
         /// TODO: Add option to search from any battletag in memory
-        bool TryReadAllBattleTagsInMemory(IntPtr hProc, out List<string> battletags)
+        public bool TryReadAllBattleTagsInMemory(IntPtr hProc, out List<string> battletags)
         {
             List<string> cleanedTags = new();
             try
@@ -225,6 +225,7 @@ namespace Studio.Services.BattleNet
             IntPtr address = IntPtr.Zero;
             UIntPtr mbiSize = (UIntPtr)Marshal.SizeOf(typeof(MEMORY_BASIC_INFORMATION));
 
+            byte[] prevBuffer = [];
             while (true)
             {
                 UIntPtr ret = VirtualQueryEx(hProc, address, out MEMORY_BASIC_INFORMATION mbi, mbiSize);
@@ -248,6 +249,7 @@ namespace Studio.Services.BattleNet
                         {
                             if (OnNewBuffer(mbi, buffer) == false)
                                 return;
+                            //prevBuffer = buffer;
                         }
                     }
                 }

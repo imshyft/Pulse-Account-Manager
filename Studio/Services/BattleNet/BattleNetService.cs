@@ -98,7 +98,7 @@ namespace Studio.Services
                         await Task.Delay(500, cancel.Token);
                     }
                 }); ;
-                await Task.Delay(2000);
+                await Task.Delay(3000);
                 return true;
             }
             catch (OperationCanceledException)
@@ -177,11 +177,6 @@ namespace Studio.Services
             {
                 process = processes[0];
             }
-
-            //var friends = _memoryReaderService.FindBlizzardFriends(process.Id);
-
-
-            //var tags = BattleNetMemoryReaderService_OLD.GetFriendBattleTagStrings(process.Handle);
             var tags = _memoryReaderService.GetFriendBattleTagStrings(process.Handle);
             BattleTagV2[] battleTags = tags.Select(x => new BattleTagV2(x)).ToArray();
 

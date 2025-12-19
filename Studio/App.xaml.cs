@@ -21,6 +21,7 @@ using Studio.Views;
 using Studio.Services.Data.ProfileFetching;
 using Studio.Services.BattleNet;
 
+
 namespace Studio;
 
 // For more information about application lifecycle events see https://docs.microsoft.com/dotnet/framework/wpf/app-development/application-management-overview
@@ -73,6 +74,7 @@ public partial class App : Application
         // Services
         services.AddSingleton<IThemeSelectorService, ThemeSelectorService>();
         services.AddSingleton<PersistAndRestoreService>();
+        services.AddSingleton<Wpf.Ui.SnackbarService>();
         //services.AddSingleton<PersistAndRestoreService>();
         services.AddSingleton<INavigationService, NavigationService>();
 

@@ -19,6 +19,7 @@ using Studio.Services;
 using Studio.Services.Data;
 using Studio.Services.Files;
 using Studio.Services.Storage;
+using Wpf.Ui;
 using Wpf.Ui.Controls;
 using static SkiaSharp.HarfBuzz.SKShaper;
 using Button = Wpf.Ui.Controls.Button;
@@ -39,6 +40,7 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
     private readonly FavouriteProfileDataService _favouriteProfiles;
     private readonly BattleNetService _battleNetService;
     private readonly UserProfileDataService _userProfiles;
+    private readonly SnackbarService _snackbarService;
     private IProfileFetchingService _profileDataFetchingService;
 
     private readonly PersistAndRestoreService _persistAndRestoreService;
@@ -57,15 +59,14 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
     {
         InitializeComponent();
         DataContext = this;
-        
         _favouriteProfiles = ((App)Application.Current).GetService<FavouriteProfileDataService>();
         _userProfiles = ((App)Application.Current).GetService<UserProfileDataService>();
         GroupSelectionService = ((App)Application.Current).GetService<GroupSelectionService>();
         _profileDataFetchingService = ((App)Application.Current).GetService<IProfileFetchingService>();
         _battleNetService = ((App)Application.Current).GetService<BattleNetService>();
+        _snackbarService = ((App)Application.Current).GetService<SnackbarService>();
 
-
-
+        _snackbarService.SetSnackbarPresenter(SnackbarPresenter);
         foreach (var profile in _favouriteProfiles.Profiles)
         {
             FilteredProfiles.Add(profile);
@@ -136,7 +137,7 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
 
     public void OpenDetailsPage(ProfileV2 profile)
     {
-        //mainContentFrame.NavigationService.Navigate(new AccountDetailsPage(profile));
+        mainContentFrame.NavigationService.Navigate(new AccountDetailsPage(profile));
 
     }
     private void OpenAccountList()
@@ -233,8 +234,6 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
             storyboard.Begin();
 
             
-
-
             PanelCollapseButtonSymbol.Symbol = IsFavouritesPanelCollapsed
                 ? SymbolRegular.ChevronDoubleRight20
                 : SymbolRegular.ChevronDoubleLeft20;
@@ -358,6 +357,7 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
                 
                 Icon = new SymbolIcon(SymbolRegular.ArrowClockwise16),
             });
+        
 
         }
         else

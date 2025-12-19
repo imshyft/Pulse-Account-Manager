@@ -38,9 +38,9 @@ namespace Studio.Models
                 profile.Snapshots.Add(new ProfileSnapshotV2()
                 {
                     Timestamp = v.LastUpdate,
-                    Tank = new Tank() { Rank = v.RankedCareer.Tank == null ? null : RankV2.RankFromSr(v.RankedCareer.Tank.CurrentRank.SkillRating) },
-                    Damage = new Damage() { Rank = v.RankedCareer.Damage == null ? null : RankV2.RankFromSr(v.RankedCareer.Damage.CurrentRank.SkillRating) },
-                    Support = new Support() { Rank = v.RankedCareer.Support == null ? null : RankV2.RankFromSr(v.RankedCareer.Support.CurrentRank.SkillRating) },
+                    Tank = new Tank() { Rank = v.RankedCareer.Tank == null ? null : new RankV2(v.RankedCareer.Tank.CurrentRank.SkillRating) },
+                    Damage = new Damage() { Rank = v.RankedCareer.Damage == null ? null : new RankV2(v.RankedCareer.Damage.CurrentRank.SkillRating) },
+                    Support = new Support() { Rank = v.RankedCareer.Support == null ? null : new RankV2(v.RankedCareer.Support.CurrentRank.SkillRating) },
                 });
             }
             return profile;
@@ -208,13 +208,40 @@ namespace Studio.Models
         [JsonIgnore]
         public int SkillRating { get; set; }
 
-        public static RankV2 RankFromSr(int sr)
+        [JsonConstructor]
+        public RankV2(int tier, Division division)
+        {
+            Division = division;
+            Tier = tier;
+            SkillRating = CalculateSR(tier, division);
+        }
+
+        public RankV2(int sr)
+        {
+            SkillRating = sr;
+
+            var rank = CalculateDiv(sr);
+
+            Division = rank.division;
+            Tier = rank.tier;
+        }
+
+        public static int CalculateSR(int tier, Division division)
+        {
+            int baseSr = (int)division;
+            int remainder = (5 - tier) * 100;
+
+            return baseSr + remainder;
+        }
+
+        public static (int tier, Division division) CalculateDiv(int sr)
         {
             if (sr < 0) sr = 0;
             if (sr >= 5000) sr = 4999;
 
             Division division = Division.Bronze;
             int remainder = 0;
+
             if (sr < 400)
                 remainder = 1;
             foreach (Division div in Enum.GetValues(typeof(Division)))
@@ -227,36 +254,59 @@ namespace Studio.Models
             int baseDivRank = (int)division;
             remainder = Math.Min(sr - (division == Division.Bronze ? 1000 : baseDivRank), 499);
 
-            int tier = Math.Min(5,  5 - remainder / 100 );
+            int tier = Math.Min(5, 5 - remainder / 100);
 
-            return new RankV2()
-            {
-                Division = division,
-                SkillRating = sr,
-                Tier = tier
-            };
+            return (tier, division);
         }
+        //public static RankV2 RankFromSr(int sr)
+        //{
+        //    if (sr < 0) sr = 0;
+        //    if (sr >= 5000) sr = 4999;
 
-        public static RankV2 RankFromDivision(string divisionString, int tier)
-        {
-            if (!Enum.TryParse(divisionString, true, out Division division))
-                throw new ArgumentException("Division was not an accepted string");
+        //    Division division = Division.Bronze;
+        //    int remainder = 0;
+        //    if (sr < 400)
+        //        remainder = 1;
+        //    foreach (Division div in Enum.GetValues(typeof(Division)))
+        //    {
+        //        if (sr < (int)div)
+        //            break;
+        //        division = div;
+        //    }
 
-            if (tier < 1 || tier > 5)
-                throw new ArgumentException("Tier must be between 1 and 5");
+        //    int baseDivRank = (int)division;
+        //    remainder = Math.Min(sr - (division == Division.Bronze ? 1000 : baseDivRank), 499);
 
-            int baseSr = (int)division;
-            int remainder = (5 - tier) * 100;
+        //    int tier = Math.Min(5,  5 - remainder / 100 );
 
-            int sr = baseSr + remainder;
+        //    return new RankV2()
+        //    {
+        //        Division = division,
+        //        SkillRating = sr,
+        //        Tier = tier
+        //    };
+        //}
 
-            return new RankV2()
-            {
-                SkillRating = sr,
-                Division = division,
-                Tier = tier
-            };
-        }
+        //public static RankV2 RankFromDivision(string divisionString, int tier)
+        //{
+        //    if (!Enum.TryParse(divisionString, true, out Division division))
+        //        throw new ArgumentException("Division was not an accepted string");
+
+        //    if (tier < 1 || tier > 5)
+        //        throw new ArgumentException("Tier must be between 1 and 5");
+
+        //    int baseSr = (int)division;
+        //    int remainder = (5 - tier) * 100;
+
+        //    int sr = baseSr + remainder;
+
+        //    return new RankV2()
+        //    {
+        //        SkillRating = sr,
+        //        Division = division,
+        //        Tier = tier
+        //    };
+        //}
     }
     #endregion
 

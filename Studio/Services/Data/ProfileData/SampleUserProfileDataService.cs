@@ -60,19 +60,19 @@ namespace Studio.Services.Data
 
                 Tank tank = new()
                 {
-                    Rank = noTank ? null : RankV2.RankFromSr(tankRank += _rnd.Next(-2, 2) * 100),
+                    Rank = noTank ? null : new RankV2(tankRank += _rnd.Next(-2, 2) * 100),
                     Stats = noTank ? null : GenerateRandomStats()
                 };
 
                 Support supp = new()
                 {
-                    Rank = noSupp ? null : RankV2.RankFromSr(suppRank += _rnd.Next(-2, 2) * 100),
+                    Rank = noSupp ? null : new RankV2(suppRank += _rnd.Next(-2, 2) * 100),
                     Stats = noSupp ? null : GenerateRandomStats()
                 };
 
                 Damage dmg = new()
                 {
-                    Rank = noDmg ? null : RankV2.RankFromSr(suppRank += _rnd.Next(-2, 2) * 100),
+                    Rank = noDmg ? null : new RankV2(suppRank += _rnd.Next(-2, 2) * 100),
                     Stats = noDmg ? null : GenerateRandomStats()
                 };
 
