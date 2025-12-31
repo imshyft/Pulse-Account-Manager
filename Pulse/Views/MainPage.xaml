@@ -235,6 +235,7 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="40"/>
                 <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="40"/>
             </Grid.ColumnDefinitions>
 
             <ui:DropDownButton
@@ -270,6 +271,27 @@
                 VerticalAlignment="Center">
             </TextBlock>
 
+            <ui:DropDownButton
+                Grid.Column="2"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                ToolTip="Add a account to switch to or monitor"
+                ToolTipService.InitialShowDelay="500"
+                Style="{DynamicResource AccentButton}">
+                <ui:DropDownButton.Effect>
+                    <DropShadowEffect ShadowDepth="0" Color="{StaticResource AccentColor}"/>
+                </ui:DropDownButton.Effect>
+                <Grid>
+                    <ui:SymbolIcon Symbol="Settings48"/>
+                </Grid>
+
+                <ui:DropDownButton.Flyout>
+                    <ContextMenu>
+                        <MenuItem Header="Open Config Dir" Click="OnOpenConfigDirClick"/>
+                    </ContextMenu>
+                </ui:DropDownButton.Flyout>
+
+            </ui:DropDownButton>
         </Grid>
 
 
@@ -289,7 +311,7 @@
         <Grid 
             Grid.Column="1"
             Grid.Row="0"
-            Margin="{StaticResource XSmallTopMargin}">
+            Margin="6">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="75"/>
                 <ColumnDefinition Width="*"/>
@@ -304,7 +326,7 @@
                 Appearance="Transparent"
                 Click="OnFavouriteUserToggleButtonClick"
                 Style="{DynamicResource AccentButton}"
-                Margin="{StaticResource XSmallLeftRightMargin}"
+                Margin="0,0,6,0"
                 ToolTip="Toggle between favourites and user profiles">
                 <ui:Button.Effect>
                     <DropShadowEffect ShadowDepth="0" Color="{StaticResource AccentColor}"/>

@@ -18,7 +18,11 @@ namespace Studio.Services.Files
         {
             string x64Folder = Environment.GetEnvironmentVariable("programfiles(x86)");
             string x64InstallLocation = Path.Combine(x64Folder, "Overwatch");
-            if (Directory.Exists(x64InstallLocation))
+
+            // personally after installing overwatch elsewhere, the 'Overwatch' Folder remained,
+            // so check specifically for the file
+            string launcherPath = Path.Combine(x64InstallLocation, "Overwatch Launcher.exe");
+            if (File.Exists(launcherPath))
             {
                 _persistAndRestoreService.SetValue("OverwatchDirectory", x64InstallLocation);
                 _persistAndRestoreService.PersistData();

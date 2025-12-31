@@ -1,7 +1,13 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using Studio.Contracts.Services;
+using Studio.Services.Files;
+using Studio.Services.Storage;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -12,11 +18,6 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
-using System.Windows.Shapes;
-using Microsoft.Win32;
-using Studio.Contracts.Services;
-using Studio.Services.Files;
-using Studio.Services.Storage;
 using Wpf.Ui.Controls;
 
 namespace Studio.Dialogs
@@ -24,18 +25,22 @@ namespace Studio.Dialogs
     /// <summary>
     /// Interaction logic for FirstTimePopup.xaml
     /// </summary>
-    public partial class FirstTimePopup : ContentDialog
+    public partial class SettingsReviewDialog : ContentDialog
     {
 
-        private PathResolverService _pathResolverService;
-        private PersistAndRestoreService _storageService;
-        public FirstTimePopup(ContentPresenter contentPresenter)
+        private readonly PathResolverService _pathResolverService;
+        private readonly PersistAndRestoreService _storageService;
+
+
+        public SettingsReviewDialog(ContentPresenter contentPresenter, string headerText)
         {
             InitializeComponent();
             DialogHost = contentPresenter;
 
             _pathResolverService = ((App)Application.Current).GetService<PathResolverService>();
             _storageService = ((App)Application.Current).GetService<PersistAndRestoreService>();
+
+            headerTextBlock.Text = headerText;
 
             LocateOverwatchDirectory();
             LocateBattleNetConfigFile();
@@ -49,7 +54,7 @@ namespace Studio.Dialogs
                 path = _pathResolverService.TryResolveOverwatchInstallation();
             }
 
-            if (string.IsNullOrEmpty(path))
+            if (string.IsNullOrEmpty(path) || !File.Exists(Path.Combine(path, "Overwatch Launcher.exe")))
             {
                 OverwatchDirInfoBar.Severity = InfoBarSeverity.Error;
                 OverwatchDirInfoBar.Title = "Couldn't Locate Overwatch";
@@ -101,7 +106,12 @@ namespace Studio.Dialogs
                 Filter = "Overwatch Launcher |Overwatch Launcher.exe"
             };
 
-            if (openFileDialog.ShowDialog() != true || !File.Exists(openFileDialog.FileName))
+            var result = openFileDialog.ShowDialog();
+            if (result != true) // cancelled
+            {
+                return;
+            }
+            else if (!File.Exists(openFileDialog.FileName))
             {
                 OverwatchDirInfoBar.Severity = InfoBarSeverity.Error;
                 OverwatchDirInfoBar.Title = "Couldn't Locate Overwatch";
@@ -109,16 +119,51 @@ namespace Studio.Dialogs
                     "The Overwatch launcher was not located.";
                 OverwatchDirInfoBar.IsOpen = true;
             }
+            else
+            {
 
-            OverwatchDirInfoBar.IsOpen = false;
+                OverwatchDirInfoBar.IsOpen = false;
 
-            string directory = Directory.GetParent(openFileDialog.FileName).FullName;
-            OverwatchDirTextBox.Text = directory;
+                string directory = Directory.GetParent(openFileDialog.FileName).FullName;
+                OverwatchDirTextBox.Text = directory;
 
-            _storageService.SetValue("OverwatchDirectory", directory);
+                _storageService.SetValue("OverwatchDirectory", directory);
+            }
+
         }
 
+        private void OnConfigFilePickerButtonClick(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog()
+            {
+                InitialDirectory = Environment.ExpandEnvironmentVariables("HOMEDRIVE"),
+                Filter = "Battle.net Config |*.config"
+            };
 
+            var result = openFileDialog.ShowDialog();
+            if (result != true)
+            {
+                return;
+            }
+            else if (!File.Exists(openFileDialog.FileName))
+            {
+                BnetConfigInfoBar.Severity = InfoBarSeverity.Error;
+                BnetConfigInfoBar.Title = "Couldn't Locate Config File";
+                BnetConfigInfoBar.Message =
+                    "The Config File was not located.";
+                BnetConfigInfoBar.IsOpen = true;
+            }
+            else
+            {
+
+                BnetConfigInfoBar.IsOpen = false;
+
+                string path = openFileDialog.FileName;
+                BnetConfigTextBox.Text = path;
+
+                _storageService.SetValue("BattleNetConfigFile", path);
+            }
+        }
     }
 
 

@@ -23,19 +23,19 @@ namespace Studio.Services
         private string _battleNetConfigPath;
         private string _overwatchLauncherPath;
         private readonly IMemoryReaderService _memoryReaderService;
-        //private readonly BattleNetMemoryReaderService _memoryReaderService;
-
+        private bool _isReady;
 
         public BattleNetService(IMemoryReaderService memoryReaderService)
         {
             _persistAndRestoreService = ((App)Application.Current).GetService<PersistAndRestoreService>();
             _memoryReaderService = memoryReaderService;
-            //_memoryReaderService = new BattleNetMemoryReaderService();
+
+            _isReady = IsPathsValid();
 
 
         }
 
-        public bool Initialize()
+        public bool IsPathsValid()
         {
             _battleNetConfigPath = _persistAndRestoreService.GetValue<string>("BattleNetConfigPath");
             if (string.IsNullOrEmpty(_battleNetConfigPath))
@@ -45,6 +45,8 @@ namespace Studio.Services
                 return false;
 
             _overwatchLauncherPath = Path.Combine(overwatchDirectory, "Overwatch Launcher.exe");
+            if (!Directory.Exists(_overwatchLauncherPath))
+                return false;
 
             return true;
         }

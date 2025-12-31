@@ -188,10 +188,4 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="BlizzardMemoryReader">
-      <HintPath>..\BattleNetMemoryReader\x64\Release\BlizzardMemoryReader.dll</HintPath>
-    </Reference>
-  </ItemGroup>
 </Project>

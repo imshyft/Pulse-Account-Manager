@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -41,6 +42,7 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
     private readonly BattleNetService _battleNetService;
     private readonly UserProfileDataService _userProfiles;
     private readonly SnackbarService _snackbarService;
+    private readonly IAppPaths _appPaths;
 
     private readonly int favouritesPanelExpandedWidth = 250;
     private readonly int favouritesPanelCollapsedWidth = 75;
@@ -64,7 +66,9 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
         GroupSelectionService = ((App)Application.Current).GetService<GroupSelectionService>();
         _battleNetService = ((App)Application.Current).GetService<BattleNetService>();
         _snackbarService = ((App)Application.Current).GetService<SnackbarService>();
-        
+        _appPaths = ((App)Application.Current).GetService<IAppPaths>();
+
+
         _snackbarService.SetSnackbarPresenter(SnackbarPresenter);
         foreach (var profile in _favouriteProfiles.Profiles)
         {
@@ -77,11 +81,35 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
         
         PreviewMouseDown += OnPreviewMouseDown;
 
-        CheckIfFirstLaunch();
-        _battleNetService.Initialize();
+        bool isFirstLaunch = _persistAndRestoreService.GetValue("IsFirstLaunch", true);
+        if (isFirstLaunch)
+        {
+            _ = ShowFirstLaunchDialog();
+        }
+        else
+        {
+            _ = validatePaths();
+        }
     }
 
-    private async void CheckIfFirstLaunch()
+    private async Task validatePaths()
+    {
+        if (!_battleNetService.IsPathsValid())
+        {
+            if (ShellWindow.Instance == null)
+                return;
+
+            ContentPresenter dialogPresenter = ShellWindow.Instance.DialogPresenter;
+            if (dialogPresenter == null)
+                return;
+
+            var dialog = new SettingsReviewDialog(dialogPresenter,
+                "Some settings may be invalid or outdated. Please review the settings here.");
+
+            var result = await dialog.ShowAsync();
+        }
+    }
+    private async Task ShowFirstLaunchDialog()
     {
         bool isFirstLaunch = _persistAndRestoreService.GetValue("IsFirstLaunch", true);
         if (isFirstLaunch)
@@ -93,14 +121,13 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
             if (dialogPresenter == null)
                 return;
 
-            var dialog = new FirstTimePopup(dialogPresenter);
-
+            var dialog = new SettingsReviewDialog(dialogPresenter,
+                "Welcome! To get started, review these settings here, and then start adding accounts with the + button.");
             var result = await dialog.ShowAsync();
 
             _persistAndRestoreService.SetValue("IsFirstLaunch", false);
             _persistAndRestoreService.PersistData();
 
-            AddProfileDropDownButton.IsDropDownOpen = true;
         }
     }
     
@@ -435,5 +462,9 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
         RefreshPanel();
     }
 
-
+    private void OnOpenConfigDirClick(object sender, RoutedEventArgs e)
+    {
+        var startInfo = new ProcessStartInfo("explorer.exe", _appPaths.Root);
+        Process.Start(startInfo);
+    }
 }

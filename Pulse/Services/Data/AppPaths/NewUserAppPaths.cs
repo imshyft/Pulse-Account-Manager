@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 
 namespace Studio.Services.Data.AppPaths
 {
+    // Wipes out accounts data on launch
     class NewUserAppPaths : IAppPaths
     {
         public string Root { get; }
@@ -27,11 +28,18 @@ namespace Studio.Services.Data.AppPaths
                 appConfig.Value.ConfigurationFolderName,
                 ".debug");
             
-            // wipe debug directory on launch to simulate new user
-            if (Directory.Exists(Root))
+            
+            // wipe debug accounts on launch to simulate new user
+            if (Directory.Exists(Profiles))
             {
-                Directory.Delete(Root, true);
+                Directory.Delete(Profiles, true);
             }
+
+            if (Directory.Exists(Favourites))
+            {
+                Directory.Delete(Favourites, true);
+            }
+
             Directory.CreateDirectory(Root);
         }
     }
