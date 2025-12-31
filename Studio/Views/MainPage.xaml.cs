@@ -41,7 +41,9 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
     private readonly BattleNetService _battleNetService;
     private readonly UserProfileDataService _userProfiles;
     private readonly SnackbarService _snackbarService;
-    private IProfileFetchingService _profileDataFetchingService;
+
+    private readonly int favouritesPanelExpandedWidth = 250;
+    private readonly int favouritesPanelCollapsedWidth = 75;
 
     private readonly PersistAndRestoreService _persistAndRestoreService;
 
@@ -52,8 +54,6 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
     }
     private bool _isFavouritesPanelCollapsed = false;
 
-    //private int _flyoutOpenId = 0;
-    //private Flyout[] _flyouts;
 
     public MainPage()
     {
@@ -62,10 +62,9 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
         _favouriteProfiles = ((App)Application.Current).GetService<FavouriteProfileDataService>();
         _userProfiles = ((App)Application.Current).GetService<UserProfileDataService>();
         GroupSelectionService = ((App)Application.Current).GetService<GroupSelectionService>();
-        _profileDataFetchingService = ((App)Application.Current).GetService<IProfileFetchingService>();
         _battleNetService = ((App)Application.Current).GetService<BattleNetService>();
         _snackbarService = ((App)Application.Current).GetService<SnackbarService>();
-
+        
         _snackbarService.SetSnackbarPresenter(SnackbarPresenter);
         foreach (var profile in _favouriteProfiles.Profiles)
         {
@@ -211,34 +210,15 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
     }
     private void OnToggleOpenFavouritesPanelButtonClick(object sender, RoutedEventArgs e)
     {
-            int expandedWidth = 250;
-            int collapsedWidth = 75;
 
-            Storyboard storyboard = new Storyboard();
 
-            Duration duration = new Duration(TimeSpan.FromMilliseconds(200));
-            CubicEase ease = new CubicEase { EasingMode = EasingMode.EaseOut };
+        FavouritesColumn.MaxWidth = IsFavouritesPanelCollapsed ? favouritesPanelExpandedWidth : favouritesPanelCollapsedWidth;
 
-            DoubleAnimation animation = new DoubleAnimation();
-            animation.EasingFunction = ease;
-            animation.Duration = duration;
-            storyboard.Children.Add(animation);
+        PanelCollapseButtonSymbol.Symbol = IsFavouritesPanelCollapsed
+            ? SymbolRegular.ChevronDoubleRight20
+            : SymbolRegular.ChevronDoubleLeft20;
 
-            
-
-            animation.From = IsFavouritesPanelCollapsed ? collapsedWidth : expandedWidth;
-            animation.To = IsFavouritesPanelCollapsed ? expandedWidth : collapsedWidth;
-            Storyboard.SetTarget(animation, FavouritesColumn);
-            Storyboard.SetTargetProperty(animation, new PropertyPath("(ColumnDefinition.MaxWidth)"));
-
-            storyboard.Begin();
-
-            
-            PanelCollapseButtonSymbol.Symbol = IsFavouritesPanelCollapsed
-                ? SymbolRegular.ChevronDoubleRight20
-                : SymbolRegular.ChevronDoubleLeft20;
-
-            IsFavouritesPanelCollapsed = !IsFavouritesPanelCollapsed;
+        IsFavouritesPanelCollapsed = !IsFavouritesPanelCollapsed;
 
         
     }
@@ -394,7 +374,6 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
         if (FavouritesList.SelectedItem is not ProfileV2 profile)
             return;
 
-        //var result = await _profileDataFetchingService.FetchProfileAsync(profile.Battletag);
         var result = new ProfileFetchResult()
         {
             Outcome = ProfileFetchOutcome.NotFound,

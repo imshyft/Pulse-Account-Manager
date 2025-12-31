@@ -229,7 +229,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-
+        
         <Grid
             Margin="6">
             <Grid.ColumnDefinitions>
@@ -273,6 +273,19 @@
         </Grid>
 
 
+
+
+        <Frame
+            Grid.Row="1"
+            x:Name="mainContentFrame"
+            NavigationUIVisibility="Hidden"
+            Focusable="False" />
+
+        <ui:SnackbarPresenter 
+            x:Name="SnackbarPresenter"
+            Grid.Row="1"/>
+
+        
         <Grid 
             Grid.Column="1"
             Grid.Row="0"
@@ -293,9 +306,9 @@
                 Style="{DynamicResource AccentButton}"
                 Margin="{StaticResource XSmallLeftRightMargin}"
                 ToolTip="Toggle between favourites and user profiles">
-                <!--<ui:Button.Effect>
+                <ui:Button.Effect>
                     <DropShadowEffect ShadowDepth="0" Color="{StaticResource AccentColor}"/>
-                </ui:Button.Effect>-->
+                </ui:Button.Effect>
                 <Grid>
                     <ui:SymbolIcon x:Name="PanelToggleSymbol"  Symbol="Star48"/>
                 </Grid>
@@ -314,20 +327,7 @@
                 Padding="5">
             </ui:TextBox>
         </Grid>
-
-
-
-        <Frame
-            Grid.Row="1"
-            x:Name="mainContentFrame"
-            NavigationUIVisibility="Hidden"
-            Focusable="False" />
-
-        <ui:SnackbarPresenter 
-            x:Name="SnackbarPresenter"
-            Grid.Row="1"/>
-
-
+        
         <ui:ListView 
             x:Name="FavouritesList"
             Grid.Column="1"
