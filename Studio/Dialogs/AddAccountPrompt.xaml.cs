@@ -185,7 +185,7 @@ namespace Studio.Controls
             IsSelectingMode = false;
 
             InfoText =
-                "Enter the Battle tag of the account you will log into. Once Battle.net is launched, log into the account and then continue.";
+                "Enter the Battle tag of the account you will log into. Then choose to save the email (locally!) of the current account signed into battle net, or sign in to a different account.";
 
         });
 
@@ -240,7 +240,20 @@ namespace Studio.Controls
         {
             _battleNetService.OpenBattleNetWithEmptyAccount();
             InfoText = "Great! Now while we fetch the account details, log in to the same account through Battle.net, and once its fully loaded press Add Account";
-            BattleTagV2 battleTag = new BattleTagV2(BattleTagInput);
+            await FetchProfile(BattleTagInput);
+        });
+
+        public ICommand GetCurrentAccountCommand => new RelayCommand<object>(async _ =>
+        {
+            _battleNetService.GetBattleNetAccount();
+            InfoText = "Great! Wait while the account details are attempted to be fetched, and then confirm by pressing 'Add Account'";
+            await FetchProfile(BattleTagInput);
+            
+        });
+
+        private async Task FetchProfile(string battletag)
+        {
+            BattleTagV2 battleTag = new BattleTagV2(battletag);
             var result = await _profileFetchingService.FetchProfileAsync(battleTag);
 
             switch (result.Outcome)
@@ -261,8 +274,7 @@ namespace Studio.Controls
 
             Profile = result.Profile;
             IsPrimaryButtonEnabled = true;
-
-        });
+        }
 
         public ICommand RetryMemoryReadCommand => new RelayCommand<object>(async _ =>
         {

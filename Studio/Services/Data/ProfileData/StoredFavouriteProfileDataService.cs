@@ -11,9 +11,9 @@ public class StoredFavouriteProfileDataService : FavouriteProfileDataService
 {
     private readonly FileService _fileService;
     private readonly string _localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-    public StoredFavouriteProfileDataService(FileService fileService, IOptions<AppConfig> appConfig)
+    public StoredFavouriteProfileDataService(FileService fileService, IAppPaths appPaths)
     {
-        ProfileDirectory = Path.Combine(_localAppData, appConfig.Value.ConfigurationFolderName, appConfig.Value.FavouritesPath);
+        ProfileDirectory = appPaths.Favourites;
 
         _fileService = fileService;
 

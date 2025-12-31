@@ -15,10 +15,9 @@ namespace Studio.Services.Data;
 public class StoredUserProfileDataService : UserProfileDataService
 {
     private readonly FileService _fileService;
-    private readonly string _localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-    public StoredUserProfileDataService(FileService fileService, IOptions<AppConfig> appConfig)
+    public StoredUserProfileDataService(FileService fileService, IAppPaths appPaths)
     {
-        ProfileDirectory = Path.Combine(_localAppData, appConfig.Value.ConfigurationFolderName, appConfig.Value.ProfilesPath);
+        ProfileDirectory = appPaths.Profiles;
 
         _fileService = fileService;
 

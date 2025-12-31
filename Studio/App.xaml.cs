@@ -20,6 +20,7 @@ using Studio.Services.Storage;
 using Studio.Views;
 using Studio.Services.Data.ProfileFetching;
 using Studio.Services.BattleNet;
+using Studio.Services.Data.AppPaths;
 
 
 namespace Studio;
@@ -75,7 +76,7 @@ public partial class App : Application
         services.AddSingleton<IThemeSelectorService, ThemeSelectorService>();
         services.AddSingleton<PersistAndRestoreService>();
         services.AddSingleton<Wpf.Ui.SnackbarService>();
-        //services.AddSingleton<PersistAndRestoreService>();
+        //services.AddSingleton<PersistAndRestoreService>();A
         services.AddSingleton<INavigationService, NavigationService>();
 
 #if SAMPLE
@@ -88,6 +89,13 @@ public partial class App : Application
         // Overfast vs Blizzard
         //services.AddSingleton<IProfileFetchingService, PublicOverfastProfileFetchingService>();
         services.AddSingleton<IProfileFetchingService, BlizzardProfileFetchingService>();
+#endif
+
+#if NEWUSER
+        services.AddSingleton<IAppPaths, NewUserAppPaths>();
+#else
+        services.AddSingleton<IAppPaths, LocalAppPaths>();
+
 #endif
         services.AddSingleton<PathResolverService>();
 

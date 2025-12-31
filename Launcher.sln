@@ -11,6 +11,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BlizzardMemoryReader", "Bat
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug_NewUser|Any CPU = Debug_NewUser|Any CPU
+		Debug_NewUser|x64 = Debug_NewUser|x64
+		Debug_NewUser|x86 = Debug_NewUser|x86
 		Debug|Any CPU = Debug|Any CPU
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
@@ -22,6 +25,12 @@ Global
 		Sample|x86 = Sample|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F3E73D28-C048-4A6D-90CE-D300F3BDE883}.Debug_NewUser|Any CPU.ActiveCfg = Sample|Any CPU
+		{F3E73D28-C048-4A6D-90CE-D300F3BDE883}.Debug_NewUser|Any CPU.Build.0 = Sample|Any CPU
+		{F3E73D28-C048-4A6D-90CE-D300F3BDE883}.Debug_NewUser|x64.ActiveCfg = Sample|Any CPU
+		{F3E73D28-C048-4A6D-90CE-D300F3BDE883}.Debug_NewUser|x64.Build.0 = Sample|Any CPU
+		{F3E73D28-C048-4A6D-90CE-D300F3BDE883}.Debug_NewUser|x86.ActiveCfg = Sample|Any CPU
+		{F3E73D28-C048-4A6D-90CE-D300F3BDE883}.Debug_NewUser|x86.Build.0 = Sample|Any CPU
 		{F3E73D28-C048-4A6D-90CE-D300F3BDE883}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F3E73D28-C048-4A6D-90CE-D300F3BDE883}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F3E73D28-C048-4A6D-90CE-D300F3BDE883}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -40,6 +49,12 @@ Global
 		{F3E73D28-C048-4A6D-90CE-D300F3BDE883}.Sample|x64.Build.0 = Sample|Any CPU
 		{F3E73D28-C048-4A6D-90CE-D300F3BDE883}.Sample|x86.ActiveCfg = Sample|Any CPU
 		{F3E73D28-C048-4A6D-90CE-D300F3BDE883}.Sample|x86.Build.0 = Sample|Any CPU
+		{B40A518F-A0FA-489A-B2E3-CAD44D549C5F}.Debug_NewUser|Any CPU.ActiveCfg = Debug_NewUser|Any CPU
+		{B40A518F-A0FA-489A-B2E3-CAD44D549C5F}.Debug_NewUser|Any CPU.Build.0 = Debug_NewUser|Any CPU
+		{B40A518F-A0FA-489A-B2E3-CAD44D549C5F}.Debug_NewUser|x64.ActiveCfg = Debug_NewUser|Any CPU
+		{B40A518F-A0FA-489A-B2E3-CAD44D549C5F}.Debug_NewUser|x64.Build.0 = Debug_NewUser|Any CPU
+		{B40A518F-A0FA-489A-B2E3-CAD44D549C5F}.Debug_NewUser|x86.ActiveCfg = Debug_NewUser|Any CPU
+		{B40A518F-A0FA-489A-B2E3-CAD44D549C5F}.Debug_NewUser|x86.Build.0 = Debug_NewUser|Any CPU
 		{B40A518F-A0FA-489A-B2E3-CAD44D549C5F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B40A518F-A0FA-489A-B2E3-CAD44D549C5F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B40A518F-A0FA-489A-B2E3-CAD44D549C5F}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -57,6 +72,12 @@ Global
 		{B40A518F-A0FA-489A-B2E3-CAD44D549C5F}.Sample|x64.Build.0 = Sample|Any CPU
 		{B40A518F-A0FA-489A-B2E3-CAD44D549C5F}.Sample|x86.ActiveCfg = Sample|Any CPU
 		{B40A518F-A0FA-489A-B2E3-CAD44D549C5F}.Sample|x86.Build.0 = Sample|Any CPU
+		{AAFB7540-B89B-4078-8964-38C658DC2722}.Debug_NewUser|Any CPU.ActiveCfg = Debug|x64
+		{AAFB7540-B89B-4078-8964-38C658DC2722}.Debug_NewUser|Any CPU.Build.0 = Debug|x64
+		{AAFB7540-B89B-4078-8964-38C658DC2722}.Debug_NewUser|x64.ActiveCfg = Debug|x64
+		{AAFB7540-B89B-4078-8964-38C658DC2722}.Debug_NewUser|x64.Build.0 = Debug|x64
+		{AAFB7540-B89B-4078-8964-38C658DC2722}.Debug_NewUser|x86.ActiveCfg = Debug|Win32
+		{AAFB7540-B89B-4078-8964-38C658DC2722}.Debug_NewUser|x86.Build.0 = Debug|Win32
 		{AAFB7540-B89B-4078-8964-38C658DC2722}.Debug|Any CPU.ActiveCfg = Debug|x64
 		{AAFB7540-B89B-4078-8964-38C658DC2722}.Debug|Any CPU.Build.0 = Debug|x64
 		{AAFB7540-B89B-4078-8964-38C658DC2722}.Debug|x64.ActiveCfg = Debug|x64

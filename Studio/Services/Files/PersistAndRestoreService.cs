@@ -14,36 +14,35 @@ public class PersistAndRestoreService
 {
     private readonly FileService _fileService;
     private readonly AppConfig _appConfig;
-    private readonly string _localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+    private readonly IAppPaths _appPaths;
 
-    public PersistAndRestoreService(FileService fileService, IOptions<AppConfig> appConfig)
+    public PersistAndRestoreService(FileService fileService, IAppPaths appPaths, IOptions<AppConfig> appConfig)
     {
         _fileService = fileService;
         _appConfig = appConfig.Value;
+        _appPaths = appPaths;
     }
 
     public void PersistData()
     {
         if (App.Current.Properties != null)
         {
-            var folderPath = Path.Combine(_localAppData, _appConfig.ConfigurationFolderName);
             var fileName = _appConfig.ConfigFileName;
-            _fileService.Save(folderPath, fileName, App.Current.Properties);
+            _fileService.Save(_appPaths.Root, fileName, App.Current.Properties);
         }
         
     }
 
     public void RestoreData()
     {
-        var folderPath = Path.Combine(_localAppData, _appConfig.ConfigurationFolderName);
         var fileName = _appConfig.ConfigFileName;
 
-        if (!Directory.Exists(folderPath))
-        {
-            Directory.CreateDirectory(folderPath);
-        }
+        //if (!Directory.Exists(folderPath))
+        //{
+        //    Directory.CreateDirectory(folderPath);
+        //}
 
-        var properties = _fileService.Read<IDictionary>(folderPath, fileName);
+        var properties = _fileService.Read<IDictionary>(_appPaths.Root, fileName);
         if (properties != null)
         {
             foreach (DictionaryEntry property in properties)
