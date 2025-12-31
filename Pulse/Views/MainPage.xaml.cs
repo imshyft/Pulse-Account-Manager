@@ -67,8 +67,8 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
         _battleNetService = ((App)Application.Current).GetService<BattleNetService>();
         _snackbarService = ((App)Application.Current).GetService<SnackbarService>();
         _appPaths = ((App)Application.Current).GetService<IAppPaths>();
-
-
+        
+        
         _snackbarService.SetSnackbarPresenter(SnackbarPresenter);
         foreach (var profile in _favouriteProfiles.Profiles)
         {

@@ -41,13 +41,19 @@ public partial class App : Application
 
     public App()
     {
+        DispatcherUnhandledException += OnUnhandledException;
+    }
 
+    private void OnUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+    {
+        MessageBox.Show("An unhandled exception just occurred: \n" + e.Exception.Message + ". \n Please make an issue on Github about what happened.", "Exception Sample", MessageBoxButton.OK, MessageBoxImage.Error);
+        e.Handled = false;
     }
 
     private async void OnStartup(object sender, StartupEventArgs e)
     {
         var appLocation = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-
+        
         // For more information about .NET generic host see  https://docs.microsoft.com/aspnet/core/fundamentals/host/generic-host?view=aspnetcore-3.0
         _host = Host.CreateDefaultBuilder(e.Args)
                 .ConfigureAppConfiguration(c =>
