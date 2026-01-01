@@ -40,6 +40,7 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
 
     private readonly FavouriteProfileDataService _favouriteProfiles;
     private readonly BattleNetService _battleNetService;
+    private IProfileFetchingService _profileDataFetchingService;
     private readonly UserProfileDataService _userProfiles;
     private readonly SnackbarService _snackbarService;
     private readonly IAppPaths _appPaths;
@@ -56,13 +57,14 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
     }
     private bool _isFavouritesPanelCollapsed = false;
 
-
+        
     public MainPage()
     {
         InitializeComponent();
         DataContext = this;
         _favouriteProfiles = ((App)Application.Current).GetService<FavouriteProfileDataService>();
         _userProfiles = ((App)Application.Current).GetService<UserProfileDataService>();
+        _profileDataFetchingService = ((App)Application.Current).GetService<IProfileFetchingService>();
         GroupSelectionService = ((App)Application.Current).GetService<GroupSelectionService>();
         _battleNetService = ((App)Application.Current).GetService<BattleNetService>();
         _snackbarService = ((App)Application.Current).GetService<SnackbarService>();
@@ -190,13 +192,15 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
         base.OnPreviewMouseDown(e);
     }
 
-    private void OnFavouritesSelectionChanged(object sender, SelectionChangedEventArgs e)
+    // Handle Sidebar Clicking as LeftButtonUps on each list item so it doesnt trigger on rmb
+    private void FavouritesList_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
-        if (e.AddedItems.Count > 0)
+        var control = (FrameworkElement)sender;
+        if (control.DataContext is ProfileV2 profile)
         {
-            OpenDetailsPage(e.AddedItems[0] as ProfileV2);
-        }
+            OpenDetailsPage(profile);
 
+        }
     }
 
     private void OnAccountListButtonClick(object sender, RoutedEventArgs e)
@@ -211,28 +215,18 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
 
     private void RefreshPanel()
     {
-        //https://learn.microsoft.com/en-us/windows/apps/design/controls/listview-filtering
         string text = FilterTextBox.Text;
 
         ProfileDataService profileSource = IsPanelShowingFavourites ? _favouriteProfiles : _userProfiles;
-        var filtered = profileSource.Profiles.Where(p => p.CustomName.Contains(text, StringComparison.CurrentCultureIgnoreCase));
+        var filtered = profileSource.Profiles.Where(p => p.CustomName.Contains(text, StringComparison.CurrentCultureIgnoreCase))
+            .OrderBy(p => p.Battletag.ToString());
 
-        for (int i = FilteredProfiles.Count - 1; i >= 0; i--)
-        {
-            var item = FilteredProfiles[i];
 
-            if (!filtered.Contains(item))
-            {
-                FilteredProfiles.Remove(item);
-            }
-        }
+        FilteredProfiles.Clear();
 
         foreach (var item in filtered)
         {
-            if (!FilteredProfiles.Contains(item))
-            {
-                FilteredProfiles.Add(item);
-            }
+            FilteredProfiles.Add(item);
         }
     }
     private void OnToggleOpenFavouritesPanelButtonClick(object sender, RoutedEventArgs e)
@@ -401,11 +395,8 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
         if (FavouritesList.SelectedItem is not ProfileV2 profile)
             return;
 
-        var result = new ProfileFetchResult()
-        {
-            Outcome = ProfileFetchOutcome.NotFound,
-            Profile = null
-        };
+        var result = await _profileDataFetchingService.UpdateProfileAsync(profile);
+
         if (result.Outcome == ProfileFetchOutcome.Success)
         {
             _ = SnackbarPresenter.ImmediatelyDisplay(new Snackbar(SnackbarPresenter)
@@ -426,8 +417,6 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
                 _userProfiles.DeleteProfile(profile);
                 _userProfiles.SaveProfile(result.Profile);
             }
-
-
         }
         else
         {
@@ -467,4 +456,16 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
         var startInfo = new ProcessStartInfo("explorer.exe", _appPaths.Root);
         Process.Start(startInfo);
     }
+
+    private async void OnReviewSettingsClick(object sender, RoutedEventArgs e)
+    {
+        ContentPresenter dialogPresenter = ShellWindow.Instance.DialogPresenter;
+        if (dialogPresenter == null)
+            return;
+
+        var dialog = new SettingsReviewDialog(dialogPresenter,
+            "Review the current settings here (Full Settings page coming soon)");
+        await dialog.ShowAsync();
+    }
+
 }

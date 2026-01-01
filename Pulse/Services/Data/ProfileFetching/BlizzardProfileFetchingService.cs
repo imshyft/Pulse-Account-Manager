@@ -1,22 +1,22 @@
-﻿using Studio.Helpers;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Net.Http;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-using Windows.System;
+﻿using AngleSharp;
+using AngleSharp.Dom;
+using AngleSharp.Html.Dom;
 using HarfBuzzSharp;
 using LiveChartsCore.Kernel;
 using Newtonsoft.Json;
 using Studio.Contracts.Services;
-using AngleSharp.Dom;
-using AngleSharp.Html.Dom;
-using AngleSharp;
-using System.Text.RegularExpressions;
+using Studio.Helpers;
 using Studio.Models;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using Windows.System;
 
 
 namespace Studio.Services.Data
@@ -28,19 +28,27 @@ namespace Studio.Services.Data
 
         }
 
-        private static string BattletagToWebFormat(BattleTagV2 battletag) =>
-            $"{battletag.Username}-{battletag.Tag}";
-
         public async Task<ProfileFetchResult> FetchProfileAsync(BattleTagV2 battleTag)
         {
             ProfileV2 profile = new();
             profile.Battletag = battleTag;
             profile.CustomName = battleTag.Username;
+            profile.Snapshots = [];
 
+            return await SyncProfile(profile);
 
+        }
+
+        public async Task<ProfileFetchResult> UpdateProfileAsync(ProfileV2 profile)
+        {
+            return await SyncProfile(profile);
+        }
+
+        private static async Task<ProfileFetchResult> SyncProfile(ProfileV2 profile)
+        {
             string errorMessage = "";
 
-            string battleTagUrl = battleTag.ToString().Replace("#", "-");
+            string battleTagUrl = profile.Battletag.FullTag.Replace("#", "-");
             string url = $"https://overwatch.blizzard.com/en-us/career/{battleTagUrl}";
 
 
@@ -48,7 +56,8 @@ namespace Studio.Services.Data
             client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:128.0) Gecko/20100101 Firefox/128.0");
 
             HttpResponseMessage response = await client.GetAsync(url);
-
+            
+            // create failed result
             if (response.StatusCode != HttpStatusCode.OK)
             {
                 errorMessage = response.ReasonPhrase ?? "unexplained error.";
@@ -62,7 +71,7 @@ namespace Studio.Services.Data
                         ErrorMessage = errorMessage
                     };
                 }
-                
+
 
                 return new ProfileFetchResult()
                 {
@@ -80,8 +89,6 @@ namespace Studio.Services.Data
             var document = await context.OpenAsync(req => req.Content(htmlContent));
 
 
-
-
             if (document.QuerySelector(".error-contain") is not null)
             {
                 return new ProfileFetchResult()
@@ -91,21 +98,29 @@ namespace Studio.Services.Data
                 };
             }
 
-
-
-
-            int unixNow = (int)DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-
             profile.AvatarURL = document.QuerySelector<IHtmlImageElement>(".Profile-player--portrait")?.Source ??
                 "https://d15f34w2p8l1cc.cloudfront.net/overwatch/daeddd96e58a2150afa6ffc3c5503ae7f96afc2e22899210d444f45dee508c6c.png";
-            profile.CustomName = battleTag.Username;
-            profile.Snapshots = [];
-            profile.Battletag = battleTag;
+            
+
+            ProfileSnapshotV2 snapshot = GetSnapshot(document);
+            profile.Snapshots.Add(snapshot);
+
+            return new ProfileFetchResult()
+            {
+                Profile = profile,
+                Outcome = ProfileFetchOutcome.Success,
+            };
+        }
+
+        private static ProfileSnapshotV2 GetSnapshot(IDocument document)
+        {
+            int unixNow = (int)DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
             var snapshot = new ProfileSnapshotV2()
             {
                 Timestamp = unixNow,
             };
+
             // getting roles for each rank
             foreach (IElement roleElement in document.QuerySelectorAll(".Profile-playerSummary--roleWrapper"))
             {
@@ -122,25 +137,19 @@ namespace Studio.Services.Data
                 switch (roleString)
                 {
                     case "offense":
-                        //snapshot.Damage = new Damage();
                         role = snapshot.Damage;
                         break;
                     case "tank":
                         role = snapshot.Tank;
-
-                        //role = profile.RankedCareer.Tank;
                         break;
                     case "support":
                         role = snapshot.Support;
-
-                        //role = profile.RankedCareer.Support;
                         break;
                     default:
                         continue;
                 }
 
-
-
+                // rank image sources
                 var imageElements = roleElement.QuerySelector(".Profile-playerSummary--rankImageWrapper")?.QuerySelectorAll<IHtmlImageElement>("img").ToList();
                 string? divisionSource = imageElements[0]?.Source;
                 string? tierSource = imageElements[1]?.Source;
@@ -148,6 +157,7 @@ namespace Studio.Services.Data
                 if (string.IsNullOrEmpty(tierSource) || string.IsNullOrEmpty(divisionSource))
                     continue;
 
+                // rank and division string names
                 var divisionMatch = Regex.Match(divisionSource, @"_([^_-]+)-");
                 var tierMatch = Regex.Match(tierSource, @"_(\d+)-");
 
@@ -163,8 +173,8 @@ namespace Studio.Services.Data
                 if (!int.TryParse(tierString, out int tier))
                     continue;
 
-                divisionString = divisionString.Remove(divisionString.Length - 4);
                 // remove 'Tier' from ending of division string
+                divisionString = divisionString.Remove(divisionString.Length - 4);
 
                 if (!Enum.TryParse(divisionString, true, out Division division))
                     throw new ArgumentException("Division was not an accepted string");
@@ -174,15 +184,9 @@ namespace Studio.Services.Data
                 RankV2 currentRank = new RankV2(tier, division);
 
                 role.Rank = currentRank;
-
-
-
             }
-            return new ProfileFetchResult()
-            {
-                Profile = profile,
-                Outcome = ProfileFetchOutcome.Success,
-            };
+
+            return snapshot;
         }
 
     }

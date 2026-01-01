@@ -33,5 +33,22 @@ namespace Studio.Services.Data.ProfileFetching
 
             return Task.FromResult(profileFetchResult);
         }
+
+        public Task<ProfileFetchResult> UpdateProfileAsync(ProfileV2 profile)
+        {
+            profile.Snapshots.Add(new ProfileSnapshotV2()
+            {
+                Timestamp = (int)DateTimeOffset.UtcNow.ToUnixTimeSeconds()
+            });
+
+
+            var result = new ProfileFetchResult()
+            {
+                Outcome = ProfileFetchOutcome.Success,
+                Profile = profile
+            };
+
+            return Task.FromResult(result);
+        }
     }
 }

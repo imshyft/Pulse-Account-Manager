@@ -258,6 +258,7 @@ namespace Studio.Dialogs
             IsManualEntry = false;
             IsLoading = false;
         });
+
         private async Task FetchProfile(string tag)
         {
 

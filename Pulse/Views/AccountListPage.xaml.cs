@@ -183,7 +183,7 @@ namespace Studio.Views
             if (((FrameworkElement)sender).DataContext is not ProfileV2 profile)
                 return;
 
-            var result = await _profileDataFetchingService.FetchProfileAsync(null); // TODO: FIX
+            var result = await _profileDataFetchingService.UpdateProfileAsync(profile);
             _snackbarService.GetSnackbarPresenter().AddToQue(new Snackbar(_snackbarService.GetSnackbarPresenter())
             {
                 Appearance = ControlAppearance.Info,
@@ -201,7 +201,7 @@ namespace Studio.Views
                     Content = "Account profile successfully synced",
                     Icon = new SymbolIcon(SymbolRegular.ArrowClockwise16),
                 });
-                result.Profile.Email = profile.Email;
+                //result.Profile.Email = profile.Email;
                 UserProfiles.DeleteProfile(profile);
                 UserProfiles.SaveProfile(result.Profile);
             }

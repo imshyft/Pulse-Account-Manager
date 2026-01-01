@@ -197,21 +197,44 @@
         
         <DataTemplate x:Key="FavouritesDataTemplate">
 
-            <ContentControl 
+            <Border
+                Background="#01000000"> <!-- Border With 1 Alpha allows interaction-->
+                <ContentControl 
                     Grid.Column="1"
                     Content="{Binding }">
-                <ContentControl.Style>
-                    <Style
+                    <ContentControl.Style>
+                        <Style
                             TargetType="{x:Type ContentControl}">
-                        <Setter Property="ContentTemplate" Value="{StaticResource DefaultPanelContentTemplate}"/>
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=Page}, Path=DataContext.GroupSelectionService.IsEnabled}" Value="True">
-                                <Setter Property="ContentTemplate" Value="{StaticResource GroupSelectionContentTemplate}" />
-                            </DataTrigger>
-                        </Style.Triggers>
+                            <Setter Property="ContentTemplate" Value="{StaticResource DefaultPanelContentTemplate}"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=Page}, Path=DataContext.GroupSelectionService.IsEnabled}" Value="True">
+                                    <Setter Property="ContentTemplate" Value="{StaticResource GroupSelectionContentTemplate}" />
+                                </DataTrigger>
+
+                            </Style.Triggers>
+                        </Style>
+                    </ContentControl.Style>
+
+                </ContentControl>
+                <Border.ContextMenu>
+                    <ContextMenu>
+                        <ui:MenuItem
+                                Header="Sync"
+                                Click="OnSidePanelItemSyncClick"/>
+                        <ui:MenuItem
+                                Header="Delete"
+                                Click="OnSidePanelItemDeleteClick"/>
+                    </ContextMenu>
+                </Border.ContextMenu>
+                <Border.Style>
+                    <Style
+                        TargetType="{x:Type Border}">
+                        <EventSetter
+                            Event="MouseLeftButtonUp"
+                            Handler="FavouritesList_MouseLeftButtonUp"/>
                     </Style>
-                </ContentControl.Style>
-            </ContentControl>
+                </Border.Style>
+            </Border>
         </DataTemplate>
 
     </Page.Resources>
@@ -288,6 +311,7 @@
                 <ui:DropDownButton.Flyout>
                     <ContextMenu>
                         <MenuItem Header="Open Config Dir" Click="OnOpenConfigDirClick"/>
+                        <MenuItem Header="Review Settings" Click="OnReviewSettingsClick"/>
                     </ContextMenu>
                 </ui:DropDownButton.Flyout>
 
@@ -311,7 +335,7 @@
         <Grid 
             Grid.Column="1"
             Grid.Row="0"
-            Margin="6">
+            Margin="0, 6, 0, 6">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="75"/>
                 <ColumnDefinition Width="*"/>
@@ -326,7 +350,7 @@
                 Appearance="Transparent"
                 Click="OnFavouriteUserToggleButtonClick"
                 Style="{DynamicResource AccentButton}"
-                Margin="0,0,6,0"
+                Margin="{StaticResource XSmallLeftRightMargin}"
                 ToolTip="Toggle between favourites and user profiles">
                 <ui:Button.Effect>
                     <DropShadowEffect ShadowDepth="0" Color="{StaticResource AccentColor}"/>
@@ -356,21 +380,11 @@
             Grid.Row="1"
             ItemTemplate="{StaticResource FavouritesDataTemplate}"
             ItemsSource="{Binding FilteredProfiles}"
-            SelectionChanged="OnFavouritesSelectionChanged"
             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
             VirtualizingPanel.ScrollUnit="Pixel"
             Margin="0, 12, 0, 50"
             Panel.ZIndex="-1">
-            <ListView.ContextMenu>
-                <ContextMenu>
-                    <ui:MenuItem
-                        Header="Sync"
-                        Click="OnSidePanelItemSyncClick"/>
-                    <ui:MenuItem
-                        Header="Delete"
-                        Click="OnSidePanelItemDeleteClick"/>
-                </ContextMenu>
-            </ListView.ContextMenu>
+
         </ui:ListView>
 
 

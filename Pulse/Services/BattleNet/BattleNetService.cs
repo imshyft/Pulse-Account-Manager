@@ -45,7 +45,7 @@ namespace Studio.Services
                 return false;
 
             _overwatchLauncherPath = Path.Combine(overwatchDirectory, "Overwatch Launcher.exe");
-            if (!Directory.Exists(_overwatchLauncherPath))
+            if (!File.Exists(_overwatchLauncherPath))
                 return false;
 
             return true;

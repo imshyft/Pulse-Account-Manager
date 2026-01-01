@@ -12,6 +12,8 @@ namespace Studio.Contracts.Services
     public interface IProfileFetchingService
     {
         public Task<ProfileFetchResult> FetchProfileAsync(BattleTagV2 battletag);
+
+        public Task<ProfileFetchResult> UpdateProfileAsync(ProfileV2 profile);
     }
 
     public class ProfileFetchResult
