@@ -100,35 +100,23 @@ namespace Studio.Controls
 
 
                 // Animate Opacity for Image
-                var opacityAnimation = new DoubleAnimation
+                if (showWide)
                 {
-                    To = showWide ? 1 : 0, // Target Opacity
-                    Duration = TimeSpan.FromSeconds(0.1),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                };
+                    var opacityAnimation = new DoubleAnimation
+                    {
+                        To = 1,
+                        Duration = TimeSpan.FromSeconds(0.05),
+                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                    };
 
-                control.WideGroupImage.BeginAnimation(UIElement.OpacityProperty, opacityAnimation);
-
-                // Toggle Visibility after fading out
-                if (!showWide)
-                {
-                    opacityAnimation.Completed += (s, a) => control.WideGroupImage.Visibility = Visibility.Hidden;
+                    control.WideGroupImage.BeginAnimation(UIElement.OpacityProperty, opacityAnimation);
+                    control.WideGroupImage.Visibility = Visibility.Visible;
                 }
                 else
                 {
-                    control.WideGroupImage.Visibility = Visibility.Visible;
+                    control.WideGroupImage.Visibility = Visibility.Hidden;
                 }
 
-
-                // Animate Border Thickness
-                var thicknessAnimation = new ThicknessAnimation
-                {
-                    To = showWide ? new Thickness(2) : new Thickness(0), // Target Thickness
-                    Duration = TimeSpan.FromSeconds(0.3), // Duration of animation
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut } // Smooth transition
-                };
-
-                control.Border.BeginAnimation(Border.BorderThicknessProperty, thicknessAnimation);
             }
         }
 

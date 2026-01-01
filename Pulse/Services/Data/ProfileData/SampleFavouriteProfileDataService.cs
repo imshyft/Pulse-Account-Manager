@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.Diagnostics;
 using Studio.Contracts.Services;
+using Studio.Helpers;
 using Studio.Models;
 
 //using Studio.Models;
@@ -12,68 +13,6 @@ namespace Studio.Services.Data
     {
 
         private readonly Random _rnd = new(1);
-        private int[] _randomDates;
-
-
-        private Dictionary<StatisticType, float> GenerateRandomStats()
-        {
-            var dict = new Dictionary<StatisticType, float>();
-            dict[StatisticType.Damage] = _rnd.Next(3000, 12000);
-            dict[StatisticType.TimePlayed] = _rnd.Next(300, 900);
-            dict[StatisticType.Elims] = _rnd.Next(10, 20);
-            dict[StatisticType.Deaths] = _rnd.Next(4, 10);
-            dict[StatisticType.Winrate] = (float)_rnd.NextDouble();
-
-            return dict;
-
-        }
-
-        private List<ProfileSnapshotV2> GenerateRandomSnapshots(int count)
-        {
-            List<ProfileSnapshotV2> snapshots = [];
-            int tankRank = _rnd.Next(500, 4500);
-            int dmgRank = _rnd.Next(500, 4500);
-            int suppRank = _rnd.Next(500, 4500);
-            //_randomDates = new int[count];
-            int date = 1726641630;
-            for (int j = 0; j < count; j++)
-            {
-                //_randomDates[j] = date;
-                bool noTank = _rnd.NextDouble() < 0.3;
-                bool noDmg = _rnd.NextDouble() < 0.3;
-                bool noSupp = _rnd.NextDouble() < 0.3;
-
-                Tank tank = new()
-                {
-                    Rank = noTank ? null : new RankV2(tankRank += _rnd.Next(-2, 2) * 100),
-                    Stats = noTank ? null : GenerateRandomStats()
-                };
-
-                Support supp = new()
-                {
-                    Rank = noSupp ? null : new RankV2(suppRank += _rnd.Next(-2, 2) * 100),
-                    Stats = noSupp ? null : GenerateRandomStats()
-                };
-
-                Damage dmg = new()
-                {
-                    Rank = noDmg ? null : new RankV2(suppRank += _rnd.Next(-2, 2) * 100),
-                    Stats = noDmg ? null : GenerateRandomStats()
-                };
-
-                snapshots.Add(new ProfileSnapshotV2()
-                {
-                    Timestamp = date,
-                    Tank = tank,
-                    Damage = dmg,
-                    Support = supp
-                });
-
-                date += _rnd.Next(80000, 160000);
-            }
-
-            return snapshots;
-        }
 
         private List<ProfileV2> CreateProfiles(int count)
         {
@@ -81,51 +20,16 @@ namespace Studio.Services.Data
             List<ProfileV2> data = new List<ProfileV2>();
             for (int i = 0; i < count; i++)
             {
-
-
                 bool missingDetails = _rnd.NextDouble() < 0.2;
-
-                //var tankMoments = RandomRankMoments(rankMoments);
-                //var dmgMoments = RandomRankMoments(rankMoments);
-                //var suppMoments = RandomRankMoments(rankMoments);
-
                 data.Add(new ProfileV2()
                 {
                     Battletag = new BattleTagV2("Username", _rnd.Next(1000, 9999).ToString()),
-                    //Username = "Username",
-                    //Tag = _rnd.Next(1000, 9999).ToString(),
                     AvatarURL = missingDetails ?
                         null : $"https://d15f34w2p8l1cc.cloudfront.net/overwatch/daeddd96e58a2150afa6ffc3c5503ae7f96afc2e22899210d444f45dee508c6c.png",
                     CustomName = $"Name{_rnd.Next(1000)}",
                     Email = "email@123",
 
-                    Snapshots = GenerateRandomSnapshots(snapshotsCount)
-                    //RankedCareer = new RankedCareer()
-                    //{
-                    //    Damage = _rnd.NextDouble() > 0.4 ? new Damage()
-                    //    {
-                    //        RankMoments = dmgMoments,
-
-                    //        CurrentRank = dmgMoments.Last().Rank,
-                    //        PeakRank = RandomRankMoments(1)[0],
-                    //    } : null,
-                    //    Support = _rnd.NextDouble() > 0.4 ? new Support()
-                    //    {
-                    //        CurrentRank = suppMoments.Last().Rank,
-                    //        PeakRank = RandomRankMoments(1)[0],
-                    //        RankMoments = suppMoments
-                    //    } : null,
-
-                    //    Tank = _rnd.NextDouble() > 0.4 ? new Tank()
-                    //    {
-                    //        CurrentRank = tankMoments.Last().Rank,
-                    //        PeakRank = RandomRankMoments(1)[0],
-                    //        RankMoments = tankMoments
-                    //    } : null,
-                    //},
-                    //TimesLaunched = _rnd.Next(3, 80),
-                    //TimesSwitched = _rnd.Next(10, 300)
-
+                    Snapshots = SampleAccountCreationHelper.GenerateRandomSnapshots(_rnd, snapshotsCount)
                 });
             }
 

@@ -105,6 +105,7 @@ namespace Studio.Models
 
     #region Roles
 
+    // TODO: move selection logic out of model
     public abstract class RoleV2 : INotifyPropertyChanged
     {
         private bool _isSelectedForComparison;
@@ -258,55 +259,7 @@ namespace Studio.Models
 
             return (tier, division);
         }
-        //public static RankV2 RankFromSr(int sr)
-        //{
-        //    if (sr < 0) sr = 0;
-        //    if (sr >= 5000) sr = 4999;
 
-        //    Division division = Division.Bronze;
-        //    int remainder = 0;
-        //    if (sr < 400)
-        //        remainder = 1;
-        //    foreach (Division div in Enum.GetValues(typeof(Division)))
-        //    {
-        //        if (sr < (int)div)
-        //            break;
-        //        division = div;
-        //    }
-
-        //    int baseDivRank = (int)division;
-        //    remainder = Math.Min(sr - (division == Division.Bronze ? 1000 : baseDivRank), 499);
-
-        //    int tier = Math.Min(5,  5 - remainder / 100 );
-
-        //    return new RankV2()
-        //    {
-        //        Division = division,
-        //        SkillRating = sr,
-        //        Tier = tier
-        //    };
-        //}
-
-        //public static RankV2 RankFromDivision(string divisionString, int tier)
-        //{
-        //    if (!Enum.TryParse(divisionString, true, out Division division))
-        //        throw new ArgumentException("Division was not an accepted string");
-
-        //    if (tier < 1 || tier > 5)
-        //        throw new ArgumentException("Tier must be between 1 and 5");
-
-        //    int baseSr = (int)division;
-        //    int remainder = (5 - tier) * 100;
-
-        //    int sr = baseSr + remainder;
-
-        //    return new RankV2()
-        //    {
-        //        SkillRating = sr,
-        //        Division = division,
-        //        Tier = tier
-        //    };
-        //}
     }
     #endregion
 

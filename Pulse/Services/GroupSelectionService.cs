@@ -31,9 +31,9 @@ namespace Studio.Services
                 if (highestMemberSr == -1)
                     return 0;
                 if (isChampionPresent)
-                    return highestMemberSr - 300;
+                    return Math.Max(highestMemberSr - 300, 1);
                 else 
-                    return highestMemberSr - 500;
+                    return Math.Max(highestMemberSr - 500, 1);
             }
         }
 

@@ -9,11 +9,44 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <Border
         x:Name="Border"
-        BorderBrush="{StaticResource WideGroupBrush}"
-        BorderThickness="0"
+        BorderThickness="2"
         CornerRadius="4"
         >
-        
+        <Border.BorderBrush>
+            <SolidColorBrush
+                Color="{StaticResource WideGroupColor}"
+                Opacity="0.0"/>
+        </Border.BorderBrush>
+        <Border.Style>
+            <Style
+                TargetType="Border">
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Path=ShowWideGroupDecorator, RelativeSource={RelativeSource AncestorType=local:RankDisplay}}" Value="True">
+                        <DataTrigger.EnterActions>
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation
+                                    Storyboard.TargetProperty="BorderBrush.Opacity"
+                                    To="1.0"
+                                    Duration="0:0:0.05" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </DataTrigger.EnterActions>
+
+                        <DataTrigger.ExitActions>
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation
+                                    Storyboard.TargetProperty="BorderBrush.Opacity"
+                                    To="0.0"
+                                    Duration="0:0:0.00" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </DataTrigger.ExitActions>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </Border.Style>
         <Viewbox
             Margin="3, 3, 3, 3">
             
