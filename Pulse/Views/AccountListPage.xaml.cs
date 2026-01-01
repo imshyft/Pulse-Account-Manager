@@ -68,24 +68,30 @@ namespace Studio.Views
         }
 
 
-        private void OnProfileListSelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void OnUiElementPreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (e.AddedItems.Count > 0 && !_mouseOverButton && !_isFlyoutOpen)
-            {
-                //NavigationService?.Navigate(new AccountDetailsPage((e.AddedItems[0] as Profile)));
-            }
-
-            AccountDataGrid.SelectedItem = null;
-        }
-
-        private void UIElement_OnPreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
+            // Clicks aren't detected on elements within the row, so the row must be
+            // recursively searched for
             if (e.OriginalSource is DependencyObject source)
             {
-                var row = VisualTreeHelper.GetParent(source) as DataGridRow;
+                int gridRowParentSearches = 20;
+                DataGridRow row = null;
+
+                DependencyObject parent = source;
+                while (gridRowParentSearches > 0)
+                {
+                    parent = VisualTreeHelper.GetParent(parent);
+                    if (parent is DataGridRow)
+                    {
+                        row = parent as DataGridRow;
+                        break;
+                    }
+
+                    gridRowParentSearches--;
+                }
                 if (row != null && !_isFlyoutOpen)
                 {
-                    NavigationService?.Navigate(new AccountDetailsPage((row.DataContext as ProfileV2)));
+                    NavigationService?.Navigate(new AccountDetailsPage(((row as DataGridRow).DataContext as ProfileV2)));
                 }
             }
         }
@@ -157,8 +163,6 @@ namespace Studio.Views
             e.Handled = true;
         }
 
-        private void ListButton_MouseOver(object sender, MouseEventArgs e) => _mouseOverButton = true;
-        private void UIElement_OnMouseLeave(object sender, MouseEventArgs e) => _mouseOverButton = false;
 
         private void OnAccountOptionsClicked(object sender, RoutedEventArgs e)
         {
@@ -302,7 +306,7 @@ namespace Studio.Views
 
             if (source is DataGridRow row && row.DataContext is ProfileV2 profile)
             {
-                await TryLaunchAccount(profile);
+                await TryLaunchAccount(profile, true);
 
             }
         }

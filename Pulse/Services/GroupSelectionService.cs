@@ -65,6 +65,9 @@ namespace Studio.Services
         }
         public void AddMember(RoleV2 member)
         {
+            if (member.Rank?.SkillRating == null)
+                return;
+
             GroupRoles.Add(member);
             member.IsSelectedForComparison = true;
             int sr = member.Rank.SkillRating;

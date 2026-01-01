@@ -13,7 +13,8 @@
       d:DataContext="{d:DesignInstance Type=data:DesignTimeSampleData, IsDesignTimeCreatable=True}"
       Title="AccountListPage"
       KeepAlive="True"
-      SizeChanged="OnPageSizeChanged">
+      SizeChanged="OnPageSizeChanged"
+      >
     <Page.Resources>
 
         <Style
@@ -47,8 +48,7 @@
             CanUserDeleteRows="False"
             VirtualizingPanel.ScrollUnit="Pixel"
             SelectionUnit="FullRow"
-            SelectionChanged="OnProfileListSelectionChanged"
-            MouseLeftButtonDown="UIElement_OnPreviewMouseLeftButtonDown"
+            MouseLeftButtonDown="OnUiElementPreviewMouseLeftButtonDown"
             HorizontalAlignment="Stretch"
             Sorting="AccountDataGrid_Sorting"
             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
@@ -70,7 +70,8 @@
                         <DataTemplate>
                             <ui:Image
                                 Margin="4"
-                                CornerRadius="4">
+                                CornerRadius="4"
+                                MouseLeftButtonDown="OnUiElementPreviewMouseLeftButtonDown">
                                 <ui:Image.Source>
                                     <Binding Path="AvatarURL" >
                                         <Binding.TargetNullValue>
@@ -99,7 +100,8 @@
                             <Viewbox
                                 HorizontalAlignment="Left"
                                 Margin="{StaticResource MediumLeftRightMargin}">
-                                <Grid>
+                                <Grid
+                                    MouseLeftButtonDown="OnUiElementPreviewMouseLeftButtonDown">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="25"/>
                                         <RowDefinition Height="20"/>
@@ -152,7 +154,8 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Grid
-                                Margin="2,10,2,10">
+                                Margin="2,10,2,10"
+                                MouseLeftButtonDown="OnUiElementPreviewMouseLeftButtonDown">
                                 <controls:RankDisplay
                                     RankValue="{Binding LatestSnapshot.Tank.Rank, Mode=OneWay}"
                                     Role="Tank">
@@ -185,7 +188,8 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Grid
-                                Margin="2,10,2,10">
+                                Margin="2,10,2,10"
+                                MouseLeftButtonDown="OnUiElementPreviewMouseLeftButtonDown">
                                 <controls:RankDisplay
                                     
                                     RankValue="{Binding LatestSnapshot.Damage.Rank, Mode=OneWay}"
@@ -216,7 +220,8 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Grid
-                                Margin="2,10,2,10">
+                                Margin="2,10,2,10"
+                                MouseLeftButtonDown="OnUiElementPreviewMouseLeftButtonDown">
                                 <controls:RankDisplay
                                     RankValue="{Binding LatestSnapshot.Support.Rank, Mode=OneWay}"
                                     Role="Support"/>
@@ -241,8 +246,6 @@
                                     x:Name="PlayBtn"
                                     Margin="{StaticResource SmallLeftRightMargin}"
                                     Click="OnPlayButtonClick" 
-                                    MouseEnter="ListButton_MouseOver"
-                                    MouseLeave="UIElement_OnMouseLeave" 
                                     HorizontalAlignment="Center" 
                                     VerticalAlignment="Center"
                                     Width="50"
@@ -287,7 +290,7 @@
                                                    Source="/Resources/Icons/BattleNetIcon.png"
                                                    >
                                                     <Image.Effect>
-                                                        <BlurEffect Radius="5"/>
+                                                        <BlurEffect Radius="1"/>
                                                     </Image.Effect>
                                                 </Image>
                                             </Grid>
@@ -386,8 +389,6 @@
                                 <ui:Button 
                                     Padding="0"
                                     Click="OnAccountOptionsClicked" 
-                                    MouseEnter="ListButton_MouseOver"
-                                    MouseLeave="UIElement_OnMouseLeave" 
                                     HorizontalAlignment="Center" 
                                     VerticalAlignment="Center"
                                     Width="30"

@@ -67,15 +67,33 @@
                 </Grid>
             </Grid>
         </Viewbox>
-        <ui:Button
+        <StackPanel
             Grid.Row="0"
             Grid.Column="1"
-            VerticalAlignment="Top"
-            Style="{DynamicResource AccentButton}"
-            HorizontalAlignment="Right"
-            Click="OnBackButtonClick">
-            <ui:SymbolIcon Symbol="ArrowPrevious12" FontSize="20"/>
-        </ui:Button>
+            Margin="10"
+            Orientation="Horizontal"
+            FlowDirection="RightToLeft">
+            <ui:Button
+                VerticalAlignment="Top"
+                Margin="5"
+                Style="{DynamicResource AccentButton}"
+                HorizontalAlignment="Right"
+                Click="OnBackButtonClick"
+                ToolTip="Go back">
+                <ui:SymbolIcon Symbol="ArrowPrevious20" FontSize="20"/>
+            </ui:Button>
+            <ui:Button
+                VerticalAlignment="Top"
+                    Margin="5"
+                    
+                Style="{DynamicResource AccentButton}"
+                HorizontalAlignment="Right"
+                Click="OnHomeButtonClick"
+                ToolTip="Go back to the list page">
+                <ui:SymbolIcon Symbol="Home20" FontSize="20"/>
+            </ui:Button>
+        </StackPanel>
+
 
         <Grid Grid.Row="1" Grid.Column="1">
             <ui:Button 

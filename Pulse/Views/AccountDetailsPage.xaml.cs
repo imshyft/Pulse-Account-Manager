@@ -39,7 +39,6 @@ namespace Studio.Views
         public ICartesianAxis[] RankYAxes { get; set; }
 
 
-        // TODO: Web graph showing stats
         public static ObservableCollection<double> Vals { get; set; } = new ObservableCollection<double> { 0, 0, 0, 0 };
         public PolarLineSeries<float>[] StatGraphSeries { get; set; }
 
@@ -63,9 +62,7 @@ namespace Studio.Views
             _battleNetService = ((App)Application.Current).GetService<BattleNetService>();
             _snackbarService = ((App)Application.Current).GetService<SnackbarService>();
 
-            //LiveCharts.Configure(c => c.AddLiveChartsRenderSettings());
             DataContext = this;
-            Loaded += OnLoaded;
 
             Profile = profile;
 
@@ -76,10 +73,10 @@ namespace Studio.Views
 
         private void OnPageSizeChanged(object sender, SizeChangedEventArgs e)
         {
-            //RankYAxes[0].TextSize
-            StatPolarGraph.Height = StatPolarGraph.ActualWidth;
-            //StatPolarGraph.Visibility = this.ActualWidth < 600 ? Visibility.Hidden : Visibility.Visible;
-                
+            // polar graph margin from -60..-30 based on width to account for margin gap being too large
+            // on small window sizes
+            double margin = Math.Clamp(-60 + ((StatPolarGraph.ActualWidth - 250.0) / 5.0), -60, -30);
+            StatPolarGraph.Margin = new Thickness(margin);
         }
 
         private void InitRankGraph()
@@ -210,10 +207,6 @@ namespace Studio.Views
 
         }
 
-        private void OnLoaded(object sender, RoutedEventArgs e)
-        {
-            return;
-        }
 
         private Dictionary<Roles, List<DateTimePoint>> GetDateTimePoints(List<ProfileSnapshotV2> snapshots)
         {
@@ -395,6 +388,12 @@ namespace Studio.Views
                 });
             }
         }
+
+        private void OnHomeButtonClick(object sender, RoutedEventArgs e)
+        {
+            NavigationService?.Navigate(new AccountListPage());
+        }
+
 
     }
 
