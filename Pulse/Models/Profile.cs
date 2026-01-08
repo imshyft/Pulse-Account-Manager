@@ -6,6 +6,7 @@ using Studio.Models.Legacy;
 using System.ComponentModel;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 
 namespace Studio.Models
 {
@@ -97,6 +98,12 @@ namespace Studio.Models
         public override string ToString()
         {
             return $"{Username}#{Tag}";
+        }
+
+        public static bool IsBattleTagValid(string battletag)
+        {
+            string pattern = @"(?<![\w\d])(([a-z]|[A-Z])\w{2,11}#\d{3,5})";
+            return Regex.IsMatch(battletag, pattern);
         }
     }
 

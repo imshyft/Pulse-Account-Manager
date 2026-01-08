@@ -41,12 +41,15 @@ public partial class App : Application
 
     public App()
     {
+#if RELEASE
         DispatcherUnhandledException += OnUnhandledException;
+#endif
     }
 
     private void OnUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
     {
-        MessageBox.Show("An unhandled exception just occurred: \n" + e.Exception.Message + ". \n Please make an issue on Github about what happened.", "Exception Sample", MessageBoxButton.OK, MessageBoxImage.Error);
+        MessageBox.Show("An unhandled exception just occurred: \n" + e.Exception.Message + ". \n " +
+            "Please make an issue on Github about what happened and what you were doing. ;-;", "Exception Caught", MessageBoxButton.OK, MessageBoxImage.Error);
         e.Handled = false;
     }
 

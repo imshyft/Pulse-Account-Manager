@@ -30,7 +30,7 @@
             Visibility="{Binding IsSelectingMode, Converter={StaticResource BooleanToVisibilityConverter}}"
             Margin="{StaticResource SmallTopMargin}"
             Height="35"
-            Content="Manually enter battle.tag"
+            Content="Manually enter Battletag"
             Command="{Binding SelectManualEntryCommand}"/>
 
             <ui:Button
@@ -43,7 +43,7 @@
 
             <!-- Manual Entry UI -->
             <StackPanel Visibility="{Binding IsManualEntry, Converter={StaticResource BooleanToVisibilityConverter}}">
-                <ui:TextBlock Text="Enter your BattleTag:" 
+                <ui:TextBlock Text="Enter the Battletag:" 
                           Margin="{StaticResource SmallTopMargin}"/>
 
                 <ui:TextBox
@@ -79,6 +79,7 @@
                 <StackPanel Visibility="{Binding IsMemoryReadSuccessful, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <ui:AutoSuggestBox
                         x:Name="AutoBattleNetSuggestBox"
+                        Text="{Binding BattleTagManualInput, Mode=TwoWay}"
                         HorizontalAlignment="Stretch"
                         Height="35"
                         OriginalItemsSource="{Binding MemoryBattleTags}"
@@ -90,6 +91,7 @@
                         HorizontalAlignment="Stretch"
                         Height="35"
                         Content="Add Friend"
+                        IsEnabled="{Binding IsBattleTagValid}"
                         Command="{Binding AddFriendFromMemory}"
                         Margin="{StaticResource SmallTopBottomMargin}"/>
                 </StackPanel>

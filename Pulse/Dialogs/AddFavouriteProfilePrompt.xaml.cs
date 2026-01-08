@@ -1,4 +1,5 @@
-﻿using Studio.Contracts.Services;
+﻿using Newtonsoft.Json.Linq;
+using Studio.Contracts.Services;
 using Studio.Models;
 using Studio.Services;
 using Studio.Services.Data;
@@ -33,6 +34,8 @@ namespace Studio.Dialogs
     {
         private readonly IProfileFetchingService _profileFetchingService;
         private readonly BattleNetService _battleNetService;
+
+        private CancellationTokenSource _memoryReadToken = new CancellationTokenSource();
 
 
         public ProfileV2 Profile { get; set; }
@@ -157,23 +160,19 @@ namespace Studio.Dialogs
         }
 
 
-
         public bool IsBattleTagValid
         {
             get
             {
                 if (!string.IsNullOrEmpty(BattleTagManualInput))
                 {
-                    string[] parts = BattleTagManualInput.Split("#");
-                    if (parts.Length == 2)
-                        return true;
+                    return BattleTagV2.IsBattleTagValid(BattleTagManualInput);
                 }
 
                 return false;
 
             }
         }
-
 
         public bool IsLoading
         {
@@ -197,14 +196,23 @@ namespace Studio.Dialogs
         {
             CloseInfoBar(); 
             IsMemoryRead = true;
+            IsLoading = true;
             IsManualEntry = false;
             IsSelectingMode = false;
             IsAwaitingMemoryRead = true;
 
+            Trace.WriteLine("STARTING");
 
+            _memoryReadToken = new CancellationTokenSource();
 
+            BattleTagV2[] battleTags = await _battleNetService.ReadFriendsListFromMemory(_memoryReadToken.Token);
 
-            BattleTagV2[] battleTags = _battleNetService.ReadFriendsListFromMemory();
+            IsLoading = false;
+            IsAwaitingMemoryRead = false;
+            
+            if (_memoryReadToken.IsCancellationRequested)
+                return;
+
             if (battleTags.Length == 0)
             {
                 ShowError("Could not find any friends", "if Battle.net wasn't opened, we just launched it so wait for it to load and try again");
@@ -213,18 +221,14 @@ namespace Studio.Dialogs
             else
             {
                 InfoText =
-                    "Your friends have been located from Battle.net. use the search bar to find who to add";
+                    "Your friends have been located from Battle.net. use the search bar to find who to add, or add a different account";
                 foreach (var battleTag in battleTags)
                 {
                     MemoryBattleTags.Add(battleTag);
                 }
-                
+                IsMemoryReadSuccessful = true;
+
             }
-
-            IsMemoryReadSuccessful = true;
-            IsAwaitingMemoryRead = false;
-
-
         });
 
         public ICommand AddFriendFromMemory => new RelayCommand<object>(async _ => {
@@ -282,17 +286,20 @@ namespace Studio.Dialogs
             }
 
             Profile = result.Profile;
+            IsLoading = false;
             IsPrimaryButtonEnabled = true;
 
         }
 
         public ICommand RetryMemoryReadCommand => new RelayCommand<object>(async _ =>
         {
+            _memoryReadToken.Cancel();
             SelectMemoryReadCommand.Execute(null);
         });
 
         public ICommand CancelMemoryReadCommand => new RelayCommand<object>(_ =>
         {
+            _memoryReadToken.Cancel();
             SelectManualEntryCommand.Execute(null);
         });
 

@@ -1,19 +1,22 @@
 ﻿using Studio.Contracts.Services;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows.Markup;
 
 namespace Studio.Services.BattleNet
 {
     public class RegexMatchingMemoryReader : IMemoryReaderService
     {
-        private List<string> _storedFriendBattleTags = new List<string>();
-        private string _storedUserBattleTag = "";
+        private static readonly string _memoryBattletagRegexPattern = @"(?<![\w\d])(([a-z]|[A-Z])\w{2,11}#\d{3,5})";
 
+        #region DLL IMPORTS
         [DllImport("kernel32.dll", SetLastError = true)]
         static extern bool ReadProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress,
             byte[] lpBuffer, UIntPtr nSize, out UIntPtr lpNumberOfBytesRead);
@@ -33,152 +36,62 @@ namespace Studio.Services.BattleNet
             public uint Protect;
             public uint Type;
         }
+        #endregion
 
-        static readonly byte[] AccountMatchingPattern = { 0x0F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0F,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x64, 0x5B};
-
-        // Offset from pattern to name
-        const long BACKWARD_OFFSET_TO_BASE = 0x4C;
-        const int MAX_NAME_CHARS = 16;
-        const long FAVOURITED_OFFSET = 0x30;
-
-        public string[] GetFriendBattleTagStrings(IntPtr processHandle)
+        public Task<string[]> GetFriendBattletagStrings(IntPtr processHandle, CancellationToken token)
         {
-            if (_storedFriendBattleTags.Count == 0)
-                UpdateStoredResults(processHandle);
-            return _storedFriendBattleTags.ToArray();
-        }
 
-        public string GetUserBattleTagString(IntPtr processHandle)
-        {
-            if (_storedUserBattleTag == "")
-                UpdateStoredResults(processHandle);
-            return _storedUserBattleTag;
-        }
-
-        private void UpdateStoredResults(IntPtr processHandle)
-        {
-            if (TryExtractBattleTags(processHandle, out var friends, out string user))
+            return Task.Run(() =>
             {
-                _storedFriendBattleTags = friends.Select(x => x.tag).ToList();
-                _storedUserBattleTag = user;
-            }
-        }
-
-        // Finds any battletag like string in memory
-        /// TODO: Add option to search from any battletag in memory
-        public bool TryReadAllBattleTagsInMemory(IntPtr hProc, out List<string> battletags)
-        {
-            List<string> cleanedTags = new();
-            try
-            {
-                HashSet<string> rawTags = new();
-                ReadProcessMemory(hProc, (MEMORY_BASIC_INFORMATION mbi, byte[] buffer) =>
+                if (TryExtractFriendAccounts(processHandle, out var accounts, token))
                 {
-                    string pattern = @"(?<![\w\d])([a-z]\w{2,11}#\d{3,5})";
-                    foreach (var val in MatchRegex(buffer, pattern))
-                        rawTags.Add(val);
-                    return true;
-                });
-
-                // clean shifted variants where reading starts inside a tag testname#1234
-                // giving results like estname#1234
-                cleanedTags = rawTags
-                    .Where(s => char.IsLetter(s[0])) // if shift results in non letter first, discard (against naming rules)
-                    .OrderByDescending(s => s.Length)
-                    .ToList();
-
-                for (int i = 0; i < cleanedTags.Count; i++)
-                    for (int j = i + 1; j < cleanedTags.Count; j++)
-                        if (cleanedTags[i].EndsWith(cleanedTags[j], StringComparison.OrdinalIgnoreCase))
-                        {
-                            cleanedTags.RemoveAt(j);
-                            j--;
-                        }
-
-            }
-            catch (Exception e)
-            {
-                battletags = new();
-                return false;
-            }
-
-            battletags = cleanedTags;
-            return true;
+                    return accounts.ToArray();
+                }
+                else return [];
+            });
 
         }
 
-        private static bool TryExtractBattleTags(IntPtr hProc, out List<(string tag, bool favourite)> friends, out string userTag)
+        public Task<string[]> GetUserBattletagStrings(IntPtr processHandle, CancellationToken token)
+        {
+
+            return Task.Run(() =>
+            {
+                if (TryExtractRecentAccounts(processHandle, out var accounts, token))
+                {
+                    return accounts.ToArray();
+                }
+                else return [];
+            });
+
+        }
+
+
+        private static bool TryExtractRecentAccounts(IntPtr hProc, out List<string> userAccounts, CancellationToken token)
         {
             bool success;
-            var friendMatches = new List<(string name, bool favourite)>();
-            string userName = "";
+            HashSet<string> accounts = [];
+            int[] b = { 0x07, 0x2D, 0x35, -1, 0x06, 0x04, 0x23, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0x2E, 0x61, 0x63, 0x74, 0x75, 0x61, 0x6C, 0x2E, 0x62, 0x61, 0x74, 0x74, 0x6C, 0x65, 0x2E, 0x6E, 0x65, 0x74 };
 
             try
             {
-                var candidateAccountAddress = new List<IntPtr>();
 
-                // find all potential account adresses
                 ReadProcessMemory(hProc, (MEMORY_BASIC_INFORMATION mbi, byte[] buffer) =>
                 {
-                    foreach (int idx in FindAllOccurrences(buffer, AccountMatchingPattern))
+                    token.ThrowIfCancellationRequested();
+
+                    foreach (int idx in FindAllOccurrences(buffer, b))
                     {
-                        IntPtr matchAddr = new IntPtr(mbi.BaseAddress.ToInt64() + idx);
-                        candidateAccountAddress.Add(matchAddr);
+
+                        string name = Encoding.ASCII.GetString(buffer, idx + 0x08, 0x34).Split("actual.battle.net").Last();
+
+                        foreach (Match m in Regex.Matches(name, _memoryBattletagRegexPattern))
+                        {
+                            accounts.Add(m.Value);
+                        }
                     }
 
                     return true;
-                });
-
-                // get names of accounts (not including id number)
-                foreach (var addr in candidateAccountAddress)
-                {
-                    IntPtr baseAddr = new IntPtr(addr.ToInt64() - BACKWARD_OFFSET_TO_BASE);
-                    string name = ReadASCIIString(hProc, baseAddr, MAX_NAME_CHARS);
-                    string friendAccountPatternRegion = ReadASCIIString(hProc, new IntPtr(baseAddr.ToInt64() + 0x24), 4);
-                    TryReadInt32At(hProc, new IntPtr(baseAddr.ToInt64() + 0x28), out int friendAccount);
-                    TryReadInt32At(hProc, new IntPtr(baseAddr.ToInt64() + FAVOURITED_OFFSET), out int favourited);
-                    if (name.Length > 0 && name.Length < 13)
-                    {
-                        if (friendAccount == 1)
-                        {
-                            bool isFavourite = favourited == 1;
-                            friendMatches.Add((name.Trim('\0'), isFavourite));
-                        }
-                        else
-                            userName = name;
-                    }
-                }
-
-                // find id for each account
-                ReadProcessMemory(hProc, (MEMORY_BASIC_INFORMATION mbi, byte[] buffer) =>
-                {
-                    bool allDataFilled = true;
-                    for (int i = 0; i < friendMatches.Count; i++)
-                    {
-                        if (friendMatches[i].name.Contains('#')) continue;
-                        foreach (int idx in FindAllOccurrences(buffer, Encoding.ASCII.GetBytes(friendMatches[i].name + "#")))
-                        {
-                            IntPtr matchAddr = new IntPtr(mbi.BaseAddress.ToInt64() + idx);
-                            if (TryParseAccountTag(hProc, matchAddr, friendMatches[i].name, out string battleTag))
-                                friendMatches[i] = (battleTag, friendMatches[i].favourite);
-                        }
-                        allDataFilled = false;
-                    }
-
-                    if (userName.Length > 0)
-                    {
-                        foreach (int idx in FindAllOccurrences(buffer, Encoding.ASCII.GetBytes(userName + "#")))
-                        {
-                            IntPtr matchAddr = new IntPtr(mbi.BaseAddress.ToInt64() + idx);
-                            if (TryParseAccountTag(hProc, matchAddr, userName, out string battleTag))
-                                userName = battleTag;
-                        }
-                        allDataFilled = false;
-                    }
-
-                    return !allDataFilled; // stop reading if no more to fill
                 });
 
                 success = true;
@@ -189,55 +102,71 @@ namespace Studio.Services.BattleNet
             }
             finally
             {
-                userTag = userName;
-                friends = friendMatches;
+                userAccounts = accounts.ToList();
             }
 
             return success;
         }
 
-        private static bool TryParseAccountTag(IntPtr hProc, IntPtr address, string name, out string tag)
+        private static bool TryExtractFriendAccounts(IntPtr hProc, out List<string> friends, CancellationToken token)
         {
-            tag = "";
-            string result = ReadASCIIString(hProc, address, 20);
-            var regexMatch = Regex.Match(result, $@"{name}#\d+");
-
-            if (regexMatch.Success)
-                tag = regexMatch.Value;
-
-            return regexMatch.Success;
-        }
-
-        private static bool TryReadInt32At(IntPtr hProc, IntPtr address, out int value)
-        {
-            byte[] buf = new byte[4];
-            value = -1;
-            if (ReadProcessMemory(hProc, address, buf, (UIntPtr)4, out UIntPtr bytesRead) && (long)bytesRead == 4)
+            bool success = false;
+            var friendMatches = new HashSet<string>(); // use hashset to avoid duplicates in memory
+            int[] memoryPattern = [0x1A, -1, 0x0A, 0x0A, 0x08, 0xCE, 0x84, 0x01, 0x10, 0x01, 0x18, 0x04, 0x20, 0x00, 0x12, -1, 0x22, -1];
+            try
             {
-                value = BitConverter.ToInt32(buf, 0);
-                return true;
+                ReadProcessMemory(hProc, (MEMORY_BASIC_INFORMATION mbi, byte[] buffer) =>
+                {
+                    token.ThrowIfCancellationRequested();
+
+                    foreach (int idx in FindAllOccurrences(buffer, memoryPattern))
+                    {
+                        string rawMemoryString = Encoding.ASCII.GetString(buffer, idx + 0x12, 16);
+
+                        foreach (Match m in Regex.Matches(rawMemoryString, _memoryBattletagRegexPattern))
+                        {
+                            friendMatches.Add(m.Value);
+                        }
+                    }
+
+                    return true;
+                });
+                success = true;
+
             }
-            return false;
+            catch (Exception ex)
+            {
+                success = false;
+            }
+            finally
+            {
+                friends = [.. friendMatches];
+            }
+
+            return success;
         }
 
-        private static void ReadProcessMemory(IntPtr hProc, Func<MEMORY_BASIC_INFORMATION, byte[], bool> OnNewBuffer)
+        private static void ReadProcessMemory(IntPtr hProc, Func<MEMORY_BASIC_INFORMATION, byte[], bool> OnNewBuffer, int overlapBytes = 256)
         {
             IntPtr address = IntPtr.Zero;
             UIntPtr mbiSize = (UIntPtr)Marshal.SizeOf(typeof(MEMORY_BASIC_INFORMATION));
 
-            byte[] prevBuffer = [];
+            byte[] prevTail = Array.Empty<byte>();
+
             while (true)
             {
                 UIntPtr ret = VirtualQueryEx(hProc, address, out MEMORY_BASIC_INFORMATION mbi, mbiSize);
-                if (ret == UIntPtr.Zero) break;
+                if (ret == UIntPtr.Zero)
+                    break;
 
-                // Check  region state and protection
                 const uint MEM_COMMIT = 0x1000;
                 const uint PAGE_GUARD = 0x100;
                 const uint PAGE_NOACCESS = 0x01;
 
                 bool isCommitted = (mbi.State & MEM_COMMIT) != 0;
-                bool isReadable = (mbi.Protect & PAGE_NOACCESS) == 0 && (mbi.Protect & PAGE_GUARD) == 0;
+                bool isReadable =
+                    (mbi.Protect & PAGE_NOACCESS) == 0 &&
+                    (mbi.Protect & PAGE_GUARD) == 0;
 
                 if (isCommitted && isReadable)
                 {
@@ -245,18 +174,45 @@ namespace Studio.Services.BattleNet
                     if (regionSize > 0)
                     {
                         byte[] buffer = new byte[regionSize];
-                        if (ReadRegion(hProc, mbi.BaseAddress, buffer, out UIntPtr bytesRead) && (long)bytesRead > 0)
+
+                        if (ReadRegion(hProc, mbi.BaseAddress, buffer, out UIntPtr bytesRead) &&
+                            (long)bytesRead > 0)
                         {
-                            if (OnNewBuffer(mbi, buffer) == false)
+                            int read = (int)bytesRead;
+
+                            // Combine previous tail and buffer
+                            byte[] combined;
+                            if (prevTail.Length > 0)
+                            {
+                                combined = new byte[prevTail.Length + read];
+                                Buffer.BlockCopy(prevTail, 0, combined, 0, prevTail.Length);
+                                Buffer.BlockCopy(buffer, 0, combined, prevTail.Length, read);
+                            }
+                            else
+                            {
+                                combined = buffer.AsSpan(0, read).ToArray();
+                            }
+
+                            if (OnNewBuffer(mbi, combined) == false)
                                 return;
-                            //prevBuffer = buffer;
+
+                            // Save tail for next iteration
+                            int tailSize = Math.Min(overlapBytes, read);
+                            prevTail = new byte[tailSize];
+                            Buffer.BlockCopy(buffer, read - tailSize, prevTail, 0, tailSize);
                         }
                     }
                 }
+                else
+                {
+                    // Reset overlap if region is unreadable
+                    prevTail = Array.Empty<byte>();
+                }
 
-                // next region start
                 long nextAddr = mbi.BaseAddress.ToInt64() + (long)mbi.RegionSize;
-                if (nextAddr >= long.MaxValue) break;
+                if (nextAddr <= 0 || nextAddr >= long.MaxValue)
+                    break;
+
                 address = new IntPtr(nextAddr);
             }
         }
@@ -266,55 +222,24 @@ namespace Studio.Services.BattleNet
             return ReadProcessMemory(hProc, baseAddress, buffer, (UIntPtr)buffer.Length, out bytesRead);
         }
 
-        private static List<int> FindAllOccurrences(byte[] buffer, byte[] pattern)
+        // Find pattern in buffer, where -1 in the pattern indicates to skip comparing the index
+        private static List<int> FindAllOccurrences(byte[] buffer, int[] pattern)
         {
+
             var list = new List<int>();
             for (int i = 0; i <= buffer.Length - pattern.Length; i++)
             {
-                bool ok = true;
+                bool valid = true;
                 for (int j = 0; j < pattern.Length; j++)
                 {
-                    if (buffer[i + j] != pattern[j]) { ok = false; break; }
+                    if (pattern[j] == -1)
+                        continue;
+
+                    if (buffer[i + j] != pattern[j]) { valid = false; break; }
                 }
-                if (ok) list.Add(i);
+                if (valid) list.Add(i);
             }
             return list;
-        }
-
-        private static string ReadASCIIString(IntPtr hProc, IntPtr address, int maxChars)
-        {
-            if (maxChars <= 0) return string.Empty;
-            // read bytes for maxChars (2 bytes per char)
-            int bytesToRead = maxChars * 2;
-            byte[] buf = new byte[bytesToRead];
-
-            if (!ReadProcessMemory(hProc, address, buf, (UIntPtr)buf.Length, out UIntPtr bytesRead) || (long)bytesRead == 0)
-                return "<read failed>";
-
-            // find null terminator (two consecutive zero bytes)
-            int lenBytes = 0;
-            for (int i = 0; i < (int)bytesRead - 1; i += 2)
-            {
-                if (buf[i] == 0 && buf[i + 1] == 0) { break; }
-                lenBytes += 2;
-            }
-
-            if (lenBytes == 0) return string.Empty;
-            return Encoding.ASCII.GetString(buf, 0, lenBytes);
-        }
-
-        static IEnumerable<string> MatchRegex(byte[] buffer, string pattern)
-        {
-            // Convert only printable bytes to ASCII, replace non-printables with space
-            var clean = new StringBuilder(buffer.Length);
-            foreach (byte b in buffer)
-                clean.Append((b >= 32 && b <= 126) ? (char)b : ' ');
-
-            string data = clean.ToString();
-
-            //string pattern = @"(?<![A-Za-z0-9#])[A-Za-z][A-Za-z0-9]{1,11}#[0-9]{3,8}(?![A-Za-z0-9#])";
-            foreach (Match m in Regex.Matches(data, pattern))
-                yield return m.Value;
         }
     }
 }

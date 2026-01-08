@@ -18,10 +18,12 @@ namespace Studio.Helpers.Converters
         public object Convert(object value, Type targetType, object parameter,
             System.Globalization.CultureInfo culture)
         {
-            if (targetType != typeof(bool))
-                throw new InvalidOperationException("The target must be a boolean");
+            if (value is bool boolValue)
+            {
+                return !boolValue;
+            }
+            throw new ArgumentException("Value to convert to inverse is not boolean.");
 
-            return !(bool)value;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter,
@@ -61,6 +63,23 @@ namespace Studio.Helpers.Converters
 
             
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
+    }
+
+    public class ValueConverterGroup : List<IValueConverter>, IValueConverter
+    {
+        #region IValueConverter Members
+
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return this.Aggregate(value, (current, converter) => converter.Convert(current, targetType, parameter, culture));
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             throw new NotImplementedException();
         }

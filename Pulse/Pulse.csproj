@@ -11,12 +11,23 @@
     <FileVersion>0.1.0.0</FileVersion>
     <Configurations>Debug;Release;Sample;Debug_NewUser</Configurations>
     <LangVersion>12.0</LangVersion>
+    <Platforms>AnyCPU;x64</Platforms>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)' == 'Sample'">
 		<DefineConstants>SAMPLE</DefineConstants>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_NewUser|AnyCPU'">
 	  <DefineConstants>$(DefineConstants);NEWUSER</DefineConstants>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_NewUser|x64'">
+	  <DefineConstants>$(DefineConstants);NEWUSER</DefineConstants>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+	  <Optimize>True</Optimize>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+	  <Optimize>True</Optimize>
 	</PropertyGroup>
 	<ItemGroup>
 	  <Compile Remove="Windows\**" />

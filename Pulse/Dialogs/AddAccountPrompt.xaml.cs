@@ -1,8 +1,16 @@
-﻿using Studio.Services;
+﻿using Studio.Contracts.Services;
+using Studio.Helpers;
+using Studio.Models;
+using Studio.Models.Legacy;
+using Studio.Services;
+using Studio.Services.Data;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -11,19 +19,13 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Shell;
-using Studio.Helpers;
 using Wpf.Ui.Controls;
-using Studio.Services.Data;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using Wpf.Ui.Input;
-using Studio.Contracts.Services;
-using System.Windows.Media.Animation;
-using Studio.Models;
 
 namespace Studio.Controls
 {
@@ -35,6 +37,9 @@ namespace Studio.Controls
         private readonly IProfileFetchingService _profileFetchingService;
         private readonly BattleNetService _battleNetService;
 
+        private CancellationTokenSource _memoryReadToken = new CancellationTokenSource();
+
+        public ObservableCollection<BattleTagV2> MemoryBattletags { get; private set; } = [];
 
         public ProfileV2 Profile { get; set; }
         public AddAccountPrompt(ContentPresenter contentPresenter)
@@ -51,6 +56,8 @@ namespace Studio.Controls
 
             _profileFetchingService = ((App)Application.Current).GetService<IProfileFetchingService>();
             _battleNetService = ((App)Application.Current).GetService<BattleNetService>();
+
+            IsMemoryReadSuccessful = false;
 
         }
 
@@ -112,6 +119,9 @@ namespace Studio.Controls
             get => _isInfoBarOpen;
             set { _isInfoBarOpen = value; OnPropertyChanged(); }
         }
+        
+
+
         public bool IsSelectingMode
         {
             get => _isSelectingMode;
@@ -124,24 +134,25 @@ namespace Studio.Controls
             set { _isManualEntry = value; OnPropertyChanged(); }
         }
 
+
         public bool IsMemoryRead
         {
             get => _isMemoryRead;
             set { _isMemoryRead = value; OnPropertyChanged(); }
         }
 
-        public bool IsMemoryReadSuccessful
-        {
-            get => _isMemoryReadSuccessful;
-            set { _isMemoryReadSuccessful = value; OnPropertyChanged(); }
-        }
         public bool IsAwaitingMemoryRead
         {
             get => _isAwaitingMemoryRead;
             set { _isAwaitingMemoryRead = value; OnPropertyChanged(); }
         }
-
-
+        
+        public bool IsMemoryReadSuccessful
+        {
+            get => _isMemoryReadSuccessful;
+            set { _isMemoryReadSuccessful = value; OnPropertyChanged(); }
+        }
+        
 
         public string BattleTagInput
         {
@@ -160,9 +171,7 @@ namespace Studio.Controls
             {
                 if (!string.IsNullOrEmpty(BattleTagInput))
                 {
-                    string[] parts = BattleTagInput.Split("#");
-                    if (parts.Length == 2)
-                        return true;
+                    return BattleTagV2.IsBattleTagValid(BattleTagInput);
                 }
 
                 return false;
@@ -170,14 +179,17 @@ namespace Studio.Controls
             }
         }
 
-
         public bool IsLoading
         {
             get => _isLoading;
             set { _isLoading = value; OnPropertyChanged(); }
         }
 
-
+        /*
+         * FLOW
+         * SelectManualEntryCommand, SelectMemoryReadCommand ->
+         * 
+         */
         public ICommand SelectManualEntryCommand => new RelayCommand<object>(_ =>
         {
             IsManualEntry = true;
@@ -185,7 +197,8 @@ namespace Studio.Controls
             IsSelectingMode = false;
 
             InfoText =
-                "Enter the Battle tag of the account you will log into. Then choose to save the email (locally!) of the current account signed into battle net, or sign in to a different account.";
+                "Enter the Battle tag of the account you will log into. " +
+                "Then choose whether to save the email (locally!) of the current account signed into battle net, or sign in to a different account.";
 
         });
 
@@ -197,42 +210,36 @@ namespace Studio.Controls
             IsManualEntry = false;
             IsSelectingMode = false;
 
+            InfoText = "Please wait while the recent battletags are read from the Battle.Net executable, which you can then seach for";
 
+            IsLoading = true;
 
-            BattleTagV2 battleTag = _battleNetService.ReadBattleTagFromMemory();
+            _memoryReadToken = new CancellationTokenSource();
+            BattleTagV2[] battleTags = await _battleNetService.ReadBattleTagsFromMemory(_memoryReadToken.Token);
 
-            if (battleTag != null)
+            IsLoading = false;
+            IsAwaitingMemoryRead = false;
+
+            if (_memoryReadToken.IsCancellationRequested)
+                return;
+
+            if (battleTags.Length == 0)
             {
-                IsMemoryReadSuccessful = true;
-                IsAwaitingMemoryRead = false;
-                AutoBattleTagResultTextBox.Text = battleTag.ToString();
-                InfoText = "Now that we've found the account, wait for us to get the profile data and then confirm";
-                IsLoading = true;
-                var result = await _profileFetchingService.FetchProfileAsync(battleTag);
-                IsLoading = false;
-                switch (result.Outcome)
-                {
-                    case ProfileFetchOutcome.NotFound:
-                        ShowError(
-                            "Profile could not be found",
-                            "We couldn't retrieve the details of the account, but you can still switch to it. Maybe the profile was private. "
-                            );
-                        break;
-                    case ProfileFetchOutcome.Success:
-                        ShowSuccess("Profile Found", $"Found the profile at {result.Profile.Battletag}");
-                        break;
-                    case ProfileFetchOutcome.Error:
-                        ShowError("Unexpected Error Occurred", $"You can still swap to it, but we couldn't get the info. Error [{result.ErrorMessage}]");
-                        break;
-                }
-
-                Profile = result.Profile;
-                
-                IsPrimaryButtonEnabled = true;
+                ShowError("Couldn't read BattleTag", "We couldn't read the BattleTag. Make sure the Battle.net has completely opened and try again or manually enter it.");
+                return;
             }
             else
             {
-                ShowError("Couldn't read BattleTag", "We couldn't read the BattleTag. Make sure the Battle.net has completely opened and try again or manually enter it.");
+                AccountNameAutoSuggestBox.OriginalItemsSource = battleTags;
+
+                IsMemoryReadSuccessful = true;
+                if (battleTags.Length == 1)
+                {
+                    AccountNameAutoSuggestBox.Text = battleTags[0].ToString();
+                }
+                InfoText = "Start typing to search recent accounts or enter a different battletag. " +
+                "Then choose whether to save the email (locally!) of the current account signed into battle net, or sign in to a different account.";
+
             }
         });
 
@@ -253,6 +260,7 @@ namespace Studio.Controls
 
         private async Task FetchProfile(string battletag)
         {
+            IsLoading = true;
             BattleTagV2 battleTag = new BattleTagV2(battletag);
             var result = await _profileFetchingService.FetchProfileAsync(battleTag);
 
@@ -273,18 +281,16 @@ namespace Studio.Controls
             }
 
             Profile = result.Profile;
+            IsLoading = false;
             IsPrimaryButtonEnabled = true;
         }
 
         public ICommand RetryMemoryReadCommand => new RelayCommand<object>(async _ =>
         {
+            _memoryReadToken.Cancel();
             SelectMemoryReadCommand.Execute(null);
         });
 
-        public ICommand CancelMemoryReadCommand => new RelayCommand<object>(_ =>
-        {
-            SelectManualEntryCommand.Execute(null);
-        });
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName] string propertyName = null) =>

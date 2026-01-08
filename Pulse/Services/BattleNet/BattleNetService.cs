@@ -1,19 +1,21 @@
-﻿using Studio.Services.Storage;
+﻿using AngleSharp.Text;
+using HarfBuzzSharp;
+using Studio.Contracts.Services;
+using Studio.Models;
+using Studio.Services.BattleNet;
+using Studio.Services.Storage;
+using System;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows;
-using System.Xml.Linq;
-using Studio.Models;
-using Studio.Services.BattleNet;
-using System;
-using System.Windows.Media.Animation;
-using AngleSharp.Text;
-using System.Collections.Specialized;
 using System.Windows.Controls.Ribbon;
-using Studio.Contracts.Services;
+using System.Windows.Media.Animation;
+using System.Xml.Linq;
 
 namespace Studio.Services
 {
@@ -23,15 +25,32 @@ namespace Studio.Services
         private string _battleNetConfigPath;
         private string _overwatchLauncherPath;
         private readonly IMemoryReaderService _memoryReaderService;
-        private bool _isReady;
+
+        private List<string> _storedFriendBattleTags = [];
+        private List<string> _storedUserBattleTags = [];
+
+        // only re-scan memory if its a new instance of battle.net
+        private int _lastFriendScanPID = 0;
+        private int _lastUserScanPID = 0;
+
+        #region IMPORTS
+        [DllImport("kernel32.dll", SetLastError = true)]
+        static extern IntPtr OpenProcess(
+        uint dwDesiredAccess,
+        bool bInheritHandle,
+        int dwProcessId);
+
+        [DllImport("kernel32.dll")]
+        static extern bool CloseHandle(IntPtr hObject);
+
+        const uint PROCESS_VM_READ = 0x0010;
+        const uint PROCESS_QUERY_INFORMATION = 0x0400;
+        #endregion
 
         public BattleNetService(IMemoryReaderService memoryReaderService)
         {
             _persistAndRestoreService = ((App)Application.Current).GetService<PersistAndRestoreService>();
             _memoryReaderService = memoryReaderService;
-
-            _isReady = IsPathsValid();
-
 
         }
 
@@ -140,50 +159,76 @@ namespace Studio.Services
 
         }
 
-        public BattleTagV2 ReadBattleTagFromMemory()
+        public async Task<BattleTagV2[]> ReadBattleTagsFromMemory(CancellationToken? token = null)
         {
-            Process[] processes = Process.GetProcessesByName("Battle.net");
-            Process process;
-            if (processes.Length == 0)
+            Process process = getBattleNetProcess();
+            IntPtr handle = GetHandle(process.Id);
+
+            string[] tags;
+            if (_storedUserBattleTags.Count == 0 || _lastUserScanPID != process.Id)
             {
-                process = Process.Start(_overwatchLauncherPath);
+                _lastUserScanPID = process.Id;
+                tags = await _memoryReaderService.GetUserBattletagStrings(handle, token ?? CancellationToken.None);
             }
             else
             {
-                process = processes[0];
+                tags = _storedUserBattleTags.ToArray();
             }
 
-            //var friends = _memoryReaderService.FindBlizzardFriends(process.Id);
+            BattleTagV2[] battleTags = tags.Select(x => new BattleTagV2(x)).ToArray();
 
-
-            //var tag = BattleNetMemoryReaderService_OLD.GetUserBattleTagString(process.Handle);
-            var tag = _memoryReaderService.GetUserBattleTagString(process.Handle);
-
-            if (tag == "")
-                return null;
-
-            BattleTagV2 battleTag = new BattleTagV2(tag);
-
-            return battleTag;
+            return battleTags;
         }
 
-        public BattleTagV2[] ReadFriendsListFromMemory()
+        public async Task<BattleTagV2[]> ReadFriendsListFromMemory(CancellationToken? token = null)
         {
-            Process[] processes = Process.GetProcessesByName("Battle.net");
-            Process process;
-            if (processes.Length == 0)
+            Process process = getBattleNetProcess();
+            IntPtr handle = GetHandle(process.Id);
+
+            string[] tags;
+            if (_storedFriendBattleTags.Count == 0 || _lastFriendScanPID != process.Id)
             {
-                process = Process.Start(_overwatchLauncherPath);
+                _lastFriendScanPID = process.Id;
+                tags = await _memoryReaderService.GetFriendBattletagStrings(handle, token ?? CancellationToken.None);
             }
             else
             {
-                process = processes[0];
+                tags = _storedFriendBattleTags.ToArray();
             }
-            var tags = _memoryReaderService.GetFriendBattleTagStrings(process.Handle);
+
             BattleTagV2[] battleTags = tags.Select(x => new BattleTagV2(x)).ToArray();
 
             return battleTags;
 
+        }
+
+        private Process getBattleNetProcess()
+        {
+            Process[] processes = Process.GetProcessesByName("Battle.net");
+            Process process;
+            if (processes.Length == 0)
+            {
+                process = Process.Start(_overwatchLauncherPath);
+            }
+            else
+            {
+                process = processes[0];
+            }
+
+            return process;
+        }
+
+        private IntPtr GetHandle(int pid)
+        {
+            IntPtr hProc = OpenProcess(
+            PROCESS_VM_READ | PROCESS_QUERY_INFORMATION,
+            false,
+            pid);
+
+            if (hProc == IntPtr.Zero)
+                throw new Win32Exception(Marshal.GetLastWin32Error());
+
+            return hProc;
         }
     }
 }
