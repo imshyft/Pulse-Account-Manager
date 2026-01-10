@@ -12,7 +12,6 @@ using Studio.Contracts.Views;
 using Studio.Contracts.Services;
 using Studio.Services;
 using Studio.Models;
-using Studio.Services;
 using Studio.Services.ApplicationServices;
 using Studio.Services.Data;
 using Studio.Services.Files;
@@ -84,8 +83,8 @@ public partial class App : Application
         // Services
         services.AddSingleton<IThemeSelectorService, ThemeSelectorService>();
         services.AddSingleton<PersistAndRestoreService>();
-        services.AddSingleton<Wpf.Ui.SnackbarService>();
-        //services.AddSingleton<PersistAndRestoreService>();A
+        services.AddSingleton<CustomSnackbarService>();
+        services.AddSingleton<AccountActionsService>();
         services.AddSingleton<INavigationService, NavigationService>();
 
 #if SAMPLE

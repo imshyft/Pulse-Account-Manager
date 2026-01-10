@@ -9,7 +9,6 @@ using LiveChartsCore.SkiaSharpView.Painting.Effects;
 using Newtonsoft.Json.Linq;
 using SkiaSharp;
 using Studio.Contracts.Services;
-using Studio.Helpers;
 using Studio.Models;
 using Studio.Services;
 using System.Collections.ObjectModel;
@@ -28,8 +27,8 @@ namespace Studio.Views
     /// </summary>
     public partial class AccountDetailsPage : Page
     {
-        private readonly SnackbarService _snackbarService;
-        private readonly BattleNetService _battleNetService;
+        private readonly CustomSnackbarService _snackbarService;
+        private readonly AccountActionsService _accountActionsService;
 
         public ProfileV2 Profile { get; set; }
 
@@ -56,8 +55,8 @@ namespace Studio.Views
         public AccountDetailsPage(ProfileV2 profile)
         {
             InitializeComponent();
-            _battleNetService = ((App)Application.Current).GetService<BattleNetService>();
-            _snackbarService = ((App)Application.Current).GetService<SnackbarService>();
+            _accountActionsService = ((App)Application.Current).GetService<AccountActionsService>();
+            _snackbarService = ((App)Application.Current).GetService<CustomSnackbarService>();
 
             DataContext = this;
 
@@ -318,67 +317,7 @@ namespace Studio.Views
 
         private async void PlayBtn_Click(object sender, RoutedEventArgs e)
         {
-            await TryLaunchAccount(Profile, true);
-        }
-
-        // TODO: fix repeated code
-        private async Task TryLaunchAccount(ProfileV2 profile, bool tryLaunchGame = false)
-        {
-            if (profile == null)
-                return;
-            if (profile.Email == null)
-            {
-                _ = _snackbarService.GetSnackbarPresenter().ImmediatelyDisplay(new Snackbar(_snackbarService.GetSnackbarPresenter())
-                {
-                    AllowDrop = false,
-                    Appearance = ControlAppearance.Danger,
-                    Title = "Couldn't Launch Account",
-                    Content = "No email is associated with this account",
-                    Icon = new SymbolIcon(SymbolRegular.ErrorCircle12),
-                    Opacity = 0.9
-                });
-                return;
-            }
-
-            _ = _snackbarService.GetSnackbarPresenter().ImmediatelyDisplay(new Snackbar(_snackbarService.GetSnackbarPresenter())
-            {
-                AllowDrop = false,
-                Appearance = ControlAppearance.Success,
-                Title = "Switching Account!",
-                Icon = new SymbolIcon(SymbolRegular.Checkmark12, 35),
-                Opacity = 0.9
-            });
-
-            _battleNetService.OpenBattleNetWithAccount(profile.Email);
-            if (!tryLaunchGame)
-                return;
-
-            bool result = await _battleNetService.WaitForMainWindow();
-            if (result)
-            {
-                _ = _snackbarService.GetSnackbarPresenter().ImmediatelyDisplay(new Snackbar(_snackbarService.GetSnackbarPresenter())
-                {
-                    AllowDrop = false,
-                    Appearance = ControlAppearance.Success,
-                    Title = "Launching Game!",
-                    Icon = new SymbolIcon(SymbolRegular.Checkmark12, 35),
-                    Opacity = 0.9
-                });
-
-                _battleNetService.OpenBattleNet(true);
-            }
-            else
-            {
-                _ = _snackbarService.GetSnackbarPresenter().ImmediatelyDisplay(new Snackbar(_snackbarService.GetSnackbarPresenter())
-                {
-                    AllowDrop = false,
-                    Appearance = ControlAppearance.Danger,
-                    Title = "Couldn't Launch Overwatch",
-                    Content = "Timed out waiting for Battle.net to load",
-                    Icon = new SymbolIcon(SymbolRegular.ErrorCircle12),
-                    Opacity = 0.9
-                });
-            }
+            await _accountActionsService.TryLaunchAccount(Profile, true);
         }
 
         private void OnHomeButtonClick(object sender, RoutedEventArgs e)

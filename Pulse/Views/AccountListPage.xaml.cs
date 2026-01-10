@@ -42,9 +42,10 @@ namespace Studio.Views
         public UserProfileDataService UserProfiles { get; set; }
         public GroupSelectionService GroupSelectionService { get; set; }
 
+        private AccountActionsService _accountActionsService;
         private BattleNetService _battleNetService;
         private IProfileFetchingService _profileDataFetchingService;
-        private SnackbarService _snackbarService;
+        private CustomSnackbarService _snackbarService;
 
         private bool _mouseOverButton = false;
         private bool _isFlyoutOpen;
@@ -60,8 +61,8 @@ namespace Studio.Views
             _battleNetService = ((App)Application.Current).GetService<BattleNetService>();
             _profileDataFetchingService = ((App)Application.Current).GetService<IProfileFetchingService>();
             GroupSelectionService = ((App)Application.Current).GetService<GroupSelectionService>();
-            _snackbarService = ((App)Application.Current).GetService<SnackbarService>();
-
+            _snackbarService = ((App)Application.Current).GetService<CustomSnackbarService>();
+            _accountActionsService = ((App)Application.Current).GetService<AccountActionsService>();
             AccountDataGrid.SelectedItem = null;
 
 
@@ -98,73 +99,13 @@ namespace Studio.Views
             }
         }
 
-        private async Task TryLaunchAccount(ProfileV2 profile, bool tryLaunchGame = false)
-        {
-            if (profile == null)
-                return;
-            if (profile.Email == null)
-            {
-                _ = _snackbarService.GetSnackbarPresenter().ImmediatelyDisplay(new Snackbar(_snackbarService.GetSnackbarPresenter())
-                {
-                    AllowDrop = false,
-                    Appearance = ControlAppearance.Danger,
-                    Title = "Couldn't Launch Account",
-                    Content = "No email is associated with this account",
-                    Icon = new SymbolIcon(SymbolRegular.ErrorCircle12),
-                    Opacity = 0.9
-                });
-                return;
-            }
-
-            _ = _snackbarService.GetSnackbarPresenter().ImmediatelyDisplay(new Snackbar(_snackbarService.GetSnackbarPresenter())
-            {
-                AllowDrop = false,
-                Appearance = ControlAppearance.Success,
-                Title = "Switching Account!",
-                Icon = new SymbolIcon(SymbolRegular.Checkmark12, 35),
-                Opacity = 0.9
-            });
-
-            _battleNetService.OpenBattleNetWithAccount(profile.Email);
-            if (!tryLaunchGame)
-                return;
-
-            bool result = await _battleNetService.WaitForMainWindow();
-            if (result)
-            {
-                //_ = _snackbarService.GetSnackbarPresenter().ImmediatelyDisplay(new Snackbar(_snackbarService.GetSnackbarPresenter())
-                //{
-                //    AllowDrop = false,
-                //    Appearance = ControlAppearance.Success,
-                //    Title = "Launching Game!",
-                //    Icon = new SymbolIcon(SymbolRegular.Checkmark12, 35),
-                //    Opacity = 0.9,
-                //});
-
-                _battleNetService.OpenBattleNet(true);
-            }
-            else
-            {
-                _ = _snackbarService.GetSnackbarPresenter().ImmediatelyDisplay(new Snackbar(_snackbarService.GetSnackbarPresenter())
-                {
-                    AllowDrop = false,
-                    Appearance = ControlAppearance.Danger,
-                    Title = "Couldn't Launch Overwatch",
-                    Content = "Timed out waiting for Battle.net to load",
-                    Icon = new SymbolIcon(SymbolRegular.ErrorCircle12),
-                    Opacity = 0.9
-                });
-            }
-        }
-
         private async void OnPlayButtonClick(object sender, RoutedEventArgs e)
         {
             ProfileV2 profile = ((FrameworkElement)sender).DataContext as ProfileV2;
-
-            await TryLaunchAccount(profile, true);
+            
+            await _accountActionsService.TryLaunchAccount(profile, true);
             e.Handled = true;
         }
-
 
         private void OnAccountOptionsClicked(object sender, RoutedEventArgs e)
         {
@@ -188,38 +129,13 @@ namespace Studio.Views
             if (((FrameworkElement)sender).DataContext is not ProfileV2 profile)
                 return;
 
-            var result = await _profileDataFetchingService.UpdateProfileAsync(profile);
-            _snackbarService.GetSnackbarPresenter().AddToQue(new Snackbar(_snackbarService.GetSnackbarPresenter())
+            var updatedProfile = await _accountActionsService.TrySyncAccount(profile);
+            if (updatedProfile != null)
             {
-                Appearance = ControlAppearance.Info,
-                Title = "Syncing Account",
-                Content = "Please wait a moment.",
-                Icon = new SymbolIcon(SymbolRegular.ArrowClockwise16),
-            });
-
-            if (result.Outcome == ProfileFetchOutcome.Success)
-            {
-                _ = _snackbarService.GetSnackbarPresenter().ImmediatelyDisplay(new Snackbar(_snackbarService.GetSnackbarPresenter())
-                {
-                    Appearance = ControlAppearance.Success,
-                    Title = "Synced Account",
-                    Content = "Account profile successfully synced",
-                    Icon = new SymbolIcon(SymbolRegular.ArrowClockwise16),
-                });
-                //result.Profile.Email = profile.Email;
                 UserProfiles.DeleteProfile(profile);
-                UserProfiles.SaveProfile(result.Profile);
+                UserProfiles.SaveProfile(updatedProfile);
             }
-            else
-            {
-                _ = _snackbarService.GetSnackbarPresenter().ImmediatelyDisplay(new Snackbar(_snackbarService.GetSnackbarPresenter())
-                {
-                    Appearance = ControlAppearance.Danger,
-                    Title = "Could not fetch account",
-                    Content = "Please try again later, or re-add the account if it keeps failing",
-                    Icon = new SymbolIcon(SymbolRegular.ErrorCircle24),
-                });
-            }
+
         }
 
         private void OnOptionsRemoveButtonClick(object sender, RoutedEventArgs e)
@@ -228,11 +144,11 @@ namespace Studio.Views
                 return;
 
             UserProfiles.DeleteProfile(profile);
-            _snackbarService.GetSnackbarPresenter().ImmediatelyDisplay(new Snackbar(_snackbarService.GetSnackbarPresenter())
+            _snackbarService.Show(true, s =>
             {
-                Appearance = ControlAppearance.Success,
-                Title = "Account deleted",
-                Icon = new SymbolIcon(SymbolRegular.Checkmark16),
+                s.Appearance = ControlAppearance.Success;
+                s.Title = "Account deleted";
+                s.Icon = new SymbolIcon(SymbolRegular.Checkmark16);
             });
 
         }
@@ -307,7 +223,7 @@ namespace Studio.Views
 
             if (source is DataGridRow row && row.DataContext is ProfileV2 profile)
             {
-                await TryLaunchAccount(profile, true);
+                await _accountActionsService.TryLaunchAccount(profile, true);
 
             }
         }
@@ -316,7 +232,7 @@ namespace Studio.Views
         {
             ProfileV2 profile = ((FrameworkElement)sender).DataContext as ProfileV2;
 
-            await TryLaunchAccount(profile, false);
+            await _accountActionsService.TryLaunchAccount(profile, false);
             e.Handled = true;
         }
     }

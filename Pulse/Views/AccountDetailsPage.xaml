@@ -148,8 +148,14 @@
             MinWidth="200"
             Margin="-30"
             Panel.ZIndex="-1">
-
-
         </lvc:PolarChart>
+
+        <!-- Workaround to prevent tooltip showing for center 0 values -->
+        <Rectangle
+            Grid.Row="2"
+            Grid.Column="1"
+            Width="20"
+            Height="20"
+            Fill="Transparent"/>
     </Grid>
 </Page>

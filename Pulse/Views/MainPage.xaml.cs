@@ -39,10 +39,10 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
     public bool IsPanelShowingFavourites { get; set; } = true;
 
     private readonly FavouriteProfileDataService _favouriteProfiles;
+    private readonly AccountActionsService _accountActionsService;
     private readonly BattleNetService _battleNetService;
-    private IProfileFetchingService _profileDataFetchingService;
     private readonly UserProfileDataService _userProfiles;
-    private readonly SnackbarService _snackbarService;
+    private readonly CustomSnackbarService _snackbarService;
     private readonly IAppPaths _appPaths;
 
     private readonly int favouritesPanelExpandedWidth = 250;
@@ -62,12 +62,12 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
     {
         InitializeComponent();
         DataContext = this;
+        _accountActionsService = ((App)Application.Current).GetService<AccountActionsService>();
         _favouriteProfiles = ((App)Application.Current).GetService<FavouriteProfileDataService>();
         _userProfiles = ((App)Application.Current).GetService<UserProfileDataService>();
-        _profileDataFetchingService = ((App)Application.Current).GetService<IProfileFetchingService>();
         GroupSelectionService = ((App)Application.Current).GetService<GroupSelectionService>();
         _battleNetService = ((App)Application.Current).GetService<BattleNetService>();
-        _snackbarService = ((App)Application.Current).GetService<SnackbarService>();
+        _snackbarService = ((App)Application.Current).GetService<CustomSnackbarService>();
         _appPaths = ((App)Application.Current).GetService<IAppPaths>();
         
         
@@ -229,6 +229,7 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
             FilteredProfiles.Add(item);
         }
     }
+    
     private void OnToggleOpenFavouritesPanelButtonClick(object sender, RoutedEventArgs e)
     {
 
@@ -388,46 +389,26 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
         
     }
 
-
-
     private async void OnSidePanelItemSyncClick(object sender, RoutedEventArgs e)
     {
         if (FavouritesList.SelectedItem is not ProfileV2 profile)
             return;
 
-        var result = await _profileDataFetchingService.UpdateProfileAsync(profile);
-
-        if (result.Outcome == ProfileFetchOutcome.Success)
+        var updatedProfile = await _accountActionsService.TrySyncAccount(profile);
+        if (updatedProfile != null)
         {
-            _ = SnackbarPresenter.ImmediatelyDisplay(new Snackbar(SnackbarPresenter)
-            {
-                Appearance = ControlAppearance.Success,
-                Title = "Synced Account",
-                Content = "Favourited profile successfully synced",
-                Icon = new SymbolIcon(SymbolRegular.ArrowClockwise16),
-            });
-
             if (IsPanelShowingFavourites)
             {
                 _favouriteProfiles.DeleteProfile(profile);
-                _favouriteProfiles.SaveProfile(result.Profile);
+                _favouriteProfiles.SaveProfile(updatedProfile);
             }
             else
             {
                 _userProfiles.DeleteProfile(profile);
-                _userProfiles.SaveProfile(result.Profile);
+                _userProfiles.SaveProfile(updatedProfile);
             }
         }
-        else
-        {
-            _ = SnackbarPresenter.ImmediatelyDisplay(new Snackbar(SnackbarPresenter)
-            {
-                Appearance = ControlAppearance.Danger,
-                Title = "Could not fetch account",
-                Content = "Please try again later, or re-add the account if it keeps failing",
-                Icon = new SymbolIcon(SymbolRegular.ErrorCircle24),
-            });
-        }
+
 
         RefreshPanel();
 
@@ -447,6 +428,13 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
         {
             _userProfiles.DeleteProfile(profile);
         }
+
+        _snackbarService.Show(true, s =>
+        {
+            s.Appearance = ControlAppearance.Success;
+            s.Title = "Account deleted";
+            s.Icon = new SymbolIcon(SymbolRegular.Checkmark16);
+        });
 
         RefreshPanel();
     }
