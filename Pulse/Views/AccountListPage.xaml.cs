@@ -86,6 +86,8 @@ namespace Studio.Views
                         row = parent as DataGridRow;
                         break;
                     }
+                    if (parent == null)
+                        break;
 
                     gridRowParentSearches--;
                 }
@@ -130,14 +132,14 @@ namespace Studio.Views
             bool result = await _battleNetService.WaitForMainWindow();
             if (result)
             {
-                _ = _snackbarService.GetSnackbarPresenter().ImmediatelyDisplay(new Snackbar(_snackbarService.GetSnackbarPresenter())
-                {
-                    AllowDrop = false,
-                    Appearance = ControlAppearance.Success,
-                    Title = "Launching Game!",
-                    Icon = new SymbolIcon(SymbolRegular.Checkmark12, 35),
-                    Opacity = 0.9
-                });
+                //_ = _snackbarService.GetSnackbarPresenter().ImmediatelyDisplay(new Snackbar(_snackbarService.GetSnackbarPresenter())
+                //{
+                //    AllowDrop = false,
+                //    Appearance = ControlAppearance.Success,
+                //    Title = "Launching Game!",
+                //    Icon = new SymbolIcon(SymbolRegular.Checkmark12, 35),
+                //    Opacity = 0.9,
+                //});
 
                 _battleNetService.OpenBattleNet(true);
             }
@@ -181,7 +183,6 @@ namespace Studio.Views
             _isFlyoutOpen = false;
         }
 
-        // TODO : make a better sync system that preserves history
         private async void OnOptionsSyncButtonClick(object sender, RoutedEventArgs e)
         {
             if (((FrameworkElement)sender).DataContext is not ProfileV2 profile)

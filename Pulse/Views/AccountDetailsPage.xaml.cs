@@ -46,9 +46,6 @@ namespace Studio.Views
         public PolarAxis[] RadiusAxes { get; set; }
         public PolarAxis[] AngleAxes { get; set; }
 
-        public double CurrentRegionLow => double.NaN;
-        public double CurrentRegion { get; set; } = 1748864068 + TimeSpan.FromDays(10).TotalSeconds;
-
         static readonly Dictionary<Roles, SKColor> _roleColors = new()
         {
             {Roles.Tank, new SKColor(52, 152, 219) },
@@ -143,14 +140,9 @@ namespace Studio.Views
             if (Profile.LatestSnapshot.Support != null)
                 series.Add(new RankLineSeries(points[Roles.Support], _roleColors[Roles.Support]));
 
-
-            //Chart.TooltipBackgroundPaint = new SolidColorPaint(SKColor.Parse("#DD2f2c3d"));
-            //Chart.TooltipTextPaint = new SolidColorPaint(SKColors.White);
             RankSeries = series.ToArray();
             var oldestSnapshot = Profile.Snapshots.OrderByDescending(s => s.Timestamp).Last();
-            var timespan = TimeSpan.FromSeconds(Profile.LatestSnapshot.Timestamp - oldestSnapshot.Timestamp);
-
-            CurrentRegion = Profile.LatestSnapshot.Timestamp;
+            var timespan = TimeSpan.FromSeconds(Math.Max(Profile.LatestSnapshot.Timestamp - oldestSnapshot.Timestamp, TimeSpan.FromDays(10).TotalSeconds));
 
             RankXAxes[0].UnitWidth = (timespan / 7.0).Ticks;
             RankXAxes[0].MinLimit = null;
@@ -173,7 +165,7 @@ namespace Studio.Views
                     },
                     TextSize = 15,
                     LabelsBackground = new LvcColor(0, 0, 0, 0),
-                    Labels = ["Damage", "Healing", "Deaths", "Elims"],
+                    Labels = ["Healing", "Elims", "Damage", "Deaths"],
                     SeparatorsPaint = new SolidColorPaint(SKColors.LightSlateGray)
                     {
                         StrokeThickness = 1,
@@ -279,10 +271,10 @@ namespace Studio.Views
         private class StatChartSeries : PolarLineSeries<float>
         {
             StatisticType[] statTypes = [
-                            StatisticType.Damage,
                             StatisticType.Healing,
-                            StatisticType.Deaths,
                             StatisticType.Elims,
+                            StatisticType.Damage,
+                            StatisticType.Deaths,
                         ];
             public StatChartSeries(RoleV2 role)
             {
@@ -294,8 +286,8 @@ namespace Studio.Views
                 else
                 {
                     var stats = StatisticScaler.ScaleStatistics(role.Stats);
-                    //Values = stats.Where(x => statTypes.Contains(x.Key)).Select(x => x.Value).ToList();
-                    Values = role.Stats.Where(x => statTypes.Contains(x.Key)).Select(x => x.Value).ToList();
+                    Values = statTypes.Select(s => role.Stats[s]).ToList();
+                    //Values = role.Stats.Where(x => statTypes.Contains(x.Key)).Select(x => x.Value).ToList();
                     Mapping = (height, rad) => new Coordinate(rad, stats[statTypes[rad]]);
                     Fill = new SolidColorPaint(_roleColors[role.Type].WithAlpha(50));
 
