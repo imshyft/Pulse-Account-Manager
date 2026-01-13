@@ -325,6 +325,7 @@
             Grid.Row="1"
             x:Name="mainContentFrame"
             NavigationUIVisibility="Hidden"
+            JournalOwnership="OwnsJournal"
             Focusable="False" />
 
         <ui:SnackbarPresenter 

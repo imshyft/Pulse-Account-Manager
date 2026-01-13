@@ -20,6 +20,7 @@ using Studio.Services;
 using Studio.Services.Data;
 using Studio.Services.Files;
 using Studio.Services.Storage;
+using Windows.Media.Audio;
 using Wpf.Ui;
 using Wpf.Ui.Controls;
 using static SkiaSharp.HarfBuzz.SKShaper;
@@ -47,6 +48,8 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
 
     private readonly int favouritesPanelExpandedWidth = 250;
     private readonly int favouritesPanelCollapsedWidth = 75;
+
+    private readonly int _maxBackEntries = 10;
 
     private readonly PersistAndRestoreService _persistAndRestoreService;
 
@@ -91,6 +94,28 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
         else
         {
             _ = validatePaths();
+        }
+
+        mainContentFrame.NavigationService.Navigated += OnContentFrameNavigated;
+    }
+
+    // limit navigation history to 10 to free memory
+    private void OnContentFrameNavigated(object sender, System.Windows.Navigation.NavigationEventArgs e)
+    {
+        var service = mainContentFrame.NavigationService;
+        if (service == null)
+            return;
+        if (mainContentFrame.BackStack == null)
+            return;
+
+        int count = _maxBackEntries;
+        foreach (var entry in mainContentFrame.BackStack)
+        {
+            count--;
+        }
+        for (int i = count; i < 0; i++)
+        {
+            mainContentFrame.RemoveBackEntry();
         }
     }
 
