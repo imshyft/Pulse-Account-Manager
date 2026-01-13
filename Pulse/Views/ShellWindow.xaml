@@ -68,7 +68,13 @@
         <ui:TitleBar
             x:Name="TitleBar"
             Grid.Row="0"
-            Height="40">
+            Height="40"
+            FontFamily="{StaticResource BigNoodleTooOblique}"
+            FontSize="20"
+            Title="Version">
+            <ui:TitleBar.Foreground>
+                <SolidColorBrush Color="White" Opacity="0.03"/>
+            </ui:TitleBar.Foreground>
             <ui:TitleBar.Icon>
                 <ui:ImageIcon Source="pack://application:,,,/Resources/Logo/Logo.ico" Height="auto" Margin="2,-6,0,-6">
                     <ui:ImageIcon.Effect>

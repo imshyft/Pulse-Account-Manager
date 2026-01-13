@@ -1,15 +1,15 @@
-﻿using System.Collections.ObjectModel;
+﻿using MahApps.Metro.Controls;
+using Studio.Contracts.Services;
+using Studio.Contracts.Views;
+using Studio.Services.Storage;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shell;
-using MahApps.Metro.Controls;
-
-using Studio.Contracts.Services;
-using Studio.Contracts.Views;
-using Studio.Services.Storage;
 using Wpf.Ui.Controls;
 
 namespace Studio.Views;
@@ -64,6 +64,7 @@ public partial class ShellWindow : FluentWindow, IShellWindow, INotifyPropertyCh
         InitializeComponent();
         DataContext = this;
         Instance = this;
+        TitleBar.Title = Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
     }
 

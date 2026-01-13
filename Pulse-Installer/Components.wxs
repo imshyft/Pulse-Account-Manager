@@ -1,0 +1,23 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Fragment>
+    <ComponentGroup Id="Program" Directory="INSTALLFOLDER">
+      <Files Include="$(var.Pulse.ProjectDir)bin\publish\Pulse\**\*"/>
+    </ComponentGroup>
+
+    <DirectoryRef Id="AppProgramMenuFolder">
+      <Component Id="Shortcut" Guid="B0ABBCF5-A52E-46A8-8318-D75F7FCC67E9">
+        <Shortcut Name="Pulse"
+                    Target="[INSTALLFOLDER]Pulse.exe"
+                    Directory="AppProgramMenuFolder"
+                    WorkingDirectory="INSTALLFOLDER"/>
+        <RemoveFolder Id="CleanupShortcut" Directory="AppProgramMenuFolder" On="uninstall"/>
+        <RegistryValue Root="HKCU" Key="Software\!(bind.Property.Manufacturer)\!(bind.Property.ProductName)"
+                       Name="Installed"
+                       Type="integer"
+                       Value="1"
+                       KeyPath="yes"/>
+      </Component>
+    </DirectoryRef>
+
+  </Fragment>
+</Wix>
