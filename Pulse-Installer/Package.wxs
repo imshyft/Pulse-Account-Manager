@@ -1,12 +1,12 @@
 ﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
      xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
-  <Package Id="shyft.Pulse" Name="Pulse" Manufacturer="shyft" Version="$(var.PulseVersion)" UpgradeCode="AE2D7C84-7158-40D3-A7BD-1483FA523267">
+  <Package Id="shyft.Pulse" Name="Pulse" Manufacturer="shyft" Version="$(var.PulseVersion)" 
+           UpgradeCode="AE2D7C84-7158-40D3-A7BD-1483FA523267"
+           ProductCode="*">
     <MajorUpgrade 
       DowngradeErrorMessage="!(loc.DowngradeError)"/>
 
     <MediaTemplate EmbedCab="yes"/>
-
-    <!--<UIRef Id="UI_Minimal"/>-->
     
     <Feature Id="Main">
       <ComponentGroupRef Id="Program"/>

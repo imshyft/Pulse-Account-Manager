@@ -96,7 +96,7 @@ namespace Studio.Services
                 {
                     s.Appearance = ControlAppearance.Danger;
                     s.Title = "Could not fetch account";
-                    s.Content = "Please try again later, or re-add the account if it keeps failing";
+                    s.Content = "Please try again later, and make sure it is a public profile";
                     s.Icon = new SymbolIcon(SymbolRegular.ErrorCircle24);
                 });
 

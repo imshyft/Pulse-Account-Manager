@@ -28,7 +28,7 @@
             <ui:Button
             HorizontalAlignment="Stretch"
             Visibility="{Binding IsSelectingMode, Converter={StaticResource BooleanToVisibilityConverter}}"
-            Margin="{StaticResource SmallTopMargin}"
+            Margin="{StaticResource MediumTopMargin}"
             Height="35"
             Content="Manually enter Battletag"
             Command="{Binding SelectManualEntryCommand}"/>

@@ -17,6 +17,7 @@ using Studio.Controls;
 using Studio.Dialogs;
 using Studio.Models;
 using Studio.Services;
+using Studio.Services.ApplicationServices;
 using Studio.Services.Data;
 using Studio.Services.Files;
 using Studio.Services.Storage;
@@ -44,6 +45,7 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
     private readonly BattleNetService _battleNetService;
     private readonly UserProfileDataService _userProfiles;
     private readonly CustomSnackbarService _snackbarService;
+    private readonly UpdaterService _updaterService;
     private readonly IAppPaths _appPaths;
 
     private readonly int favouritesPanelExpandedWidth = 250;
@@ -71,9 +73,11 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
         GroupSelectionService = ((App)Application.Current).GetService<GroupSelectionService>();
         _battleNetService = ((App)Application.Current).GetService<BattleNetService>();
         _snackbarService = ((App)Application.Current).GetService<CustomSnackbarService>();
+        _updaterService = ((App)Application.Current).GetService<UpdaterService>();
         _appPaths = ((App)Application.Current).GetService<IAppPaths>();
-        
-        
+
+        Loaded += OnMainPageLoaded;
+
         _snackbarService.SetSnackbarPresenter(SnackbarPresenter);
         foreach (var profile in _favouriteProfiles.Profiles)
         {
@@ -97,6 +101,38 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
         }
 
         mainContentFrame.NavigationService.Navigated += OnContentFrameNavigated;
+    }
+
+    private async void OnMainPageLoaded(object sender, RoutedEventArgs e)
+    {
+
+
+        var updateFound = await _updaterService.AppUpdater.CheckForUpdatesAsync();
+        if (!updateFound)
+            return;
+
+        Debug.WriteLine($"Update found: {updateFound}");
+        _snackbarService.Show(true, s =>
+        {
+            s.Appearance = ControlAppearance.Success;
+            s.Title = "New Update Available";
+            s.Content = "A new version of Pulse is available. Click to download.";
+            s.Timeout = TimeSpan.FromSeconds(10);
+            s.MouseLeftButtonUp += OnUpdateSnackbarClick;
+        });
+    }
+
+    private async void OnUpdateSnackbarClick(object sender, MouseButtonEventArgs e)
+    {
+        if (ShellWindow.Instance == null)
+            return;
+
+        ContentPresenter dialogPresenter = ShellWindow.Instance.DialogPresenter;
+        if (dialogPresenter == null)
+            return;
+
+        var dialog = new UpdateDetailsDialog(dialogPresenter);
+        var result = await dialog.ShowAsync();
     }
 
     // limit navigation history to 10 to free memory

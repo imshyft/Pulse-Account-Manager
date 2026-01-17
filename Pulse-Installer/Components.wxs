@@ -1,7 +1,7 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
   <Fragment>
     <ComponentGroup Id="Program" Directory="INSTALLFOLDER">
-      <Files Include="$(var.Pulse.ProjectDir)bin\publish\Pulse\**\*"/>
+      <Files Include="$(var.Pulse.ProjectDir)bin\publish\Pulse-$(var.PulseVersion)\**\*"/>
     </ComponentGroup>
 
     <DirectoryRef Id="AppProgramMenuFolder">

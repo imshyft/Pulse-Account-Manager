@@ -86,7 +86,7 @@ public partial class App : Application
         services.AddSingleton<CustomSnackbarService>();
         services.AddSingleton<AccountActionsService>();
         services.AddSingleton<INavigationService, NavigationService>();
-
+        services.AddSingleton<UpdaterService>();
 #if SAMPLE
         services.AddSingleton<UserProfileDataService, SampleUserProfileDataService>();
         services.AddSingleton<FavouriteProfileDataService, SampleFavouriteProfileDataService>();
