@@ -106,20 +106,26 @@ public partial class MainPage : Page, INotifyPropertyChanged, INavigationAware
     private async void OnMainPageLoaded(object sender, RoutedEventArgs e)
     {
 
-
-        var updateFound = await _updaterService.AppUpdater.CheckForUpdatesAsync();
-        if (!updateFound)
-            return;
-
-        Debug.WriteLine($"Update found: {updateFound}");
-        _snackbarService.Show(true, s =>
+        try
         {
-            s.Appearance = ControlAppearance.Success;
-            s.Title = "New Update Available";
-            s.Content = "A new version of Pulse is available. Click to download.";
-            s.Timeout = TimeSpan.FromSeconds(10);
-            s.MouseLeftButtonUp += OnUpdateSnackbarClick;
-        });
+            var updateFound = await _updaterService.AppUpdater.CheckForUpdatesAsync();
+            if (!updateFound)
+                return;
+
+            Debug.WriteLine($"Update found: {updateFound}");
+            _snackbarService.Show(true, s =>
+            {
+                s.Appearance = ControlAppearance.Success;
+                s.Title = "New Update Available";
+                s.Content = "A new version of Pulse is available. Click to download.";
+                s.Timeout = TimeSpan.FromSeconds(10);
+                s.MouseLeftButtonUp += OnUpdateSnackbarClick;
+            });
+        }
+        catch (Exception _)
+        {
+        }
+
     }
 
     private async void OnUpdateSnackbarClick(object sender, MouseButtonEventArgs e)

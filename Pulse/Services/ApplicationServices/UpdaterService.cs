@@ -9,8 +9,8 @@ namespace Studio.Services.ApplicationServices
 {
     public class UpdaterService
     {
-        private const string RepositoryOwner = "pressctrlkey";
-        private const string RepositoryName = "launcher-updater-test";
+        private const string RepositoryOwner = "imshyft";
+        private const string RepositoryName = "Pulse-Account-Manager";
 
         private readonly UpdatumManager _appUpdater = new(RepositoryOwner, RepositoryName)
         {

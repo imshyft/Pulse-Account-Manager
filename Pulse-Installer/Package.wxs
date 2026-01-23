@@ -4,7 +4,9 @@
            UpgradeCode="AE2D7C84-7158-40D3-A7BD-1483FA523267"
            ProductCode="*">
     <MajorUpgrade 
-      DowngradeErrorMessage="!(loc.DowngradeError)"/>
+      AllowSameVersionUpgrades="no"
+      AllowDowngrades="yes"/>
+    
 
     <MediaTemplate EmbedCab="yes"/>
     
@@ -14,3 +16,4 @@
     </Feature>
   </Package>
 </Wix>
+  

@@ -12,6 +12,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Directory.Build.props = Directory.Build.props
 	EndProjectSection
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Pulse Launcher", "Pulse Launcher\Pulse Launcher.vdproj", "{003ED2CF-C3D4-74C1-319D-A336F81B5D11}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug_NewUser|Any CPU = Debug_NewUser|Any CPU
@@ -96,6 +98,22 @@ Global
 		{4FBA6CB1-0531-B5BD-05DA-4CD1ABE68608}.Sample|x64.Build.0 = Release|x64
 		{4FBA6CB1-0531-B5BD-05DA-4CD1ABE68608}.Sample|x86.ActiveCfg = Release|x86
 		{4FBA6CB1-0531-B5BD-05DA-4CD1ABE68608}.Sample|x86.Build.0 = Release|x86
+		{003ED2CF-C3D4-74C1-319D-A336F81B5D11}.Debug_NewUser|Any CPU.ActiveCfg = Debug
+		{003ED2CF-C3D4-74C1-319D-A336F81B5D11}.Debug_NewUser|ARM64.ActiveCfg = Debug
+		{003ED2CF-C3D4-74C1-319D-A336F81B5D11}.Debug_NewUser|x64.ActiveCfg = Debug
+		{003ED2CF-C3D4-74C1-319D-A336F81B5D11}.Debug_NewUser|x86.ActiveCfg = Debug
+		{003ED2CF-C3D4-74C1-319D-A336F81B5D11}.Debug|Any CPU.ActiveCfg = Debug
+		{003ED2CF-C3D4-74C1-319D-A336F81B5D11}.Debug|ARM64.ActiveCfg = Debug
+		{003ED2CF-C3D4-74C1-319D-A336F81B5D11}.Debug|x64.ActiveCfg = Debug
+		{003ED2CF-C3D4-74C1-319D-A336F81B5D11}.Debug|x86.ActiveCfg = Debug
+		{003ED2CF-C3D4-74C1-319D-A336F81B5D11}.Release|Any CPU.ActiveCfg = Release
+		{003ED2CF-C3D4-74C1-319D-A336F81B5D11}.Release|ARM64.ActiveCfg = Release
+		{003ED2CF-C3D4-74C1-319D-A336F81B5D11}.Release|x64.ActiveCfg = Release
+		{003ED2CF-C3D4-74C1-319D-A336F81B5D11}.Release|x86.ActiveCfg = Release
+		{003ED2CF-C3D4-74C1-319D-A336F81B5D11}.Sample|Any CPU.ActiveCfg = Release
+		{003ED2CF-C3D4-74C1-319D-A336F81B5D11}.Sample|ARM64.ActiveCfg = Release
+		{003ED2CF-C3D4-74C1-319D-A336F81B5D11}.Sample|x64.ActiveCfg = Release
+		{003ED2CF-C3D4-74C1-319D-A336F81B5D11}.Sample|x86.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
